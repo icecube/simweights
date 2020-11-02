@@ -15,7 +15,7 @@ class GenerationSurfaceCollection:
             if key not in self.spectra:
                 self.spectra[key]=[]
             self.spectra[key].append(dist)
-            
+
     def __call__(self, particle_type, energy, cos_zen):
         energy = np.asarray(energy)
         cos_zen = np.asarray(cos_zen)
@@ -76,3 +76,26 @@ class GenerationSurfaceCollection:
                 if sum(p1 == p2 for p2 in s2) != 1:
                     return False
         return True
+
+    def __repr__(self):
+        return (self.__class__.__name__+'(['+
+                ','.join(repr(x) for x in self.spectra.values())+'])')
+
+    def __str__(self):
+        
+
+
+        
+        s=[]
+        for p,d in self.spectra.items():
+
+            collections = []            
+            for x in d:
+                collections.append( 'N={:8.4g} {} {}'.format(x.nevents,x.spectrum,x.surface) )                
+            s.append('     {:11} : '.format(x.particle_name)+
+                     '                 \n'.join(collections))
+                
+        return '< '+self.__class__.__name__ + '\n'+ '\n'.join(s) + '\n>'
+        
+            
+    

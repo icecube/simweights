@@ -5,14 +5,17 @@ import copy
 class GenerationSurface:
     def __init__(self,particle_type,nevents,spectrum,surface):
         self.particle_type=particle_type
+        self.particle_name=PDGCode(self.particle_type).name
         self.nevents=nevents        
         self.spectrum=spectrum        
         self.surface=surface
         self.enorm = self.spectrum.total_integral()
         
-    def __call__(self,energy,cos_zen):
-        return ( self.nevents * self.spectrum.eval(energy)
-                 /self.spectrum.total_integral() /self.surface.area_weight(cos_zen))
+        
+    def __call__(self,energy,cos_zen):        
+        return (self.nevents * self.spectrum.eval(energy)
+                /self.spectrum.total_integral() /self.surface.area_weight(cos_zen))
+
     def __imul__(self, factor):
         self.nevents *= factor
         return self
@@ -38,6 +41,6 @@ class GenerationSurface:
  
     def __repr__(self):
         return "{}({}, {:7.3e}, {}, {})".format(
-            self.__class__.__name__, PDGCode(self.particle_type).name,
+            self.__class__.__name__, self.particle_name,
             self.nevents, self.spectrum, self.surface)
     

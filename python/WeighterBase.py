@@ -1,8 +1,6 @@
 import numpy as np
 from . import Null
 
-from pprint import pprint
-
 def append_dicts(first,second):
     if not first:
         return second
@@ -27,9 +25,11 @@ def check_run_counts(table,nfiles):
     return ret
 
 class Weighter:
-    def __init__(self,surface,event_data,flux_map,surface_map,weight_name):
-        for k,v in vars().items():
-            setattr(self,k,v)
+    def __init__(self,surface,event_data,flux_map):
+        self.surface =  surface
+        self.event_data = event_data
+        self.flux_map = flux_map
+
         l=None
         for v in self.event_data.values():
             if l is None:
@@ -38,10 +38,14 @@ class Weighter:
                 assert l==len(v)
                 
     def get_weights(self,flux):
+
         flux_params = { k:self.event_data[v] for k,v in self.flux_map.items()}
-        surface_params = { k:self.event_data[v] for k,v in self.surface_map.items()}
-        event_weight = self.event_data[self.weight_name]
-        return event_weight * flux(**flux_params) / self.surface(**surface_params)       
+        surface = self.surface(particle_type=self.event_data['type'],
+                               energy=self.event_data['energy'],
+                               cos_zen=self.event_data['cos_zenith'])
+        
+        event_weight = self.event_data['weight']
+        return event_weight * flux(**flux_params) / surface
 
     def is_null(self):
         return (isinstance(self.surface,Null)
@@ -76,7 +80,7 @@ def NullWeighter():
     return Weighter(Null(),{},{},{},{})
 
 def make_weighter(info_obj,weight_obj,surface_func, surface_from_weight_table,
-                  event_data_func, flux_map,surface_map,weight_name):
+                  event_data_func, flux_map):
 
     def _weighter(infile,sframe=True,nfiles=None):
 
@@ -100,6 +104,6 @@ def make_weighter(info_obj,weight_obj,surface_func, surface_from_weight_table,
             check_run_counts(weight_table,nfiles)
 
         event_data=event_data_func(weight_table)
-        return Weighter(surface,event_data,flux_map,surface_map,weight_name)
+        return Weighter(surface,event_data,flux_map)
 
     return _weighter

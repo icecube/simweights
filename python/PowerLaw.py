@@ -6,9 +6,8 @@ class PowerLaw:
         self.emin=emin
         self.emax=emax        
     def eval(self,value:float) -> float:
-        return np.where( (value > self.emin) & (value < self.emax),
-                         value**self.gamma,
-                         0)
+        return value**self.gamma
+        
     def integral(self,a:float,b:float) -> float:
         if self.gamma == -1:
             return np.log(b/a)

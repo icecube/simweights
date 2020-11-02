@@ -1,8 +1,7 @@
 import numpy as np
 import inspect
 from . import Null,UprightCylinder,PowerLaw,GenerationSurface,GenerationSurfaceCollection,ZenithBias
-from pprint import pprint
-from .utils import get_constant_column
+from .utils import get_constant_column,check_nfiles
 
 class WeighterBase:
     def __init__(self,infile,sframe=True,nfiles=None):        
@@ -31,7 +30,7 @@ class WeighterBase:
 
     def check_run_counts(self,infile):
         table = getattr(infile.root,self._weight_obj)
-        runs,counts = np.unique(table.cols.Run[:],return_counts=True)
+        #runs,counts = np.unique(table.cols.Run[:],return_counts=True)
         #more sophisticated checks go here
         if len(runs)==self.nfiles:
             s = 'OK'

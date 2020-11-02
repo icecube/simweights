@@ -45,52 +45,14 @@ def corsika_info_func(table):
              for i,p in enumerate(v["ParticleType"])]
 
 def corsika_event_data(weight_table):
-    return dict(PrimaryEnergy=weight_table.cols.PrimaryEnergy[:],
-                PrimaryType  =weight_table.cols.PrimaryType[:].astype(np.int32),
-                cos_zen      = np.full(len(weight_table),np.nan),
-                Weight       = weight_table.cols.Weight[:])
+    return dict(energy     = weight_table.cols.PrimaryEnergy[:],
+                type       = weight_table.cols.PrimaryType[:].astype(np.int32),
+                cos_zenith = np.full(len(weight_table),np.nan),
+                weight     = weight_table.cols.Weight[:])
 
-corsika_flux_map = dict(E='PrimaryEnergy',ptype='PrimaryType')
-corsika_surface_map = dict(energy='PrimaryEnergy',particle_type='PrimaryType',cos_zen='cos_zen')
+corsika_flux_map = dict(E='energy',ptype='type')
 
 CorsikaWeighter = make_weighter("I3CorsikaInfo", "CorsikaWeightMap",
                                 corsika_surface_func,corsika_info_func,
                                 corsika_event_data,
-                                corsika_flux_map,corsika_surface_map,'Weight')
-
-
-
-def primary_injector_surface_func(primary_type,n_events,
-                                  cylinder_height,cylinder_radius,min_zenith,max_zenith,
-                                  min_energy,max_energy,power_law_index,zenith_bias,
-                                  **kwargs):
-    surface = UprightCylinder(cylinder_height,cylinder_radius,
-                              np.cos(max_zenith),np.cos(min_zenith),
-                              ZenithBias(zenith_bias))
-
-    assert(power_law_index<0)
-    spectrum = PowerLaw(power_law_index,min_energy,max_energy)        
-    s= GenerationSurface( primary_type,n_events,spectrum,surface)
-    return s
-
-def primary_injector_info_func(table):
-    raise Error("primary injector must have 'S' Frame")
-
-def primary_injector_event_data(weight_table):
-    return dict(energy       = weight_table.cols.energy[:],
-                type         = weight_table.cols.type[:].astype(np.int32),
-                cos_zen      = np.cos(weight_table.cols.zenith[:]),
-                weight       = np.full(len(weight_table),1.),
-                )
-
-primary_injector_flux_map = dict(E='energy',ptype='type')
-primary_injector_surface_map = dict(energy='energy',particle_type='type',cos_zen='cos_zen')
-
-
-PrimaryWeighter = make_weighter("I3PrimaryInjectorInfo", "I3MCPrimary",
-                                primary_injector_surface_func,
-                                primary_injector_info_func,
-                                primary_injector_event_data,
-                                primary_injector_flux_map,
-                                primary_injector_surface_map,
-                                'weight')
+                                corsika_flux_map)

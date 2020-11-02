@@ -6,6 +6,7 @@ from .PowerLaw import PowerLaw
 from .GenerationSurface import GenerationSurface
 from .GenerationSurfaceCollection import GenerationSurfaceCollection
 from .WeighterBase import Weighter,NullWeighter
-from .NuGenWeight import NuGenWeighter
-from .CorsikaWeighter import CorsikaWeighter,PrimaryWeighter
+#from .NuGenWeight import NuGenWeighter
+from .CorsikaWeighter import CorsikaWeighter
+from .PrimaryWeighter import PrimaryWeighter
 #from .fluxes import *
