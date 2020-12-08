@@ -1,14 +1,12 @@
 import numpy as np
-from . import UprightCylinder,ZenithBias,PowerLaw,GenerationSurface
+from . import GenerationSurface, VolumeCorrCylinder, PowerLaw
 from .WeighterBase import make_weighter
 
 def primary_injector_surface_func(
         primary_type,n_events, cylinder_height,cylinder_radius,min_zenith,
         max_zenith,min_energy,max_energy,power_law_index,**kwargs):
     
-    surface = UprightCylinder(cylinder_height,cylinder_radius,
-                              np.cos(max_zenith),np.cos(min_zenith),
-                              ZenithBias.VolumeCorr)
+    surface = VolumeCorrCylinder(cylinder_height, cylinder_radius, np.cos(max_zenith), np.cos(min_zenith))
     assert(power_law_index<0)
     spectrum = PowerLaw(power_law_index, min_energy, max_energy)        
     s = GenerationSurface(primary_type, n_events, spectrum, surface)

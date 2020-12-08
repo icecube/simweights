@@ -1,5 +1,5 @@
 import numpy as np
-from . import UprightCylinder,ZenithBias,PowerLaw,GenerationSurface
+from . import VolumeCorrCylinder,PowerLaw,GenerationSurface
 from .utils import get_constant_column
 from .WeighterBase import make_weighter
 
@@ -7,9 +7,8 @@ def corsika_surface_func(primary_type,n_events,oversampling,
             cylinder_height,cylinder_radius,min_zenith,max_zenith,
             min_energy,max_energy,power_law_index,
             **kwargs):
-    surface = UprightCylinder(cylinder_height,cylinder_radius,
-                              np.cos(max_zenith),np.cos(min_zenith),
-                              ZenithBias.VolumeCorr)
+    surface = VolumeCorrCylinder(cylinder_height, cylinder_radius, np.cos(max_zenith), np.cos(min_zenith))
+
     assert(power_law_index<0)
     spectrum = PowerLaw(power_law_index,min_energy,max_energy)        
     s= GenerationSurface( primary_type,n_events*oversampling,spectrum,surface)
@@ -45,14 +44,15 @@ def corsika_info_func(table):
              for i,p in enumerate(v["ParticleType"])]
 
 def corsika_event_data(weight_table):
-    return dict(energy     = weight_table.cols.PrimaryEnergy[:],
-                type       = weight_table.cols.PrimaryType[:].astype(np.int32),
-                cos_zenith = np.full(len(weight_table),np.nan),
-                weight     = weight_table.cols.Weight[:])
+    print(dir(weight_table.cols))
+    return dict(energy     = weight_table.cols.energy[:],
+                type       = weight_table.cols.pdg_encoding[:],
+                cos_zenith = np.cos(weight_table.cols.zenith[:]),
+                weight     = np.full(len(weight_table),1))
 
 corsika_flux_map = dict(E='energy',ptype='type')
 
-CorsikaWeighter = make_weighter("I3CorsikaInfo", "CorsikaWeightMap",
+CorsikaWeighter = make_weighter("I3CorsikaInfo", "PolyplopiaPrimary",
                                 corsika_surface_func,corsika_info_func,
                                 corsika_event_data,
                                 corsika_flux_map)

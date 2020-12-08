@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from . import PDGCode
+from .fluxes import PDGCode
 
 class GenerationSurface:
     def __init__(self,particle_type,nevents,spectrum,surface):
@@ -9,11 +9,10 @@ class GenerationSurface:
         self.nevents=nevents        
         self.spectrum=spectrum        
         self.surface=surface
-        self.enorm = self.spectrum.total_integral()
         
     def __call__(self,energy,cos_zen):        
-        return (self.nevents * self.spectrum.eval(energy)
-                /self.spectrum.total_integral() /self.surface.area_weight(cos_zen))
+        r = (self.nevents * self.spectrum.pdf(energy) * self.surface.pdf(cos_zen))
+        return r
 
     def __imul__(self, factor):
         self.nevents *= factor

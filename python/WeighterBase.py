@@ -1,5 +1,17 @@
 import numpy as np
-from . import Null
+
+class Null:
+    """
+    An identity object, useful as a starting point for accumulators, e.g.::
+
+    total = Null()
+    for i in range(10):
+        total += SomeClassThatImplementsAddition(i)
+    """
+    def __iadd__(self, other):
+        return other
+    def __eq__(self, other):
+        return isinstance(other, Null) or 0 == other
 
 def append_dicts(first,second):
     if not first:
@@ -43,9 +55,11 @@ class Weighter:
         surface = self.surface(particle_type=self.event_data['type'],
                                energy=self.event_data['energy'],
                                cos_zen=self.event_data['cos_zenith'])
-        
         event_weight = self.event_data['weight']
-        return event_weight * flux(**flux_params) / surface
+        w = event_weight * flux(**flux_params) / surface
+        #this shouldn't be here but corsika keeps decreacing the energy of primaries for some reason
+        w[w==np.inf]=0
+        return w
 
     def is_null(self):
         return (isinstance(self.surface,Null)
