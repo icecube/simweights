@@ -221,7 +221,6 @@ flux_values = {
 }
 
 from icecube.simweights import fluxes
-from icecube.simweights.enums import PDGCode
 
 import numpy as np
 import unittest
@@ -241,15 +240,10 @@ class TestCosmicRayModels(unittest.TestCase):
         assert ((abs(v1[v2!=0]/v2[v2!=0]-1)<1e-13).all())
     
     def test_corsika_to_pdg(self):
-        c = [14,  402,  703,  904, 1105, 1206, 1407, 1608, 1909, 2010, 2311, 
-           2412, 2713, 2814, 3115, 3216, 3517, 4018, 3919, 4020, 4521, 4822, 
-           5123, 5224, 5525, 5626]
-        pdg = [ 2212, 1000020040, 1000030070, 1000040090, 1000050110, 1000060120,
-          1000070140, 1000080160, 1000090190, 1000100200, 1000110230, 1000120240, 
-          1000130270, 1000140280, 1000150310, 1000160320, 1000170350, 1000180400, 
-          1000190390, 1000200400, 1000210450, 1000220480, 1000230510, 1000240520, 
-          1000250550, 1000260560]
-        assert (fluxes.corsika_to_pdg(c)==pdg).all()
+        c = [14,  402,  703,  904, 1105, 1206, 1407, 1608, 1909, 2010, 2311, 2412, 2713, 
+           2814, 3115, 3216, 3517, 4018, 3919, 4020, 4521, 4822, 5123, 5224, 5525, 5626]
+        pdg = list(flux_values["Hoerandel"].keys())
+        assert np.all(fluxes.corsika_to_pdg(c) == pdg)
 
 for m in flux_values.keys():
     setattr(TestCosmicRayModels,'test_'+m,lambda self,m=m: self.flux_cmp(m))

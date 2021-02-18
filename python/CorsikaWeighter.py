@@ -16,6 +16,10 @@ def corsika_surface_func(primary_type,n_events,oversampling,
 
 def read_corsika_columns(table):
     vals = {}
+
+
+    print(table)
+    
     vals["ParticleType"] = sorted(np.unique(table.cols.ParticleType[:].astype(int)))
     for x in ("CylinderLength","CylinderRadius","ThetaMin","ThetaMax",
               "OverSampling","Weight"):
@@ -29,8 +33,8 @@ def read_corsika_columns(table):
             vals[x].append(get_constant_column(getattr(table.cols,x)[:][mask]))            
     return vals
 
-def corsika_info_func(table):
-    v =read_corsika_columns(table)
+def corsika_info_func(f):
+    v =read_corsika_columns(f.root.CorsikaWeightMap)
     return [ dict(primary_type    = p,                        
                   n_events        = v['NEvents'][i],
                   oversampling    = v["OverSampling"],
@@ -46,7 +50,7 @@ def corsika_info_func(table):
 def corsika_event_data(weight_table):
     print(dir(weight_table.cols))
     return dict(energy     = weight_table.cols.energy[:],
-                type       = weight_table.cols.pdg_encoding[:],
+                type       = weight_table.cols.type[:],
                 cos_zenith = np.cos(weight_table.cols.zenith[:]),
                 weight     = np.full(len(weight_table),1))
 

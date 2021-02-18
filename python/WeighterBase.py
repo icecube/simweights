@@ -93,7 +93,7 @@ class Weighter:
 def NullWeighter():
     return Weighter(Null(),{},{},{},{})
 
-def make_weighter(info_obj,weight_obj,surface_func, surface_from_weight_table,
+def make_weighter(info_obj,weight_obj,surface_func, surface_from_file,
                   event_data_func, flux_map):
 
     def _weighter(infile,sframe=True,nfiles=None):
@@ -108,7 +108,7 @@ def make_weighter(info_obj,weight_obj,surface_func, surface_from_weight_table,
                 surface += surface_func(**d)       
         else:
             assert(nfiles is not None)
-            infos = surface_from_weight_table(weight_table)
+            infos = surface_from_file(infile)
             surface=Null()
             for i in infos:
                 surface += surface_func(**i)

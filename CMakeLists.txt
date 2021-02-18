@@ -5,4 +5,6 @@ i3_project(simweights
 i3_test_scripts(
   resources/tests/compare_fluxes.py
   resources/tests/test_fluxes.py
+  resources/tests/test_cylinder.py
+  resources/tests/test_powerlaw.py
   )
