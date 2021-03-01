@@ -75,9 +75,9 @@ class CosmicRayFlux:
     def _condition(self,E,pt):
         return [ pt == p for p in self.ptypes ]
 
-    def __call__(self,E,pt):
-        E, pt = broadcast_arrays(E, pt)
-        pcond = self._condition(E, pt)
+    def __call__(self,E,ptype):
+        E, ptype = broadcast_arrays(E, ptype)
+        pcond = self._condition(E, ptype)
         return piecewise(E, pcond, self._funcs)
 
 class Hoerandel(CosmicRayFlux):

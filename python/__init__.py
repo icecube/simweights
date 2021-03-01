@@ -1,5 +1,5 @@
 #from .units import TeV
-from .cylinder import VolumeCorrCylinder
+from .cylinder import VolumeCorrCylinder,VolumeDetCylinder
 from .powerlaw import PowerLaw
 from .GenerationSurface import GenerationSurface,GenerationSurfaceCollection
 from .WeighterBase import Weighter,NullWeighter
