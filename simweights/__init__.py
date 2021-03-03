@@ -1,4 +1,11 @@
-#from .units import TeV
+"""
+SimWeights
+
+Pure python library for weighting IceCube simulation
+"""
+
+__version__ = '0.1'
+
 from .cylinder import VolumeCorrCylinder,VolumeDetCylinder
 from .powerlaw import PowerLaw
 from .GenerationSurface import GenerationSurface,GenerationSurfaceCollection
