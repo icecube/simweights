@@ -8,9 +8,8 @@ However they have been refactored to:
 * Use :py:func:`numpy.piecewise` instad of :py:mod:`numexpr`
 * Follow :py:mod:`numpy` broadcasting rules
 
-
 """
-from enum import Enum,IntEnum
+from enum import Enum, IntEnum
 from numpy import asarray, broadcast_arrays, equal, meshgrid, piecewise, exp, sqrt
 
 class PDGCode(IntEnum):
@@ -49,14 +48,14 @@ def corsika_to_pdg(code):
     numbering scheme. 
 
     This function will only convert codes that correspond to 
-    nuclei needed for the flux models in this module. That includes PPlus(14) 
+    nuclei needed for the flux models in this module. That includes PPlus (14) 
     and He4Nucleus (402) through Fe56Nucleus (5626).
 
     Args:
-        code (array_like): CORSIKA code to convert to PDG
+        code (array_like): CORSIKA codes
 
     Returns:
-        array_like: PDG code 
+        array_like: PDG codes
     """
     code = asarray(code)
     return piecewise(code, [code == 14, (code >= 100) & (code <= 9999) ], 
@@ -351,5 +350,5 @@ class FixedFractionFlux(CosmicRayFlux):
         E, ptype = broadcast_arrays(E, ptype)
         v = sum(self.flux(E, p) for p in self.ptypes)
         cond = self._condition(E, ptype)
-        p = piecewise(E,cond, self.fracs)
+        p = piecewise(E, cond, self.fracs)
         return p * v

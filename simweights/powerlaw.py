@@ -31,6 +31,8 @@ class PowerLaw:
         else:
             self.I = (self.b**self.G - self.a**self.G) / self.G
 
+        self.span = b - a 
+
     def _pdf(self, x: float) -> float:
         return x**self.g / self.I
 
@@ -57,7 +59,8 @@ class PowerLaw:
             array_like: Probability density function evaluated at `x`
         """
         #print('pdf',x,[x<self.a,x>self.b])
-        return np.piecewise(np.asfarray(x), [(x >= self.a) & (x <= self.b)], [self._pdf])
+        x = np.asfarray(x)
+        return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
     def cdf(self, x: float) -> float:
         r"""

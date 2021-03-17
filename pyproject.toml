@@ -7,7 +7,7 @@ module = "simweights"
 author = "Kevin Meagher"
 author-email = "kmeagher@icecube.wisc.edu"
 home-page = "https://github.com/icecube/simweights"
-requires = ["numpy"]
+requires = ["numpy","pandas"]
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',

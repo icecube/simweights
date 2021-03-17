@@ -220,7 +220,7 @@ flux_values = {
                  1.363932529828272e-18,  8.020822568423635e-22,  6.771998772413694e-25]}
 }
 
-from icecube.simweights import fluxes
+from simweights import fluxes
 
 import numpy as np
 import unittest

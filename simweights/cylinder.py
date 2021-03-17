@@ -45,7 +45,8 @@ class VolumeDetCylinder(CylinderBase):
         return 1 / (2 * np.pi * self.projected_area(x))
     
     def pdf(self,x):
-        return np.piecewise(np.asfarray(x), [(x >= self.a) & (x <= self.b)], [self._pdf])
+        x = np.asfarray(x)
+        return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
 
 class VolumeCorrCylinder(CylinderBase):
@@ -58,5 +59,6 @@ class VolumeCorrCylinder(CylinderBase):
         self._N = 1 / self.etendue 
 
     def pdf(self, x):
-        return np.piecewise(np.asfarray(x), [(x >= self.a) & (x <= self.b)], [self._N])
+        x = np.asfarray(x)
+        return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._N])
     

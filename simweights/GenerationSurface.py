@@ -3,39 +3,42 @@ import numpy as np
 from .fluxes import PDGCode
 
 class GenerationSurface:
-    def __init__(self,particle_type,nevents,spectrum,surface):
-        self.particle_type=particle_type
-        self.particle_name=PDGCode(self.particle_type).name
-        self.nevents=nevents        
-        self.spectrum=spectrum        
-        self.surface=surface
+    def __init__(self, particle_type, nevents, spectrum, surface):
+        self.particle_type = particle_type
+        self.particle_name = PDGCode(self.particle_type).name
+        self.nevents = nevents
+        self.spectrum = copy.deepcopy(spectrum)
+        self.surface = copy.deepcopy(surface)
         
-    def __call__(self,energy,cos_zen):        
-        r = (self.nevents * self.spectrum.pdf(energy) * self.surface.pdf(cos_zen))
-        return r
+    def get_extended_pdf(self, particle_type, energy, cos_zen):
+        assert(np.all(particle_type == self.particle_type))
+        return self.nevents * self.spectrum.pdf(energy) * self.surface.pdf(cos_zen)
 
-    def __imul__(self, factor):
-        self.nevents *= factor
-        return self
-
-    def __eq__(self,other):
-        return self.is_compatible(other) and self.nevents==other.nevents
-        
+    def get_surface_area(self):
+        return (self.spectrum.span*self.surface.etendue)
+    
     def is_compatible(self, other):
         return (isinstance(other, type(self)) and
                 self.particle_type == other.particle_type and
-                self.spectrum==other.spectrum and
-                self.surface ==other.surface)
+                self.spectrum == other.spectrum and
+                self.surface == other.surface)
+
+    def __eq__(self,other):
+        return self.is_compatible(other) and self.nevents == other.nevents
     
-    def __iadd__(self, other):
+    def __add__(self, other):
         if isinstance(other, type(self)):
             if self.is_compatible(other):
                 self.nevents += other.nevents
                 return self
             else:
-                return GenerationSurfaceCollection([copy.deepcopy(self), other])
+                return GenerationSurfaceCollection([self, other])
         else:
             raise TypeError("Can't add a %s to this %s" % (type(other).__name__, type(self).__name__))
+
+    def __imul__(self, factor):
+        self.nevents *= factor
+        return self
  
     def __repr__(self):
         return "{}({}, {:7.3e}, {}, {})".format(
@@ -51,23 +54,24 @@ class GenerationSurfaceCollection:
         :param spectra: a collection of GenerationProbabilities.
         """
         #from collections import defaultdict
-        self.spectra = {}#defaultdict(list)
+        self.spectra = {}
         for dist in spectra:
             key = int(dist.particle_type)
             if key not in self.spectra:
-                self.spectra[key]=[]
-            self.spectra[key].append(dist)
+                self.spectra[key] = []
+            self.spectra[key].append(copy.deepcopy(dist))
 
-    def __call__(self, particle_type, energy, cos_zen):
+    def get_extended_pdf(self, particle_type, energy, cos_zen):
         energy = np.asarray(energy)
         cos_zen = np.asarray(cos_zen)
         count = np.zeros_like(energy)
+
         for ptype in np.unique(particle_type):
-            mask = particle_type==ptype
+            mask = (particle_type == ptype)
             if np.any(mask):
                 Em = energy[mask]
                 ctm = cos_zen[mask]
-                count[mask] += sum(p(Em, ctm) for p in self.spectra[ptype])
+                count[mask] += sum(p.get_extended_pdf(ptype, Em, ctm) for p in self.spectra[ptype])
         return count
 
     def __imul__(self, factor):
@@ -128,7 +132,7 @@ class GenerationSurfaceCollection:
         for p,d in self.spectra.items():
             collections = []            
             for x in d:
-                collections.append('N={:8.4g} {} {}'.format(x.nevents,x.spectrum,x.surface))
+                collections.append('N={:8.4g} {} {}'.format(x.nevents, x.spectrum, x.surface))
             s.append('     {:11} : '.format(x.particle_name)+
                      '                 \n'.join(collections))
         return '< '+self.__class__.__name__ + '\n'+ '\n'.join(s) + '\n>'

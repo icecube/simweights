@@ -1,10 +1,15 @@
 #!/usr/bin/env python
-from icecube.weighting import fluxes as oldfluxes 
-from icecube.simweights import fluxes as newfluxes
-from icecube.corsika_reader import CorsikaToPDG
+try:
+    from icecube.corsika_reader import CorsikaToPDG,PDGToCorsika,CorsikaToPDG
+    from icecube.weighting import fluxes as oldfluxes
+except ImportError:
+    oldfluxes=False
+
+from simweights import fluxes as newfluxes
 import numpy as np
 import unittest
 
+@unittest.skipUnless(oldfluxes, "IceTray libraries not found")
 class TestCosmicRayModels(unittest.TestCase):
     def flux_cmp(self, name):
         f1 = getattr(oldfluxes, name)()
@@ -32,13 +37,13 @@ class TestCosmicRayModels(unittest.TestCase):
         so do it in a sperate test
         """
         f= { 2212: .1, 1000020040: .2, 1000080160: .3, 1000260560: .4 }
-        f1 = oldfluxes.FixedFractionFlux(f)
+        f1 = oldfluxes.FixedFractionFlux({PDGToCorsika(p):x for p,x in f.items()})
         f2 = newfluxes.FixedFractionFlux(f)
         N = 1000
         E=np.logspace(2, 10, N)
-        self.assertEqual(f1.ptypes, f2.ptypes)
-        for p in f1.ptypes:
-            v1 = [ f1(EE, p) for EE in E ]
+        self.assertEqual([CorsikaToPDG(p) for p in f1.ptypes], f2.ptypes)
+        for p in f2.ptypes:
+            v1 = [ f1(EE, PDGToCorsika(p)) for EE in E ]
             v2 = f2(E, p)
             for i in range(N):
                 self.assertAlmostEqual(v1[i], v2[i], 17)

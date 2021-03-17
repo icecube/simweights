@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 
 class Null:
     """
@@ -50,15 +51,21 @@ class Weighter:
                 assert l==len(v)
                 
     def get_weights(self,flux):
+        
+        surface = self.surface.get_extended_pdf(
+            particle_type=self.event_data['type'],
+            energy=self.event_data['energy'],
+            cos_zen=self.event_data['cos_zenith'])
+        
+        mask = surface > 0
+        if not np.all(mask):
+            warnings.warn('simweights :: {} events out of {} were found to be outside the generation surface'
+                          .format(np.logical_not(mask).sum(),mask.size))
 
-        flux_params = { k:self.event_data[v] for k,v in self.flux_map.items()}
-        surface = self.surface(particle_type=self.event_data['type'],
-                               energy=self.event_data['energy'],
-                               cos_zen=self.event_data['cos_zenith'])
-        event_weight = self.event_data['weight']
-        w = event_weight * flux(**flux_params) / surface
-        #this shouldn't be here but corsika keeps decreacing the energy of primaries for some reason
-        w[w==np.inf]=0
+        flux_params = { k : self.event_data[v][mask] for k, v in self.flux_map.items()}        
+        event_weight = self.event_data['weight'][mask]      
+        w = np.zeros_like(surface)
+        w[mask] = event_weight * flux(**flux_params) / surface[mask] 
         return w
 
     def is_null(self):
@@ -96,7 +103,7 @@ def NullWeighter():
 def make_weighter(info_obj,weight_obj,surface_func, surface_from_file,
                   event_data_func, flux_map):
 
-    def _weighter(infile,sframe=True,nfiles=None):
+    def _weighter(infile, sframe=True, nfiles=None):
 
         weight_table = getattr(infile.root,weight_obj)
     
@@ -107,8 +114,9 @@ def make_weighter(info_obj,weight_obj,surface_func, surface_from_file,
                 d = {x:r[x] for x in info_table.colnames}
                 surface += surface_func(**d)       
         else:
-            assert(nfiles is not None)
             infos = surface_from_file(infile)
+            assert(nfiles is not None)
+            
             surface=Null()
             for i in infos:
                 surface += surface_func(**i)

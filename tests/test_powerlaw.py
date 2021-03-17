@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from scipy import stats
 from scipy.integrate import quad
-from icecube.simweights.powerlaw import PowerLaw
+from simweights.powerlaw import PowerLaw
 
 class TestPowerLaw(unittest.TestCase):
     def cmp_scipy(self,g,s):
