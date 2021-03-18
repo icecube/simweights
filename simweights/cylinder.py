@@ -25,7 +25,7 @@ class CylinderBase:
         return np.pi * (self._cap * x * np.abs(x) + self._side * (x * np.sqrt(1 - x**2) - np.arccos(x)))
 
     def pdf(self,x):
-        raise NotImplemented
+        raise NotImplementedError()
 
     def __repr__(self):
         return ("{}({},{},{:4.2f},{:4.2f})".format(self.__class__.__name__, self.length, self.radius, self.a, self.b))
@@ -35,18 +35,18 @@ class CylinderBase:
                 self.radius == other.radius and self.a == other.a and self.b == other.b)
 
 
-class VolumeDetCylinder(CylinderBase):
+#class VolumeDetCylinder(CylinderBase):
     """
     A Cylinder where the primary zenith distribution was uniform and then
     the events were sampled on the cross section perpendicular to the direction
     of the primary. 
     """
-    def _pdf(self, x):
-        return 1 / (2 * np.pi * self.projected_area(x))
+#    def _pdf(self, x):
+#        return 1 / (2 * np.pi * self.projected_area(x))
     
-    def pdf(self,x):
-        x = np.asfarray(x)
-        return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
+#    def pdf(self,x):
+#        x = np.asfarray(x)
+#        return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
 
 class VolumeCorrCylinder(CylinderBase):

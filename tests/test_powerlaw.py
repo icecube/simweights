@@ -20,11 +20,19 @@ class TestPowerLaw(unittest.TestCase):
         c1 = p1.cdf(x)
         x1 = p1.ppf(q)
 
-        assert(0 in x)
-        assert(s in x)
-        assert np.allclose(v0, v1)
-        assert np.allclose(c0, c1)
-        assert np.allclose(x0, x1, equal_nan=True)
+        self.assertIn(0,x)
+        self.assertIn(s,x)
+        np.testing.assert_array_almost_equal(v0, v1)
+        np.testing.assert_array_almost_equal(c0, c1)
+        np.testing.assert_array_almost_equal(x0, x1)
+
+        rep = str(p1)
+        self.assertEqual(rep[:9],"PowerLaw(")
+        self.assertEqual(rep[-1:],")")
+        v = rep[9:-1].split(',')
+        self.assertEqual(float(v[0]),g)
+        self.assertEqual(float(v[1]),0)
+        self.assertEqual(float(v[2]),s)
 
     def test_scipy(self):    
         self.cmp_scipy(0.0, 1)
@@ -37,29 +45,36 @@ class TestPowerLaw(unittest.TestCase):
     def check_vals(self,p):
         x= np.linspace(p.a, p.b, 51)
         v1 = p.pdf(x) * x**-p.g
-        assert np.allclose(v1, v1[0])
+        np.testing.assert_array_almost_equal(v1, v1[0])
         
         c0 = [ quad(p.pdf, p.a, xx)[0] for xx in x ]
         c1 = p.cdf(x)
-        assert np.allclose(c0, c1)
-        assert np.allclose(p.ppf(c1), x)
+        np.testing.assert_array_almost_equal(c0, c1)
+        np.testing.assert_array_almost_equal(p.ppf(c1), x)
         self.assertEqual(c1[0], 0)
         self.assertEqual(c1[-1], 1)
 
         x1 = np.linspace(p.b, p.b+2, 21)
-        assert np.all(p.pdf(x1[1:]) == 0)
-        assert np.all(p.cdf(x1) == 1)
+        np.testing.assert_array_equal(p.pdf(x1[1:]), 0)
+        np.testing.assert_array_equal(p.cdf(x1), 1)
         
         x2 = np.linspace(p.a - 2, p.a, 21)
-        assert np.all(p.pdf(x2[:-1]) == 0)
-        assert np.all(p.cdf(x2) == 0)
-        
-        assert np.all(np.isnan(p.ppf(np.linspace(-1, 0, 21)[:-1])))
-        assert np.all(np.isnan(p.ppf(np.linspace( 1, 2, 21)[1:])))
-        assert p.pdf(np.nan)==0
-        assert np.isnan(p.cdf(np.nan))
-        assert np.isnan(p.ppf(np.nan)) 
+        np.testing.assert_array_equal(p.pdf(x2[:-1]), 0)
+        np.testing.assert_array_equal(p.cdf(x2), 0)
 
+        np.testing.assert_array_equal(p.ppf(np.linspace(-1, 0, 21)[:-1]),np.nan)
+        np.testing.assert_array_equal(p.ppf(np.linspace( 1, 2, 21)[1:]),np.nan)
+        np.testing.assert_array_equal(p.pdf(np.nan),0)
+        np.testing.assert_array_equal(p.cdf(np.nan),np.nan)
+        np.testing.assert_array_equal(p.ppf(np.nan),np.nan)
+
+        rep = str(p)
+        self.assertEqual(rep[:9],"PowerLaw(")
+        self.assertEqual(rep[-1:],")")
+        v = rep[9:-1].split(',')
+        self.assertEqual(float(v[0]),p.g)
+        self.assertEqual(float(v[1]),p.a)
+        self.assertEqual(float(v[2]),p.b)
 
     def test_vals(self):
         self.check_vals(PowerLaw( 2, 1, 2))

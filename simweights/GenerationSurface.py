@@ -5,7 +5,10 @@ from .fluxes import PDGCode
 class GenerationSurface:
     def __init__(self, particle_type, nevents, spectrum, surface):
         self.particle_type = particle_type
-        self.particle_name = PDGCode(self.particle_type).name
+        try:
+            self.particle_name = PDGCode(particle_type).name
+        except ValueError:
+            self.particle_name = str(particle_type)
         self.nevents = nevents
         self.spectrum = copy.deepcopy(spectrum)
         self.surface = copy.deepcopy(surface)

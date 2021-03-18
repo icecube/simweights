@@ -6,7 +6,7 @@ Pure python library for weighting IceCube simulation
 
 __version__ = '0.1'
 
-from .cylinder import VolumeCorrCylinder,VolumeDetCylinder
+from .cylinder import VolumeCorrCylinder
 from .powerlaw import PowerLaw
 from .GenerationSurface import GenerationSurface,GenerationSurfaceCollection
 from .WeighterBase import Weighter,NullWeighter
