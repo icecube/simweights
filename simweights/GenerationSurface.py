@@ -1,4 +1,4 @@
-import copy
+from copy import deepcopy
 import numpy as np
 from .fluxes import PDGCode
 
@@ -10,8 +10,8 @@ class GenerationSurface:
         except ValueError:
             self.particle_name = str(particle_type)
         self.nevents = nevents
-        self.spectrum = copy.deepcopy(spectrum)
-        self.surface = copy.deepcopy(surface)
+        self.spectrum = deepcopy(spectrum)
+        self.surface = deepcopy(surface)
         
     def get_extended_pdf(self, particle_type, energy, cos_zen):
         assert(np.all(particle_type == self.particle_type))
@@ -32,17 +32,22 @@ class GenerationSurface:
     def __add__(self, other):
         if isinstance(other, type(self)):
             if self.is_compatible(other):
-                self.nevents += other.nevents
-                return self
+                r = deepcopy(self)
+                r.nevents = self.nevents + other.nevents
+                return r
             else:
                 return GenerationSurfaceCollection([self, other])
         else:
-            raise TypeError("Can't add a %s to this %s" % (type(other).__name__, type(self).__name__))
+            raise TypeError("Can't add %s to %s" % (type(other).__name__, type(self).__name__))
 
-    def __imul__(self, factor):
-        self.nevents *= factor
-        return self
- 
+    def __mul__(self, factor):
+        s = deepcopy(self)
+        s.nevents *= factor
+        return s
+
+    def __rmul__(self, factor):
+        return self * factor
+
     def __repr__(self):
         return "{}({}, {:7.3e}, {}, {})".format(
             self.__class__.__name__, self.particle_name,
@@ -56,18 +61,38 @@ class GenerationSurfaceCollection:
         """
         :param spectra: a collection of GenerationProbabilities.
         """
-        #from collections import defaultdict
         self.spectra = {}
-        for dist in spectra:
-            key = int(dist.particle_type)
-            if key not in self.spectra:
-                self.spectra[key] = []
-            self.spectra[key].append(copy.deepcopy(dist))
+        for s in spectra:
+            self._insert(s)
+
+    def _insert(self,surface):
+        assert type(surface)==GenerationSurface
+        key = int(surface.particle_type)
+        if key not in self.spectra:
+            self.spectra[key] = []
+
+        for i,s in enumerate(self.spectra[key]):
+            if surface.is_compatible(s):
+                self.spectra[key][i] = s + surface
+                break
+        else:
+            self.spectra[key].append(deepcopy(surface))
+
+    def __add__(self,other):
+        if isinstance(other, type(GenerationSurface)):
+            self._insert(other)
+        elif isinstance(other, type(GenerationSurfaceCollection)):
+            for pt, ospectra in other.spectra.items():
+                for ospec in ospectra:
+                    self._insert(other)
+        else:
+            raise ValueError("")
+        return self
 
     def get_extended_pdf(self, particle_type, energy, cos_zen):
         energy = np.asarray(energy)
         cos_zen = np.asarray(cos_zen)
-        count = np.zeros_like(energy)
+        count = np.zeros_like(energy, dtype=float)
 
         for ptype in np.unique(particle_type):
             mask = (particle_type == ptype)
@@ -86,29 +111,6 @@ class GenerationSurfaceCollection:
     def __idiv__(self, factor):
         self *= (1./factor)
         return self
-
-    def __iadd__(self, other):
-        if isinstance(other, type(self)):
-            for pt, ospectra in other.spectra.items():
-                for ospec in ospectra:
-                    for spec in self.spectra[pt]:
-                        if spec.is_compatible(ospec):
-                            spec += ospec
-                            break
-                    else:
-                        self.spectra[pt].append(ospec)
-            return self
-        else:
-            if other.particle_type in self.spectra:
-                for spec in self.spectra[other.particle_type]:
-                    if spec.is_compatible(other):
-                        spec += other
-                        break
-                else:
-                    self.spectra[other.particle_type].append(other)
-            else:
-                self.spectra[other.particle_type]=[other]
-            return self
 
     def __eq__(self, other):
         # must handle the same set of particle types

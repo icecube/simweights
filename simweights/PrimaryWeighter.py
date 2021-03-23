@@ -13,9 +13,9 @@ def primary_injector_surface_func(
     return s
 
 def primary_injector_info_func(table):
-    raise Exception("File `{}` is Missing S-Frames table `I3PrimaryInjectorInfo`, this is required for PrimaryInjector files"
-                    .format(table.filename)
-                    )
+    raise RuntimeError("File `{}` is Missing S-Frames table `I3PrimaryInjectorInfo`, this is required for PrimaryInjector files"
+                       .format(table.filename)
+                       )
 
 def primary_injector_event_data(weight_table):
     return dict(energy       = weight_table.cols.energy[:],
