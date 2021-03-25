@@ -1,5 +1,6 @@
 import numpy as np
 import warnings
+from .utils import has_table, get_table
 
 class Null:
     """
@@ -96,7 +97,6 @@ class Weighter:
         self.event_data=append_dicts(self.event_data,other.event_data)
         return self
         
-    
 def NullWeighter():
     return Weighter(Null(),{},{},{},{})
 
@@ -104,15 +104,15 @@ def make_weighter(info_obj,weight_obj,surface_func, surface_from_file,
                   event_data_func, flux_map):
 
     def _weighter(infile, sframe=True, nfiles=None):
+        weight_table = get_table(infile, weight_obj)
 
-        weight_table = getattr(infile.root,weight_obj)
-    
-        if sframe and hasattr(infile.root,info_obj):
-            info_table = getattr(infile.root,info_obj)
-            surface=Null()
-            for r in info_table.iterrows():
-                d = {x:r[x] for x in info_table.colnames}
-                surface += surface_func(**d)       
+        if sframe and has_table(infile, info_obj):
+            info_table = get_table(infile, info_obj)
+
+            surface = Null()
+            for row in info_table:
+                d = { x:row[x] for x in info_table.dtype.names }
+                surface += surface_func(**d)
         else:
             infos = surface_from_file(infile)
             assert(nfiles is not None)

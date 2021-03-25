@@ -105,6 +105,20 @@ class TestPowerLaw(unittest.TestCase):
         self.assertNotEqual(p1,PowerLaw(-1, 2, 10))
         self.assertNotEqual(p1,PowerLaw(-1, 1, 11))
 
+    def check_sample(self,g):
+        p = PowerLaw(g, 1, 1000)
+        N = 100000
+        x = p.ppf(np.linspace(1/2/N, 1 - 1/2/N, N))
+        w = 1/p.pdf(x)
+        self.assertAlmostEqual(w.sum() / N / p.span, 1, 2)
+
+    def test_sample(self):
+        self.check_sample(-.5)
+        self.check_sample(-1)
+        self.check_sample(-1.5)
+        self.check_sample(-2)
+        self.check_sample(-2.5)
+
 if __name__ == '__main__':
     unittest.main()
 

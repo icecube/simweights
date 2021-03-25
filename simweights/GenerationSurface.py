@@ -26,6 +26,9 @@ class GenerationSurface:
                 self.spectrum == other.spectrum and
                 self.surface == other.surface)
 
+    def get_energy_range(self, ptype):
+        return self.spectrum.a, self.spectrum.b
+
     def __eq__(self,other):
         return self.is_compatible(other) and self.nevents == other.nevents
     
@@ -79,14 +82,14 @@ class GenerationSurfaceCollection:
             self.spectra[key].append(deepcopy(surface))
 
     def __add__(self,other):
-        if isinstance(other, type(GenerationSurface)):
+        if isinstance(other, GenerationSurface):
             self._insert(other)
-        elif isinstance(other, type(GenerationSurfaceCollection)):
+        elif isinstance(other, GenerationSurfaceCollection):
             for pt, ospectra in other.spectra.items():
                 for ospec in ospectra:
                     self._insert(other)
         else:
-            raise ValueError("")
+            raise ValueError("Cannot add {} to {}".format(type(self),type(self)))
         return self
 
     def get_extended_pdf(self, particle_type, energy, cos_zen):
@@ -101,6 +104,19 @@ class GenerationSurfaceCollection:
                 ctm = cos_zen[mask]
                 count[mask] += sum(p.get_extended_pdf(ptype, Em, ctm) for p in self.spectra[ptype])
         return count
+
+    def get_energy_range(self, ptype):
+        if ptype not in self.spectra:
+            return [np.nan,np.nan]
+        assert len(self.spectra[ptype])
+        emin = np.inf
+        emax = -np.inf
+        for p in self.spectra[ptype]:
+            emin = min(emin,p.spectrum.a)
+            emax = min(emin,p.spectrum.b)
+        assert(np.isfinite(emin))
+        assert(np.isfinite(emax))
+        return emin, emax
 
     def __imul__(self, factor):
         for spectra in self.spectra.values():

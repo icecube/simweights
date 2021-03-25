@@ -1,6 +1,24 @@
 import numpy as np
 from scipy import stats
 
+def has_table(f, name: str):
+    if hasattr(f, 'root'):
+        return hasattr(f.root, name)
+    else:
+        return name in f.keys()
+
+def get_table(f, name: str):
+    if hasattr(f, 'root'):
+        return getattr(f.root, name)
+    else:
+        return f[name]
+
+def get_column(table, name: str):
+    if hasattr(table, 'cols'):
+        return getattr(table.cols, name)[:]
+    else:
+        return table[name]
+
 def get_constant_column(col):
     val = col[0]
     assert np.ndim(val)==0    
