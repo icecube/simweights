@@ -39,7 +39,7 @@ def check_run_counts(table,nfiles):
     return ret
 
 class Weighter:
-    def __init__(self,surface,event_data,flux_map):
+    def __init__(self, surface, event_data, flux_map):
         self.surface =  surface
         self.event_data = event_data
         self.flux_map = flux_map
@@ -50,7 +50,7 @@ class Weighter:
                 l = len(v)
             else:
                 assert l==len(v)
-                
+
     def get_weights(self,flux):
         
         surface = self.surface.get_extended_pdf(
@@ -79,13 +79,10 @@ class Weighter:
     def is_compatable(self,other):
         if self.is_null() or other.is_null():
             return True
-
         return ( self.event_data.keys()==other.event_data.keys()
-                 and self.flux_map==other.flux_map
-                 and self.surface_map==other.surface_map
-                 and self.weight_name == other.weight_name)
-                 
-    def __iadd__(self,other):
+                 and self.flux_map == other.flux_map)
+
+    def __add__(self,other):
         assert self.is_compatable(other)
 
         if self.is_null():
@@ -93,13 +90,10 @@ class Weighter:
         if other.is_null():
             return self
 
-        self.surface+=other.surface
-        self.event_data=append_dicts(self.event_data,other.event_data)
-        return self
+        surface = self.surface + other.surface
+        event_data = append_dicts(self.event_data,other.event_data)
+        return Weighter(surface, event_data, self.flux_map)
         
-def NullWeighter():
-    return Weighter(Null(),{},{},{},{})
-
 def make_weighter(info_obj,weight_obj,surface_func, surface_from_file,
                   event_data_func, flux_map):
 

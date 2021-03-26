@@ -9,7 +9,7 @@ __version__ = '0.1'
 from .cylinder import VolumeCorrCylinder
 from .powerlaw import PowerLaw
 from .GenerationSurface import GenerationSurface,GenerationSurfaceCollection
-from .WeighterBase import Weighter,NullWeighter
+from .WeighterBase import Weighter
 #from .NuGenWeight import NuGenWeighter
 from .CorsikaWeighter import CorsikaWeighter
 from .PrimaryWeighter import PrimaryWeighter
