@@ -27,6 +27,7 @@ class GenerationSurface:
                 self.surface == other.surface)
 
     def get_energy_range(self, ptype):
+        assert ptype == self.particle_type
         return self.spectrum.a, self.spectrum.b
 
     def __eq__(self,other):
@@ -39,17 +40,21 @@ class GenerationSurface:
                 r.nevents = self.nevents + other.nevents
                 return r
             else:
-                return GenerationSurfaceCollection([self, other])
+                return GenerationSurfaceCollection(self, other)
         else:
             raise TypeError("Can't add %s to %s" % (type(other).__name__, type(self).__name__))
 
+    def __imul__(self,factor):
+        self.nevents *= factor
+        return self
+
     def __mul__(self, factor):
         s = deepcopy(self)
-        s.nevents *= factor
+        s.__imul__(factor)
         return s
 
     def __rmul__(self, factor):
-        return self * factor
+        return self.__mul__(factor)
 
     def __repr__(self):
         return "{}({}, {:7.3e}, {}, {})".format(
@@ -60,7 +65,7 @@ class GenerationSurfaceCollection:
     """
     A collection of generation spectra, possibly for different particle types.
     """
-    def __init__(self, spectra):
+    def __init__(self, *spectra):
         """
         :param spectra: a collection of GenerationProbabilities.
         """
@@ -69,7 +74,7 @@ class GenerationSurfaceCollection:
             self._insert(s)
 
     def _insert(self,surface):
-        assert type(surface)==GenerationSurface
+        assert type(surface) == GenerationSurface
         key = int(surface.particle_type)
         if key not in self.spectra:
             self.spectra[key] = []
@@ -82,15 +87,26 @@ class GenerationSurfaceCollection:
             self.spectra[key].append(deepcopy(surface))
 
     def __add__(self,other):
+        output = deepcopy(self)
         if isinstance(other, GenerationSurface):
-            self._insert(other)
+            output._insert(other)
         elif isinstance(other, GenerationSurfaceCollection):
             for pt, ospectra in other.spectra.items():
                 for ospec in ospectra:
-                    self._insert(other)
+                    output._insert(ospec)
         else:
             raise ValueError("Cannot add {} to {}".format(type(self),type(self)))
-        return self
+        return output
+
+    def __mul__(self, factor):
+        s = deepcopy(self)
+        for p in s.spectra.values():
+            for i in range(len(p)):
+                p[i] *= factor
+        return s
+
+    def __rmul__(self, factor):
+        return self.__mul__(factor)
 
     def get_extended_pdf(self, particle_type, energy, cos_zen):
         energy = np.asarray(energy)
@@ -106,27 +122,16 @@ class GenerationSurfaceCollection:
         return count
 
     def get_energy_range(self, ptype):
-        if ptype not in self.spectra:
-            return [np.nan,np.nan]
+        assert ptype in self.spectra
         assert len(self.spectra[ptype])
         emin = np.inf
         emax = -np.inf
         for p in self.spectra[ptype]:
             emin = min(emin,p.spectrum.a)
-            emax = min(emin,p.spectrum.b)
+            emax = max(emax,p.spectrum.b)
         assert(np.isfinite(emin))
         assert(np.isfinite(emax))
         return emin, emax
-
-    def __imul__(self, factor):
-        for spectra in self.spectra.values():
-            for prob in spectra:
-                prob *= factor
-        return self
-
-    def __idiv__(self, factor):
-        self *= (1./factor)
-        return self
 
     def __eq__(self, other):
         # must handle the same set of particle types
@@ -145,8 +150,8 @@ class GenerationSurfaceCollection:
         return True
 
     def __repr__(self):
-        return (self.__class__.__name__+'(['+
-                ','.join(repr(x) for x in self.spectra.values())+'])')
+        return (self.__class__.__name__+'('+
+                ','.join(repr(y) for x in self.spectra.values() for y in x)+')')
 
     def __str__(self):
         s=[]
@@ -155,7 +160,7 @@ class GenerationSurfaceCollection:
             for x in d:
                 collections.append('N={:8.4g} {} {}'.format(x.nevents, x.spectrum, x.surface))
             s.append('     {:11} : '.format(x.particle_name)+
-                     '                 \n'.join(collections))
+                     '\n                   '.join(collections))
         return '< '+self.__class__.__name__ + '\n'+ '\n'.join(s) + '\n>'
         
             

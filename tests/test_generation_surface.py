@@ -1,10 +1,10 @@
 #!/usr/bin/env python
+import unittest
+from copy import deepcopy
 import numpy as np
 from simweights import PDGCode, PowerLaw, VolumeCorrCylinder, GenerationSurface, GenerationSurfaceCollection
-import unittest
 
 class TestGenerationSurface(unittest.TestCase):
-
     def setUp(self):
         self.p1 = PowerLaw(-1, 10, 100)
         self.p2 = PowerLaw(-2, 50, 500)
@@ -17,10 +17,10 @@ class TestGenerationSurface(unittest.TestCase):
         self.s3 = GenerationSurface(2212, 10000, self.p1, self.c2)
         self.s4 = GenerationSurface(2213, 10000, self.p1, self.c1)
 
-        self.gsc1 = GenerationSurfaceCollection([self.s0,self.s1])
-        self.gsc2 = GenerationSurfaceCollection([self.s0,self.s2])
-        self.gsc3 = GenerationSurfaceCollection([self.s0,self.s3])
-        self.gsc4 = GenerationSurfaceCollection([self.s0,self.s4])
+        self.gsc1 = GenerationSurfaceCollection(self.s0,self.s1)
+        self.gsc2 = GenerationSurfaceCollection(self.s0,self.s2)
+        self.gsc3 = GenerationSurfaceCollection(self.s0,self.s3)
+        self.gsc4 = GenerationSurfaceCollection(self.s0,self.s4)
 
     def test_compatible(self):
         assert(self.s0.is_compatible(self.s0))
@@ -44,6 +44,24 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertNotEqual(self.s0,self.s2)
         self.assertNotEqual(self.s0,self.s3)
         self.assertNotEqual(self.s0,self.s4)
+
+    def test_energy_range(self):
+        self.assertEqual(self.s0.get_energy_range(2212),(10,100))
+        self.assertEqual(self.s2.get_energy_range(2212),(50,500))
+        self.assertEqual(self.s4.get_energy_range(2213),(10,100))
+        with self.assertRaises(AssertionError):
+            self.s0.get_energy_range(2213)
+        with self.assertRaises(AssertionError):
+            self.s4.get_energy_range(2212)
+
+        self.assertEqual(self.gsc1.get_energy_range(2212),(10,100))
+        self.assertEqual(self.gsc2.get_energy_range(2212),(10,500))
+        self.assertEqual(self.gsc4.get_energy_range(2212),(10,100))
+        self.assertEqual(self.gsc4.get_energy_range(2213),(10,100))
+        with self.assertRaises(AssertionError):
+            self.gsc1.get_energy_range(2213)
+        with self.assertRaises(AssertionError):
+            self.gsc2.get_energy_range(2213)
 
     def test_addition(self):
         n0 = self.s0.nevents
@@ -94,29 +112,33 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertAlmostEqual(s4.get_extended_pdf(2213,50,0),self.s4.get_extended_pdf(2213,50,0))
 
         with self.assertRaises(TypeError):
-            print(self.s0 + None)
+            self.s0 + None
 
         with self.assertRaises(TypeError):
-            print(self.s0 + int)
+            self.s0 + int
 
         with self.assertRaises(TypeError):
-            print(self.s0 + PowerLaw)
+            self.s0 + PowerLaw
 
     def test_multiplication(self):
-        sa = self.s0
+        sa = deepcopy(self.s0)
+        said = id(sa)
         sa *= 4.4
+        self.assertEqual(said,id(sa))
         self.assertEqual(sa.nevents,44000)
         self.assertEqual(self.s0.nevents, 10000)
         self.assertAlmostEqual(sa.get_extended_pdf(2212, 50, 0),
                                4.4 * self.s0.get_extended_pdf(2212, 50, 0))
 
         sb = self.s0 * 5.5
+        self.assertNotEqual(id(sb),id(self.s0))
         self.assertEqual(sb.nevents,55000)
         self.assertEqual(self.s0.nevents, 10000)
         self.assertAlmostEqual(sb.get_extended_pdf(2212, 50, 0),
                                5.5 * self.s0.get_extended_pdf(2212, 50, 0))
 
         sc = 6.6 * self.s0
+        self.assertNotEqual(id(sc),id(self.s0))
         self.assertEqual(sc.nevents,66000)
         self.assertEqual(self.s0.nevents, 10000)
         self.assertAlmostEqual(sc.get_extended_pdf(2212, 50, 0),
@@ -124,15 +146,20 @@ class TestGenerationSurface(unittest.TestCase):
 
     def test_repr(self):
         rep = str(self.s0)
-        print(rep)
         self.assertEqual(rep[:18],"GenerationSurface(")
         self.assertEqual(rep[-1:],")")
         v = rep[18:-1].split(',')
-        print (v)
         self.assertEqual(v[0],'PPlus')
         self.assertEqual(float(v[1]),1e4)
         self.assertEqual(','.join(v[2:5]).strip(),repr(self.p1))
         self.assertEqual(','.join(v[5:9]).strip(),repr(self.c1))
+
+        PPlus=PDGCode.PPlus
+        self.assertEqual(eval(repr(self.s0)),self.s0)
+        self.assertEqual(eval(repr(self.s1)),self.s1)
+        self.assertEqual(eval(repr(self.s2)),self.s2)
+        self.assertEqual(eval(repr(self.s3)),self.s3)
+        self.assertEqual(eval(repr(self.s4)),self.s4)
 
     def test_powerlaw(self):
         N=self.s0.nevents
@@ -196,13 +223,13 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertIsNot(surf.spectra[2212][1].spectrum, self.s2.spectrum)
 
     def test_instantiation(self):
-        s02 = GenerationSurfaceCollection([self.s0,self.s0])
+        s02 = GenerationSurfaceCollection(self.s0, self.s0)
         self.assertEqual(len(s02.spectra),1)
         self.assertEqual(len(s02.spectra[2212]),1)
         assert s02.spectra[2212][0].is_compatible(self.s0)
         self.assertEqual(s02.spectra[2212][0].nevents,20000)
 
-        s02 = GenerationSurfaceCollection([self.s0,self.s2])
+        s02 = GenerationSurfaceCollection(self.s0, self.s2)
         self.assertEqual(len(s02.spectra),1)
         self.assertEqual(len(s02.spectra[2212]),2)
         assert s02.spectra[2212][0].is_compatible(self.s0)
@@ -210,7 +237,7 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(s02.spectra[2212][0].nevents,10000)
         self.assertEqual(s02.spectra[2212][1].nevents,10000)
 
-        s04 = GenerationSurfaceCollection([self.s0,self.s4])
+        s04 = GenerationSurfaceCollection(self.s0, self.s4)
         self.assertEqual(len(s04.spectra),2)
         self.assertEqual(len(s04.spectra[2212]),1)
         self.assertEqual(len(s04.spectra[2213]),1)
@@ -218,6 +245,120 @@ class TestGenerationSurface(unittest.TestCase):
         assert s04.spectra[2213][0].is_compatible(self.s4)
         self.assertEqual(s04.spectra[2212][0].nevents,10000)
         self.assertEqual(s04.spectra[2213][0].nevents,10000)
+
+        with self.assertRaises(AssertionError):
+            GenerationSurfaceCollection(self.s1,None)
+        with self.assertRaises(AssertionError):
+            GenerationSurfaceCollection(self.s1,self.p1)
+        with self.assertRaises(AssertionError):
+            GenerationSurfaceCollection(5)
+
+    def test_addition_gsc(self):
+        s0 = self.gsc1 + self.s0
+        self.assertEqual(type(s0), GenerationSurfaceCollection)
+        self.assertEqual(len(s0.spectra), 1)
+        self.assertEqual(len(s0.spectra[2212]), 1)
+        assert s0.spectra[2212][0].is_compatible(self.s0)
+        self.assertEqual(s0.spectra[2212][0].nevents, 40000)
+
+        s2 = self.gsc2 + self.s0
+        self.assertEqual(type(s2),GenerationSurfaceCollection)
+        self.assertEqual(len(s2.spectra), 1)
+        self.assertEqual(len(s2.spectra[2212]), 2)
+        assert s2.spectra[2212][0].is_compatible(self.s0)
+        assert s2.spectra[2212][1].is_compatible(self.s2)
+        self.assertEqual(s2.spectra[2212][0].nevents, 20000)
+        self.assertEqual(s2.spectra[2212][1].nevents, 10000)
+
+        s4 = self.gsc4 + self.s0
+        self.assertEqual(type(s4), GenerationSurfaceCollection)
+        self.assertEqual(len(s4.spectra), 2)
+        self.assertEqual(len(s4.spectra[2212]), 1)
+        self.assertEqual(len(s4.spectra[2213]), 1)
+        assert s4.spectra[2212][0].is_compatible(self.s0)
+        assert s4.spectra[2213][0].is_compatible(self.s4)
+        self.assertEqual(s4.spectra[2212][0].nevents, 20000)
+        self.assertEqual(s4.spectra[2213][0].nevents, 10000)
+
+        s5 = self.gsc1 + self.gsc2
+        self.assertEqual(type(s5), GenerationSurfaceCollection)
+        self.assertEqual(len(s5.spectra), 1)
+        self.assertEqual(len(s5.spectra[2212]), 2)
+        assert s5.spectra[2212][0].is_compatible(self.s0)
+        assert s5.spectra[2212][1].is_compatible(self.s2)
+        self.assertEqual(s5.spectra[2212][0].nevents, 40000)
+        self.assertEqual(s5.spectra[2212][1].nevents, 10000)
+
+        s6 = self.gsc2 + self.gsc4
+        self.assertEqual(type(s6), GenerationSurfaceCollection)
+        self.assertEqual(len(s6.spectra), 2)
+        self.assertEqual(len(s6.spectra[2212]), 2)
+        self.assertEqual(len(s6.spectra[2213]), 1)
+        assert s6.spectra[2212][0].is_compatible(self.s0)
+        assert s6.spectra[2212][1].is_compatible(self.s2)
+        assert s6.spectra[2213][0].is_compatible(self.s4)
+        self.assertEqual(s6.spectra[2212][0].nevents, 20000)
+        self.assertEqual(s6.spectra[2212][1].nevents, 10000)
+        self.assertEqual(s6.spectra[2213][0].nevents, 10000)
+
+        with self.assertRaises(ValueError):
+            self.gsc2 + None
+        with self.assertRaises(ValueError):
+            self.gsc2 + self.p1
+        with self.assertRaises(ValueError):
+            self.gsc2 + self.c1
+        with self.assertRaises(ValueError):
+            self.gsc2 + 5
+
+    def test_multiplication_gsc(self):
+        s0 = deepcopy(self.gsc2)
+        s0id = id(s0)
+        s0 *= 2.3
+        self.assertEqual(s0.spectra[2212][0], 2.3 * self.s0)
+        self.assertEqual(s0.spectra[2212][1], 2.3 * self.s2)
+
+        s1 = 3.4 * self.gsc2
+        self.assertEqual(s1.spectra[2212][0], 3.4 * self.s0)
+        self.assertEqual(s1.spectra[2212][1], 3.4 * self.s2)
+
+        s1 = self.gsc3 * 4.5
+        self.assertEqual(s1.spectra[2212][0], 4.5 * self.s0)
+        self.assertEqual(s1.spectra[2212][1], 4.5 * self.s3)
+
+    def test_equal_gsc(self):
+        self.assertEqual(self.gsc1, self.gsc1)
+        self.assertEqual(self.gsc2, self.gsc2)
+        self.assertEqual(self.gsc3, self.gsc3)
+        self.assertEqual(self.gsc4, self.gsc4)
+        self.assertNotEqual(self.gsc1, self.gsc2)
+        self.assertNotEqual(self.gsc1, self.gsc3)
+        self.assertNotEqual(self.gsc1, self.gsc4)
+        self.assertNotEqual(self.gsc2, self.gsc3)
+        self.assertNotEqual(self.gsc2, self.gsc4)
+        self.assertNotEqual(self.gsc3, self.gsc4)
+        self.assertEqual(self.gsc1, GenerationSurfaceCollection(self.s1,self.s0))
+        self.assertEqual(self.gsc2, GenerationSurfaceCollection(self.s2,self.s0))
+        self.assertEqual(self.gsc3, GenerationSurfaceCollection(self.s3,self.s0))
+        self.assertEqual(self.gsc4, GenerationSurfaceCollection(self.s4,self.s0))
+
+    def test_repr_gsc(self):
+        PPlus=PDGCode.PPlus
+        self.assertEqual(self.gsc1,eval(repr(self.gsc1)))
+        self.assertEqual(self.gsc2,eval(repr(self.gsc2)))
+        self.assertEqual(self.gsc3,eval(repr(self.gsc3)))
+        self.assertEqual(self.gsc4,eval(repr(self.gsc4)))
+
+        s=str(self.gsc2 + self.gsc3 + self.gsc4).split('\n')
+        self.assertEqual(s[0], '< GenerationSurfaceCollection')
+        self.assertEqual(eval(s[1].split()[-1]), self.c1)
+        self.assertEqual(eval(s[1].split()[-2]), self.p1)
+        self.assertEqual(eval(s[2].split()[-1]), self.c1)
+        self.assertEqual(eval(s[2].split()[-2]), self.p2)
+        self.assertEqual(eval(s[3].split()[-1]), self.c2)
+        self.assertEqual(eval(s[3].split()[-2]), self.p1)
+        self.assertEqual(eval(s[4].split()[-1]), self.c1)
+        self.assertEqual(eval(s[4].split()[-2]), self.p1)
+        self.assertEqual(s[5], '>')
 
 if __name__ == '__main__':
     unittest.main()
