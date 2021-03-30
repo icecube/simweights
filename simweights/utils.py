@@ -1,6 +1,19 @@
 import numpy as np
 from scipy import stats
 
+class Null:
+    """
+    An identity object, useful as a starting point for accumulators, e.g.::
+
+    total = Null()
+    for i in range(10):
+        total += SomeClassThatImplementsAddition(i)
+    """
+    def __iadd__(self, other):
+        return other
+    def __eq__(self, other):
+        return isinstance(other, Null) or 0 == other
+
 def has_table(f, name: str):
     if hasattr(f, 'root'):
         return hasattr(f.root, name)
@@ -25,7 +38,30 @@ def get_constant_column(col):
     assert ((val==col).all())
     return val
 
-def check_nfiles(runcol):
+def append_dicts(first,second): # pragma: no cover
+    if not first:
+        return second
+    if not second:
+        return first    
+    out={}
+    assert(first.keys()==second.keys())
+    for k in first.keys():
+        out[k]=np.r_[first[k],second[k]]
+    return out
+
+def check_run_counts(table,nfiles): # pragma: no cover
+    runs,counts = np.unique(table.cols.Run[:],return_counts=True)
+    #more sophisticated checks go here?
+    if len(runs)==nfiles:
+        s = 'OK'
+        ret = True
+    else:
+        s = 'Fail'
+        ret = False 
+    print ("Claimed Runs = {}, Found Runs = {}, {}".format(nfiles,len(runs),s))
+    return ret
+
+def check_nfiles(runcol): # pragma: no cover
     """
     runcol: and array containing a 
     """
