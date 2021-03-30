@@ -86,7 +86,7 @@ class GenerationSurfaceCollection:
         else:
             self.spectra[key].append(deepcopy(surface))
 
-    def __add__(self,other):
+    def __add__(self, other):
         output = deepcopy(self)
         if isinstance(other, GenerationSurface):
             output._insert(other)

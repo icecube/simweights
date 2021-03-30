@@ -35,7 +35,7 @@ def make_hdf5_file(fname,v):
     f.create_dataset("I3PrimaryInjectorInfo", data = info)
     f.close()
 
-class TestCylinder(unittest.TestCase):
+class TestPrimaryWeighter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         make_hdf5_file('file1.h5', (2212, 100000, 1200, 600,0, np.pi, 1e4, 1e6, -1))
@@ -52,7 +52,7 @@ class TestCylinder(unittest.TestCase):
         w = wf.get_weights(self.flux_model)
         emin, emax = wf.surface.get_energy_range(2212)
         self.assertAlmostEqual(w.sum() / (emax - emin), 1, 4)
-        E = wf.event_data["energy"]
+        E = wf.get_column('I3CorsikaWeight','energy')
         y,x = np.histogram(E, weights = w, bins=50, range=[emin, emax])
         Ewidth = (x[1:]-x[:-1])
         np.testing.assert_array_almost_equal(y/Ewidth, 1,2)

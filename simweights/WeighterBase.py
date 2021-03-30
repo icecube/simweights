@@ -1,6 +1,6 @@
 import numpy as np
 import warnings
-from .utils import has_table, get_table
+from .utils import has_table, get_table, get_column
 
 class Null:
     """
@@ -39,60 +39,36 @@ def check_run_counts(table,nfiles):
     return ret
 
 class Weighter:
-    def __init__(self, surface, event_data, flux_map):
-        self.surface =  surface
-        self.event_data = event_data
-        self.flux_map = flux_map
+    def __init__(self, surface, data):        
+        self.surface = surface
+        self.data = data
+                
+    def get_column(self, table:str, column:str):
+        return np.r_[[get_column(get_table(d,table),column) for d in self.data]]
 
-        l=None
-        for v in self.event_data.values():
-            if l is None:
-                l = len(v)
-            else:
-                assert l==len(v)
+    def get_weights(self, flux):
+        epdf = self.surface.get_extended_pdf(**self.get_surface_params())
+        flux_val = flux(**self.get_flux_params())
+        event_weight = self.get_event_weight()
 
-    def get_weights(self,flux):
-        
-        surface = self.surface.get_extended_pdf(
-            particle_type=self.event_data['type'],
-            energy=self.event_data['energy'],
-            cos_zen=self.event_data['cos_zenith'])
-        
-        mask = surface > 0
+        #Getting events with epdf=0 indicates some sort of mismatch between the
+        #the surface and the dataset that can't be solved here so print a
+        #warning and ignore the events
+        mask = epdf > 0
         if not np.all(mask):
             warnings.warn('simweights :: {} events out of {} were found to be outside the generation surface'
                           .format(np.logical_not(mask).sum(),mask.size))
-
-        flux_params = { k : self.event_data[v][mask] for k, v in self.flux_map.items()}        
-        event_weight = self.event_data['weight'][mask]      
-        w = np.zeros_like(surface)
-        w[mask] = event_weight * flux(**flux_params) / surface[mask] 
+       
+        w = np.zeros_like(epdf)
+        w[mask] = (event_weight * flux_val)[mask] / epdf[mask] 
         return w
 
-    def is_null(self):
-        return (isinstance(self.surface,Null)
-                and not self.event_data
-                and not self.flux_map
-                and not self.surface_map
-                and not self.weight_name)
-
-    def is_compatable(self,other):
-        if self.is_null() or other.is_null():
-            return True
-        return ( self.event_data.keys()==other.event_data.keys()
-                 and self.flux_map == other.flux_map)
-
     def __add__(self,other):
-        assert self.is_compatable(other)
-
-        if self.is_null():
-            return other
-        if other.is_null():
-            return self
-
-        surface = self.surface + other.surface
-        event_data = append_dicts(self.event_data,other.event_data)
-        return Weighter(surface, event_data, self.flux_map)
+        if type(self) is not type(self):
+            raise ValueError("Cannot add {} to {}".format(type(self),type(self)))        
+        self.surface+=other.surface
+        self.data+=other.data
+        return self
         
 def make_weighter(info_obj,weight_obj,surface_func, surface_from_file,
                   event_data_func, flux_map):
@@ -120,6 +96,6 @@ def make_weighter(info_obj,weight_obj,surface_func, surface_from_file,
             check_run_counts(weight_table,nfiles)
 
         event_data=event_data_func(weight_table)
-        return Weighter(surface,event_data,flux_map)
+        return Weighter(surface, [infile])
 
     return _weighter
