@@ -3,9 +3,8 @@ import warnings
 from .utils import has_table, get_table, get_column
 
 class Weighter:
-    def __init__(self, surface, data):        
-        self.surface = surface
-        self.data = data
+    def __init__(self):
+        raise NotImplemented
                 
     def get_column(self, table:str, column:str):
         return np.ravel([get_column(get_table(d,table),column) for d in self.data])

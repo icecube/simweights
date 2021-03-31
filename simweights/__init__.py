@@ -10,7 +10,7 @@ from .cylinder import VolumeCorrCylinder
 from .powerlaw import PowerLaw
 from .GenerationSurface import GenerationSurface,GenerationSurfaceCollection
 from .WeighterBase import Weighter
-#from .NuGenWeight import NuGenWeighter
+from .NuGenWeighter import NuGenWeighter
 from .CorsikaWeighter import CorsikaWeighter
 from .PrimaryWeighter import PrimaryWeighter
 from .fluxes import (PDGCode, FixedFractionFlux, GaisserH3a, GaisserH4a, GaisserH4a_IT, GaisserHillas, 
