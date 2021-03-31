@@ -1,6 +1,9 @@
 from copy import deepcopy
+
 import numpy as np
+
 from .fluxes import PDGCode
+
 
 class GenerationSurface:
     def __init__(self, particle_type, nevents, spectrum, surface):

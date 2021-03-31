@@ -1,6 +1,9 @@
-import numpy as np
 import warnings
-from .utils import has_table, get_table, get_column
+
+import numpy as np
+
+from .utils import get_column, get_table, has_table
+
 
 class Weighter:
     def __init__(self):

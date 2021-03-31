@@ -10,7 +10,9 @@ However they have been refactored to:
 
 """
 from enum import Enum, IntEnum
-from numpy import asarray, broadcast_arrays, equal, meshgrid, piecewise, exp, sqrt
+
+from numpy import asarray, broadcast_arrays, equal, exp, meshgrid, piecewise, sqrt
+
 
 class PDGCode(IntEnum):
     PPlus       =       2212

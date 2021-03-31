@@ -1,7 +1,9 @@
 import numpy as np
-from . import VolumeCorrCylinder, PowerLaw, GenerationSurface
+
+from . import GenerationSurface, PowerLaw, VolumeCorrCylinder
+from .utils import Null, get_table, has_table
 from .WeighterBase import Weighter
-from .utils import has_table, get_table, Null
+
 
 class PrimaryWeighter(Weighter):
     def __init__(self,infile):

@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import stats
 
+
 class Null:
     """
     An identity object, useful as a starting point for accumulators, e.g.::

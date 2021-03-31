@@ -1,6 +1,7 @@
 import numpy as np
 from scipy._lib._util import check_random_state
 
+
 class PowerLaw:
     r"""A power-law function continuous random variable.
     

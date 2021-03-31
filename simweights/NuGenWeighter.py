@@ -1,7 +1,9 @@
 import numpy as np
-from . import VolumeCorrCylinder, PowerLaw, GenerationSurface, GenerationSurfaceCollection
-from .utils import get_table, get_column, get_constant_column, Null
+
+from . import GenerationSurface, GenerationSurfaceCollection, PowerLaw, VolumeCorrCylinder
+from .utils import Null, get_column, get_constant_column, get_table
 from .WeighterBase import Weighter
+
 
 class NuGenWeighter(Weighter):
     def __init__(self, infile, nfiles):
