@@ -15,28 +15,25 @@ class Null:
         return other
 
     def __eq__(self, other):
-        return isinstance(other, Null) or 0 == other
+        return isinstance(other, Null)
 
 
 def has_table(f, name: str):
     if hasattr(f, "root"):
         return hasattr(f.root, name)
-    else:
-        return name in f.keys()
+    return name in f.keys()
 
 
 def get_table(f, name: str):
     if hasattr(f, "root"):
         return getattr(f.root, name)
-    else:
-        return f[name]
+    return f[name]
 
 
 def get_column(table, name: str):
     if hasattr(table, "cols"):
         return getattr(table.cols, name)[:]
-    else:
-        return table[name]
+    return table[name]
 
 
 def get_constant_column(col):
@@ -59,7 +56,7 @@ def append_dicts(first, second):  # pragma: no cover
 
 
 def check_run_counts(table, nfiles):  # pragma: no cover
-    runs, counts = np.unique(table.cols.Run[:], return_counts=True)
+    runs, _ = np.unique(table.cols.Run[:], return_counts=True)
     # more sophisticated checks go here?
     if len(runs) == nfiles:
         s = "OK"

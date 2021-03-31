@@ -41,14 +41,12 @@ class PowerLaw:
     def _cdf(self, x: float) -> float:
         if self.G == 0:
             return np.log(x / self.a) / self.integral
-        else:
-            return (x ** self.G - self.a ** self.G) / self.G / self.integral
+        return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
     def _ppf(self, q: float) -> float:
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
-        else:
-            return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
+        return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
     def pdf(self, x: float) -> float:
         r"""
@@ -111,5 +109,5 @@ class PowerLaw:
     def __repr__(self):
         return "{}({:4.2f},{:6.2e},{:6.2e})".format(self.__class__.__name__, self.g, self.a, self.b)
 
-    def __eq__(p1, p2):
-        return p1.g == p2.g and p1.a == p2.a and p1.b == p2.b
+    def __eq__(self, other):
+        return self.g == other.g and self.a == other.a and self.b == other.b

@@ -1,8 +1,5 @@
 import numpy as np
 
-from .cylinder import VolumeCorrCylinder
-from .GenerationSurface import GenerationSurface
-from .powerlaw import PowerLaw
 from .utils import Null, get_column, get_constant_column, get_table
 from .WeighterBase import Weighter
 
@@ -11,34 +8,12 @@ class CorsikaWeighter(Weighter):
     def __init__(self, infile, nfiles):
         assert nfiles is not None
         surface = Null()
-        for i in self.read_weight_map(infile):
-            surface += nfiles * self.get_surface(**i)
-        self.surface = surface
-        self.data = [infile]
+        for smap in self.get_surface_map(infile):
+            surface += nfiles * self.get_surface(smap)
+        super().__init__(surface, [infile])
 
-    def get_surface(
-        self,
-        primary_type,
-        n_events,
-        oversampling,
-        cylinder_height,
-        cylinder_radius,
-        min_zenith,
-        max_zenith,
-        min_energy,
-        max_energy,
-        power_law_index,
-        **kwargs,
-    ):
-        surface = VolumeCorrCylinder(
-            cylinder_height, cylinder_radius, np.cos(max_zenith), np.cos(min_zenith)
-        )
-        assert power_law_index < 0
-        spectrum = PowerLaw(power_law_index, min_energy, max_energy)
-        return GenerationSurface(primary_type, n_events * oversampling, spectrum, surface)
-
-    def read_weight_map(self, infile):
-
+    @staticmethod
+    def get_surface_map(infile):
         table = get_table(infile, "CorsikaWeightMap")
         vals = {}
         vals["ParticleType"] = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
@@ -55,8 +30,7 @@ class CorsikaWeighter(Weighter):
         return [
             dict(
                 primary_type=p,
-                n_events=vals["NEvents"][i],
-                oversampling=vals["OverSampling"],
+                n_events=vals["OverSampling"] * vals["NEvents"][i],
                 cylinder_height=vals["CylinderLength"],
                 cylinder_radius=vals["CylinderRadius"],
                 min_zenith=vals["ThetaMin"],

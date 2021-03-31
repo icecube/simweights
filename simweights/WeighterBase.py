@@ -2,12 +2,16 @@ import warnings
 
 import numpy as np
 
+from .cylinder import VolumeCorrCylinder
+from .GenerationSurface import GenerationSurface
+from .powerlaw import PowerLaw
 from .utils import get_column, get_table
 
 
 class Weighter:
-    def __init__(self):
-        raise NotImplementedError()
+    def __init__(self, surface, data):
+        self.surface = surface
+        self.data = data
 
     def get_column(self, table: str, column: str):
         return np.ravel([get_column(get_table(d, table), column) for d in self.data])
@@ -30,6 +34,27 @@ class Weighter:
         w = np.zeros_like(epdf)
         w[mask] = (event_weight * flux_val)[mask] / epdf[mask]
         return w
+
+    @staticmethod
+    def get_surface(smap):
+        assert smap["power_law_index"] < 0
+        surface = VolumeCorrCylinder(
+            smap["cylinder_height"],
+            smap["cylinder_radius"],
+            np.cos(smap["max_zenith"]),
+            np.cos(smap["min_zenith"]),
+        )
+        spectrum = PowerLaw(smap["power_law_index"], smap["min_energy"], smap["max_energy"])
+        return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, surface)
+
+    def get_surface_params(self):
+        raise NotImplementedError()
+
+    def get_flux_params(self):
+        raise NotImplementedError()
+
+    def get_event_weight(self):
+        raise NotImplementedError()
 
     def __add__(self, other):
         if type(self) is not type(self):

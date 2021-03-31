@@ -44,10 +44,8 @@ class GenerationSurface:
                 r = deepcopy(self)
                 r.nevents = self.nevents + other.nevents
                 return r
-            else:
-                return GenerationSurfaceCollection(self, other)
-        else:
-            raise TypeError("Can't add %s to %s" % (type(other).__name__, type(self).__name__))
+            return GenerationSurfaceCollection(self, other)
+        raise TypeError("Can't add %s to %s" % (type(other).__name__, type(self).__name__))
 
     def __imul__(self, factor):
         self.nevents *= factor
@@ -81,7 +79,7 @@ class GenerationSurfaceCollection:
             self._insert(s)
 
     def _insert(self, surface):
-        assert type(surface) == GenerationSurface
+        assert isinstance(surface, GenerationSurface)
         key = int(surface.particle_type)
         if key not in self.spectra:
             self.spectra[key] = []
@@ -98,7 +96,7 @@ class GenerationSurfaceCollection:
         if isinstance(other, GenerationSurface):
             output._insert(other)
         elif isinstance(other, GenerationSurfaceCollection):
-            for pt, ospectra in other.spectra.items():
+            for _, ospectra in other.spectra.items():
                 for ospec in ospectra:
                     output._insert(ospec)
         else:
@@ -108,7 +106,7 @@ class GenerationSurfaceCollection:
     def __mul__(self, factor):
         s = deepcopy(self)
         for p in s.spectra.values():
-            for i in range(len(p)):
+            for i, _ in enumerate(p):
                 p[i] *= factor
         return s
 
@@ -166,9 +164,9 @@ class GenerationSurfaceCollection:
 
     def __str__(self):
         s = []
-        for p, d in self.spectra.items():
+        for d in self.spectra.values():
             collections = []
             for x in d:
                 collections.append("N={:8.4g} {} {}".format(x.nevents, x.spectrum, x.surface))
-            s.append("     {:11} : ".format(x.particle_name) + "\n                   ".join(collections))
+            s.append("     {:11} : ".format(d[0].particle_name) + "\n                   ".join(collections))
         return "< " + self.__class__.__name__ + "\n" + "\n".join(s) + "\n>"

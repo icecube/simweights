@@ -1,52 +1,21 @@
 import numpy as np
 
-from .cylinder import VolumeCorrCylinder
-from .GenerationSurface import GenerationSurface
-from .powerlaw import PowerLaw
 from .utils import Null, get_table, has_table
 from .WeighterBase import Weighter
 
 
 class PrimaryWeighter(Weighter):
     def __init__(self, infile):
-
         info_obj = "I3PrimaryInjectorInfo"
         if not has_table(infile, info_obj):
             raise RuntimeError(
                 "File `{}` is Missing S-Frames table `I3PrimaryInjectorInfo`, "
                 "this is required for PrimaryInjector files".format(infile.filename)
             )
-
-        info_table = get_table(infile, info_obj)
-
         surface = Null()
-        for row in info_table:
-            d = {x: row[x] for x in info_table.dtype.names}
-            surface += self.get_surface(**d)
-
-        self.surface = surface
-        self.data = [infile]
-
-    def get_surface(
-        self,
-        primary_type,
-        n_events,
-        cylinder_height,
-        cylinder_radius,
-        min_zenith,
-        max_zenith,
-        min_energy,
-        max_energy,
-        power_law_index,
-        **kwargs,
-    ):
-        surface = VolumeCorrCylinder(
-            cylinder_height, cylinder_radius, np.cos(max_zenith), np.cos(min_zenith)
-        )
-        assert power_law_index < 0
-        spectrum = PowerLaw(power_law_index, min_energy, max_energy)
-        s = GenerationSurface(primary_type, n_events, spectrum, surface)
-        return s
+        for row in get_table(infile, info_obj):
+            surface += self.get_surface(row)
+        super().__init__(surface, [infile])
 
     def get_surface_params(self):
         return dict(

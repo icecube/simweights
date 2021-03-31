@@ -80,7 +80,11 @@ class CosmicRayFlux:
     desired.
     """
 
+    ptypes = []
+    _funcs = []
+
     def _condition(self, E, pt):
+        # pylint: disable=unused-argument
         return [pt == p for p in self.ptypes]
 
     def __call__(self, E, ptype):
@@ -428,7 +432,7 @@ class FixedFractionFlux(CosmicRayFlux):
     weightings for systematic checks.
     """
 
-    def __init__(self, fractions={}, basis=GaisserH4a_IT(), normalized=True):
+    def __init__(self, fractions, basis=GaisserH4a_IT(), normalized=True):
         """
         :param fractions: A dictionary of fractions. They must add up to one and they
         should correspond to the ptypes in basis
@@ -452,5 +456,4 @@ class FixedFractionFlux(CosmicRayFlux):
         E, ptype = broadcast_arrays(E, ptype)
         v = sum(self.flux(E, p) for p in self.ptypes)
         cond = self._condition(E, ptype)
-        p = piecewise(E, cond, self.fracs)
-        return p * v
+        return v * piecewise(E, cond, self.fracs)
