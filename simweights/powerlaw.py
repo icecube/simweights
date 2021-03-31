@@ -4,9 +4,9 @@ from scipy._lib._util import check_random_state
 
 class PowerLaw:
     r"""A power-law function continuous random variable.
-    
-    This has a similar interface to the classes found in :py:module:`scipy.stats` 
-    but differs in several ways: support is defined from a to b and negitive 
+
+    This has a similar interface to the classes found in :py:module:`scipy.stats`
+    but differs in several ways: support is defined from a to b and negitive
     values of gamma are allowed. No shape or location parameters are used.
 
     Notes
@@ -17,37 +17,38 @@ class PowerLaw:
     for :math:`a \le x \le b`.
 
     Args:
-        g (float): Power law index 
+        g (float): Power law index
         a (float): Lower bound of the support of the distribution.
         b (float): Upper bound of the support of the distribution.
     """
-    def __init__(self, g:float, a:float, b:float):
-        assert(b > a)
+
+    def __init__(self, g: float, a: float, b: float):
+        assert b > a
         self.g = float(g)
         self.a = float(a)
         self.b = float(b)
         self.G = self.g + 1
         if self.G == 0:
-            self.I = np.log(self.b / self.a)
+            self.integral = np.log(self.b / self.a)
         else:
-            self.I = (self.b**self.G - self.a**self.G) / self.G
+            self.integral = (self.b ** self.G - self.a ** self.G) / self.G
 
-        self.span = b - a 
+        self.span = b - a
 
     def _pdf(self, x: float) -> float:
-        return x**self.g / self.I
+        return x ** self.g / self.integral
 
     def _cdf(self, x: float) -> float:
-        if self.G==0:
-            return np.log(x / self.a) / self.I    
+        if self.G == 0:
+            return np.log(x / self.a) / self.integral
         else:
-            return (x**self.G - self.a**self.G) / self.G / self.I
+            return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
     def _ppf(self, q: float) -> float:
         if self.G == 0:
-            return self.a * np.exp(q * self.I)
+            return self.a * np.exp(q * self.integral)
         else:
-            return (q * self.G * self.I + self.a**self.G)**(1 / self.G)
+            return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
     def pdf(self, x: float) -> float:
         r"""
@@ -59,7 +60,7 @@ class PowerLaw:
         Returns:
             array_like: Probability density function evaluated at `x`
         """
-        #print('pdf',x,[x<self.a,x>self.b])
+        # print('pdf',x,[x<self.a,x>self.b])
         x = np.asfarray(x)
         return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
@@ -73,7 +74,7 @@ class PowerLaw:
         Returns:
             array_like: Cumulative distribution function evaluated at `x`
         """
-        return np.piecewise(np.asfarray(x), [x < self.a , x > self.b], [0, 1, self._cdf])
+        return np.piecewise(np.asfarray(x), [x < self.a, x > self.b], [0, 1, self._cdf])
 
     def ppf(self, q: float) -> float:
         """
@@ -85,8 +86,7 @@ class PowerLaw:
         Returns:
             array_like: quantile corresponding to the lower tail probability `q`.
         """
-        return np.piecewise(np.asfarray(q),[(q >= 0) & (q <= 1)], [self._ppf, np.nan])
-
+        return np.piecewise(np.asfarray(q), [(q >= 0) & (q <= 1)], [self._ppf, np.nan])
 
     def rvs(self, size=None, random_state=None):
         """
