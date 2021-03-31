@@ -14,20 +14,20 @@ class PrimaryWeighter(Weighter):
             )
         surface = Null()
         for row in get_table(infile, info_obj):
-            surface += self.get_surface(row)
+            surface += self._get_surface(row)
         super().__init__(surface, [infile])
 
-    def get_surface_params(self):
+    def _get_surface_params(self):
         return dict(
             particle_type=self.get_column("I3CorsikaWeight", "type"),
             energy=self.get_column("I3CorsikaWeight", "energy"),
             cos_zen=np.cos(self.get_column("I3CorsikaWeight", "zenith")),
         )
 
-    def get_flux_params(self):
+    def _get_flux_params(self):
         return dict(
             E=self.get_column("I3CorsikaWeight", "energy"), ptype=self.get_column("I3CorsikaWeight", "type")
         )
 
-    def get_event_weight(self):
+    def _get_event_weight(self):
         return self.get_column("I3CorsikaWeight", "weight")

@@ -2,20 +2,13 @@ from copy import copy
 
 import numpy as np
 
-from .utils import Null, get_column, get_constant_column, get_table
-from .WeighterBase import Weighter
+from .utils import get_column, get_constant_column, get_table
+from .WeighterBase import MapWeighter
 
 
-class NuGenWeighter(Weighter):
-    def __init__(self, infile, nfiles):
-        assert nfiles is not None
-        surface = Null()
-        for smap in self.get_surface_map(infile):
-            surface += nfiles * self.get_surface(smap)
-        super().__init__(surface, [infile])
-
+class NuGenWeighter(MapWeighter):
     @staticmethod
-    def get_surface_map(infile):
+    def _get_surface_map(infile):
         table = get_table(infile, "I3MCWeightDict")
         d1 = dict(
             n_events=0.5 * get_constant_column(get_column(table, "NEvents")),
@@ -32,15 +25,15 @@ class NuGenWeighter(Weighter):
         d2.update(dict(primary_type=-d1["primary_type"]))
         return [d1, d2]
 
-    def get_surface_params(self):
+    def _get_surface_params(self):
         return dict(
             energy=self.get_column("I3MCWeightDict", "PrimaryNeutrinoEnergy"),
             particle_type=self.get_column("I3MCWeightDict", "PrimaryNeutrinoType"),
             cos_zen=np.cos(self.get_column("I3MCWeightDict", "PrimaryNeutrinoZenith")),
         )
 
-    def get_flux_params(self):
-        return self.get_surface_params()
+    def _get_flux_params(self):
+        return self._get_surface_params()
 
-    def get_event_weight(self):
+    def _get_event_weight(self):
         return self.get_column("I3MCWeightDict", "TotalWeight")

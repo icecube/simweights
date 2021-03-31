@@ -1,19 +1,12 @@
 import numpy as np
 
-from .utils import Null, get_column, get_constant_column, get_table
-from .WeighterBase import Weighter
+from .utils import get_column, get_constant_column, get_table
+from .WeighterBase import MapWeighter
 
 
-class CorsikaWeighter(Weighter):
-    def __init__(self, infile, nfiles):
-        assert nfiles is not None
-        surface = Null()
-        for smap in self.get_surface_map(infile):
-            surface += nfiles * self.get_surface(smap)
-        super().__init__(surface, [infile])
-
+class CorsikaWeighter(MapWeighter):
     @staticmethod
-    def get_surface_map(infile):
+    def _get_surface_map(infile):
         table = get_table(infile, "CorsikaWeightMap")
         vals = {}
         vals["ParticleType"] = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
@@ -42,18 +35,18 @@ class CorsikaWeighter(Weighter):
             for i, p in enumerate(vals["ParticleType"])
         ]
 
-    def get_surface_params(self):
+    def _get_surface_params(self):
         return dict(
             particle_type=self.get_column("PolyplopiaPrimary", "type"),
             energy=self.get_column("PolyplopiaPrimary", "energy"),
             cos_zen=np.cos(self.get_column("PolyplopiaPrimary", "zenith")),
         )
 
-    def get_flux_params(self):
+    def _get_flux_params(self):
         return dict(
             ptype=self.get_column("PolyplopiaPrimary", "type"),
             E=self.get_column("PolyplopiaPrimary", "energy"),
         )
 
-    def get_event_weight(self):
+    def _get_event_weight(self):
         return np.ones_like(self.get_column("PolyplopiaPrimary", "energy"))
