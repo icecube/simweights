@@ -3,21 +3,39 @@ import warnings
 import numpy as np
 
 from .cylinder import VolumeCorrCylinder
-from .GenerationSurface import GenerationSurface
+from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
 from .utils import Null, get_column, get_table
 
 
 class Weighter:
+    """
+    Abstract base class from which all weighers derive.
+
+    Weighters will take a file object as input and calculate the weights of the events in the file
+    for a given flux. As well as helper functions for all columns in the file. Weighters will keep
+    track of the generation surface for the Monte Carlo in question. Weighters can be
+    added together to form samples with differnt simulation parameters
+    """
+
     def __init__(self, surface, data):
         self.surface = surface
         self.data = data
 
     def get_column(self, table: str, column: str):
+        """
+        Helper function to get a specific column from the file
+        """
         return np.ravel([get_column(get_table(d, table), column) for d in self.data])
 
     def get_weights(self, flux):
-        epdf = self.surface.get_extended_pdf(**self._get_surface_params())
+        """
+        Calculate the weights for the sample in the weighter function.
+
+        Multiplies the flux by the event weight and devides by the surface for every event in the
+        Monte Carlo sample.
+        """
+        epdf = self.surface.get_epdf(**self._get_surface_params())
         flux_val = flux(**self._get_flux_params())
         event_weight = self._get_event_weight()
 
@@ -31,9 +49,9 @@ class Weighter:
                 "outside the generation surface".format(np.logical_not(mask).sum(), mask.size)
             )
 
-        w = np.zeros_like(epdf)
-        w[mask] = (event_weight * flux_val)[mask] / epdf[mask]
-        return w
+        weights = np.zeros_like(epdf)
+        weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
+        return weights
 
     @staticmethod
     def _get_surface(smap):
@@ -65,6 +83,14 @@ class Weighter:
 
 
 class MapWeighter(Weighter):
+    """
+    Abstract base class for weighter which don't have S-frames
+
+    These generators (CorsikaReader and neutrion-generator) store the surface information in an
+    I3MapStringDouble and do not know how many jobs contributed to the current sample.
+    So the user must provide nfiles
+    """
+
     def __init__(self, infile, nfiles):
         assert nfiles is not None
         surface = Null()

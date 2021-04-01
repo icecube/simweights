@@ -75,8 +75,8 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(n0,self.s0.nevents)
         self.assertEqual(n1,self.s1.nevents)
         self.assertAlmostEqual(
-            s.get_extended_pdf(2212,50,0),
-            self.s0.get_extended_pdf(2212,50,0) + self.s1.get_extended_pdf(2212,50,0)
+            s.get_epdf(2212,50,0),
+            self.s0.get_epdf(2212,50,0) + self.s1.get_epdf(2212,50,0)
         )
 
         ss = self.s0 + self.s2
@@ -86,8 +86,8 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(ss.spectra[2212][0], self.s0)
         self.assertEqual(ss.spectra[2212][1], self.s2)
         self.assertAlmostEqual(
-            ss.get_extended_pdf(2212,50,0),
-            self.s0.get_extended_pdf(2212,50,0) + self.s2.get_extended_pdf(2212,50,0)
+            ss.get_epdf(2212,50,0),
+            self.s0.get_epdf(2212,50,0) + self.s2.get_epdf(2212,50,0)
         )
 
         s3 = self.s0 + self.s3
@@ -97,8 +97,8 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(s3.spectra[2212][0], self.s0)
         self.assertEqual(s3.spectra[2212][1], self.s3)
         self.assertAlmostEqual(
-            s3.get_extended_pdf(2212,50,0),
-            self.s0.get_extended_pdf(2212,50,0) + self.s3.get_extended_pdf(2212,50,0)
+            s3.get_epdf(2212,50,0),
+            self.s0.get_epdf(2212,50,0) + self.s3.get_epdf(2212,50,0)
         )
 
         s4 = self.s0 + self.s4
@@ -108,8 +108,8 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(len(s4.spectra[2213]),1)
         self.assertEqual(s4.spectra[2212][0], self.s0)
         self.assertEqual(s4.spectra[2213][0], self.s4)
-        self.assertAlmostEqual(s4.get_extended_pdf(2212,50,0),self.s0.get_extended_pdf(2212,50,0))
-        self.assertAlmostEqual(s4.get_extended_pdf(2213,50,0),self.s4.get_extended_pdf(2213,50,0))
+        self.assertAlmostEqual(s4.get_epdf(2212,50,0),self.s0.get_epdf(2212,50,0))
+        self.assertAlmostEqual(s4.get_epdf(2213,50,0),self.s4.get_epdf(2213,50,0))
 
         with self.assertRaises(TypeError):
             self.s0 + None
@@ -127,22 +127,22 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(said,id(sa))
         self.assertEqual(sa.nevents,44000)
         self.assertEqual(self.s0.nevents, 10000)
-        self.assertAlmostEqual(sa.get_extended_pdf(2212, 50, 0),
-                               4.4 * self.s0.get_extended_pdf(2212, 50, 0))
+        self.assertAlmostEqual(sa.get_epdf(2212, 50, 0),
+                               4.4 * self.s0.get_epdf(2212, 50, 0))
 
         sb = self.s0 * 5.5
         self.assertNotEqual(id(sb),id(self.s0))
         self.assertEqual(sb.nevents,55000)
         self.assertEqual(self.s0.nevents, 10000)
-        self.assertAlmostEqual(sb.get_extended_pdf(2212, 50, 0),
-                               5.5 * self.s0.get_extended_pdf(2212, 50, 0))
+        self.assertAlmostEqual(sb.get_epdf(2212, 50, 0),
+                               5.5 * self.s0.get_epdf(2212, 50, 0))
 
         sc = 6.6 * self.s0
         self.assertNotEqual(id(sc),id(self.s0))
         self.assertEqual(sc.nevents,66000)
         self.assertEqual(self.s0.nevents, 10000)
-        self.assertAlmostEqual(sc.get_extended_pdf(2212, 50, 0),
-                               6.6 * self.s0.get_extended_pdf(2212, 50, 0))
+        self.assertAlmostEqual(sc.get_epdf(2212, 50, 0),
+                               6.6 * self.s0.get_epdf(2212, 50, 0))
 
     def test_repr(self):
         rep = str(self.s0)
@@ -164,8 +164,8 @@ class TestGenerationSurface(unittest.TestCase):
     def test_powerlaw(self):
         N=self.s0.nevents
         E = np.geomspace(self.p1.a, self.p1.b - 1 / N, N)
-        cz = np.linspace(self.c1.a, self.c1.b, N)
-        w = 1/self.s0.get_extended_pdf(2212, E, cz)
+        cz = np.linspace(self.c1.cos_zen_min, self.c1.cos_zen_max, N)
+        w = 1/self.s0.get_epdf(2212, E, cz)
 
         area = (self.p1.b - self.p1.a) * (2 * self.c1.radius * np.pi**2
                                           * (self.c1.radius + self.c1.length))
@@ -181,17 +181,17 @@ class TestGenerationSurface(unittest.TestCase):
 
     def test_two_surfaces(self):
         N=self.s0.nevents
-        cz = np.linspace(self.c1.a, self.c1.b, N)
+        cz = np.linspace(self.c1.cos_zen_min, self.c1.cos_zen_max, N)
         q = np.linspace(1 / 2 / N, 1 - 1 / 2 / N, N)
         E1  = 10 * np.exp(q * np.log(100 / 10))
-        w1 = 1 / self.s0.get_extended_pdf(2212, E1, cz)
+        w1 = 1 / self.s0.get_epdf(2212, E1, cz)
         E2 = (q * (500**-1 - 50**-1)  + 50**-1)**-1
-        w2 = 1 / self.s2.get_extended_pdf(2212, E2, cz)
+        w2 = 1 / self.s2.get_epdf(2212, E2, cz)
 
         surf = self.s0 + self.s2
         E = np.r_[E1, E2]
         czc = np.r_[cz, cz]
-        wc = 1/surf.get_extended_pdf(2212, E, czc)
+        wc = 1/surf.get_epdf(2212, E, czc)
 
         self.assertAlmostEqual(wc.sum() / (self.p2.b - self.p1.a) / self.c1.etendue, 1, 3)
 

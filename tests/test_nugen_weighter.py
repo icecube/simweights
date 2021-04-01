@@ -43,8 +43,8 @@ def make_hdf5_file(fname,v):
 class TestCorsikaWeighter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        make_hdf5_file('file1.h5', (2212, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
-        make_hdf5_file('file2.h5', (2212, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
+        make_hdf5_file('file1.h5', (12, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
+        make_hdf5_file('file2.h5', (12, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
         cls.etendue = VolumeCorrCylinder(600, 1200, 0, 1).etendue
         cls.flux_model = lambda cls, energy, particle_type, cos_zen: 1 / cls.etendue
 
@@ -55,7 +55,7 @@ class TestCorsikaWeighter(unittest.TestCase):
 
     def check_weights(self, wf):
         w = wf.get_weights(self.flux_model)
-        emin, emax = wf.surface.get_energy_range(2212)
+        emin, emax = wf.surface.get_energy_range(12)
         self.assertAlmostEqual(w.sum() / (emax - emin), 2, 4)
         E = wf.get_column('I3MCWeightDict','PrimaryNeutrinoEnergy')
         y,x = np.histogram(E, weights = w, bins=50, range=[emin, emax])

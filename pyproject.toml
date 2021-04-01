@@ -19,6 +19,9 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Physics',
     ]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
@@ -32,7 +35,7 @@ line-length = 108
 target-version = ['py37']
 
 [tool.pylint.messages_control]
-disable = "C0330, C0326, C0114, C0103, C0115, C0116, R0903"
+disable = "C0330, C0326, C0114"
 
 [tool.pylint.format]
 max-line-length = "108"

@@ -3,14 +3,25 @@ from copy import copy
 import numpy as np
 
 from .utils import get_column, get_constant_column, get_table
-from .WeighterBase import MapWeighter
+from .weighter import MapWeighter
 
 
 class NuGenWeighter(MapWeighter):
+    """
+    Weighter for neutrino-generator (NuGen) simulation
+
+    Does not use S-Frames and stores the surface information in an I3MapStringDouble so that the user
+    does not know how many jobs contributed to the current sample, so it needs to know the number of
+    files. Nugen calculates the event weight in a column called ``TotalWeight`` which takes into account
+    the netutrino cross-section, detector density, and distance traveled through the generation volume.
+    """
+
     @staticmethod
     def _get_surface_map(infile):
+        # nugen generates an equal number of nu's and nubar's so you need to make two surfaces
+        # each with an n_events of half the number in the NEvents column
         table = get_table(infile, "I3MCWeightDict")
-        d1 = dict(
+        neutrino_surface = dict(
             n_events=0.5 * get_constant_column(get_column(table, "NEvents")),
             primary_type=get_constant_column(abs(get_column(table, "PrimaryNeutrinoType"))),
             cylinder_height=get_constant_column(get_column(table, "CylinderHeight")),
@@ -21,9 +32,12 @@ class NuGenWeighter(MapWeighter):
             max_zenith=get_constant_column(get_column(table, "MaxZenith")),
             power_law_index=-get_constant_column(get_column(table, "PowerLawIndex")),
         )
-        d2 = copy(d1)
-        d2.update(dict(primary_type=-d1["primary_type"]))
-        return [d1, d2]
+        # create a copy for the nubar and change the value of the type
+        anti_neutrino_surface = copy(neutrino_surface)
+        anti_neutrino_surface.update(dict(primary_type=-neutrino_surface["primary_type"]))
+        assert neutrino_surface["primary_type"] in [12, 14, 16]
+        assert anti_neutrino_surface["primary_type"] in [-12, -14, -16]
+        return [neutrino_surface, anti_neutrino_surface]
 
     def _get_surface_params(self):
         return dict(

@@ -1,10 +1,20 @@
 import numpy as np
 
 from .utils import Null, get_table, has_table
-from .WeighterBase import Weighter
+from .weighter import Weighter
 
 
 class PrimaryWeighter(Weighter):
+    """
+    Weighter for triggered (dynamic-stack) CORSIKA simulation.
+
+    This simulation is generated with I3PrimaryInjector icetray Module.
+    The cosmic-ray primaries are then propagated in the atmosphere with I3CORSIKAServer.
+    These files have an S-Frame so there is no need to guess the number of jobs.
+    These showers can be biased toward events with higher energy leading edge muons the weight from this
+    process is stored in the frame as ``I3CorsikaWeight.weight`` which is used as the event weight.
+    """
+
     def __init__(self, infile):
         info_obj = "I3PrimaryInjectorInfo"
         if not has_table(infile, info_obj):
@@ -30,4 +40,5 @@ class PrimaryWeighter(Weighter):
         )
 
     def _get_event_weight(self):
+        # this is the weight from the leading edge muon shower bias
         return self.get_column("I3CorsikaWeight", "weight")

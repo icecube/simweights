@@ -3,24 +3,27 @@ from scipy._lib._util import check_random_state
 
 
 class PowerLaw:
-    r"""A power-law function continuous random variable.
+    r"""A power-law continuous probability distribution.
 
-    This has a similar interface to the classes found in :py:module:`scipy.stats`
-    but differs in several ways: support is defined from a to b and negitive
-    values of gamma are allowed. No shape or location parameters are used.
+    This has a similar interface to the probability distribution classes found in :py:mod:`scipy.stats`.
+    However, it has several differences needed for weighting Monte Carlo simulation:
 
-    Notes
-    -----
-    The probability density function for `PowerLaw` is:
+    - The support is defined from a to b rather than from 0 to 1.
+    - Negitive values of the power-law index are allowed.
+    - No shape or location parameters are supported.
+
+    The probability density function for a `PowerLaw` is defined as:
+
     .. math::
-        f(x, \gamma) = A x^{\gamma}
-    for :math:`a \le x \le b`.
+
+      pdf(x, \gamma) = A x^{\gamma}\quad\mathrm{for}\quad a \le x \le b.
 
     Args:
-        g (float): Power law index
+        g (float): Power-law index
         a (float): Lower bound of the support of the distribution.
         b (float): Upper bound of the support of the distribution.
     """
+    # pylint: disable=invalid-name
 
     def __init__(self, g: float, a: float, b: float):
         assert b > a
@@ -92,16 +95,11 @@ class PowerLaw:
 
         Args:
             size (int or tuple of ints, optional): Defining number of random variates (Default is 1).
-            random_state ({None, int, `~np.random.RandomState`, `~np.random.Generator`}, optional):
-                This parameter defines the object to use for drawing random
-                variates.
-                If `random_state` is `None` the `~np.random.RandomState` singleton
-                is used.
-                If `random_state` is an int, a new ``RandomState`` instance is used,
-                seeded with random_state.
-                If `random_state` is already a ``RandomState`` or ``Generator``
-                instance, then that object is used.
-                Default is None.
+            random_state ({None, int, `~np.random.RandomState`, `~np.random.Generator`}, optional): This
+               parameter defines the object to use for drawing random variates. If `random_state` is `None`
+               the `~np.random.RandomState` singleton is used. If `random_state` is an int, a new
+               ``RandomState`` instance is used, seeded with random_state. If `random_state` is already a
+               ``RandomState`` or ``Generator`` instance, then that object is used. Default is None.
         """
         random_state = check_random_state(random_state)
         return self._ppf(random_state.uniform(0, 1, size))

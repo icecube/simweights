@@ -35,13 +35,13 @@ class TestCylinder(unittest.TestCase):
     def check_pdf_etendue(self,c,etendue):
         self.assertAlmostEqual(c.etendue, etendue)
 
-        x = np.linspace(c.a, c.b)
+        x = np.linspace(c.cos_zen_min, c.cos_zen_max)
         np.testing.assert_array_almost_equal(c.pdf(x), 1 / etendue)
 
-        x = np.linspace(-2,np.nextafter(c.a, -np.inf))
+        x = np.linspace(-2,np.nextafter(c.cos_zen_min, -np.inf))
         np.testing.assert_array_equal(c.pdf(x), 0)
 
-        x = np.linspace(np.nextafter(c.b, np.inf), 2)
+        x = np.linspace(np.nextafter(c.cos_zen_max, np.inf), 2)
         np.testing.assert_array_equal(c.pdf(x), 0)
 
     def test_cylinder_base(self):

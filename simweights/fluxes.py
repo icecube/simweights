@@ -15,6 +15,16 @@ from numpy import asarray, broadcast_arrays, exp, piecewise, sqrt
 
 
 class PDGCode(IntEnum):
+    """
+    Enumeration of the PDG particle numbering scheme by the Particle Data Group (PDG) for cosmic-ray
+    primaries
+
+    The PDG assigns a unique code to each type of particle. The numbering includes all known elementary
+    particles, composite particles, and atomic nuclei. However this enumeration is only used for cosmic-ray
+    flux models and is limited to particle types in these models.
+    """
+
+    # pylint: disable=invalid-name
     PPlus = 2212
     He4Nucleus = 1000020040
     Li7Nucleus = 1000030070
@@ -43,17 +53,15 @@ class PDGCode(IntEnum):
     Fe56Nucleus = 1000260560
 
 
-p = PDGCode
-
-
-def corsika_to_pdg(code):
+def corsika_to_pdg(cid):
     """
     Convert CORSIKA particle code to particle data group (PDG) Monte Carlo
     numbering scheme.
 
-    This function will only convert codes that correspond to
-    nuclei needed for the flux models in this module. That includes PPlus (14)
-    and He4Nucleus (402) through Fe56Nucleus (5626).
+    Note:
+        This function will only convert codes that correspond to
+        nuclei needed for the flux models in this module. That includes PPlus (14)
+        and He4Nucleus (402) through Fe56Nucleus (5626).
 
     Args:
         code (array_like): CORSIKA codes
@@ -61,12 +69,15 @@ def corsika_to_pdg(code):
     Returns:
         array_like: PDG codes
     """
-    code = asarray(code)
+    cid = asarray(cid)
     return piecewise(
-        code,
-        [code == 14, (code >= 100) & (code <= 9999)],
+        cid,
+        [cid == 14, (cid >= 100) & (cid <= 9999)],
         [2212, lambda c: 1000000000 + 10000 * (c % 100) + 10 * (c // 100)],
     )
+
+
+# pylint: disable=too-few-public-methods
 
 
 class CosmicRayFlux:
@@ -83,55 +94,49 @@ class CosmicRayFlux:
     ptypes = []
     _funcs = []
 
-    def _condition(self, E, pt):
+    def _condition(self, energy, pdgid):
         # pylint: disable=unused-argument
-        return [pt == p for p in self.ptypes]
+        return [pdgid == p for p in self.ptypes]
 
-    def __call__(self, E, ptype):
-        E, ptype = broadcast_arrays(E, ptype)
-        pcond = self._condition(E, ptype)
-        return piecewise(E, pcond, self._funcs)
+    def __call__(self, energy, pdgid):
+        energy, pdgid = broadcast_arrays(energy, pdgid)
+        pcond = self._condition(energy, pdgid)
+        return piecewise(energy, pcond, self._funcs)
 
 
 class Hoerandel(CosmicRayFlux):
-    """
-    All-particle spectrum (up to iron) after Hoerandel [#Hoerandel]_, as implemented
+    r"""
+    All-particle spectrum (up to iron) after Hörandel\ [#Hoerandel]_, as implemented
     in dCORSIKA.
-
-
-    .. [#Hoerandel] J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
-        `Astropart. Phys. 19 (2003) 193-220 <http://dx.doi.org/10.1016/S0927-6505(02)00198-6>`_.
-        `astro-ph/0210453 <https://arxiv.org/abs/astro-ph/0210453>`_.
-
     """
 
     ptypes = [
-        p.PPlus,
-        p.He4Nucleus,
-        p.Li7Nucleus,
-        p.Be9Nucleus,
-        p.B11Nucleus,
-        p.C12Nucleus,
-        p.N14Nucleus,
-        p.O16Nucleus,
-        p.F19Nucleus,
-        p.Ne20Nucleus,
-        p.Na23Nucleus,
-        p.Mg24Nucleus,
-        p.Al27Nucleus,
-        p.Si28Nucleus,
-        p.P31Nucleus,
-        p.S32Nucleus,
-        p.Cl35Nucleus,
-        p.Ar40Nucleus,
-        p.K39Nucleus,
-        p.Ca40Nucleus,
-        p.Sc45Nucleus,
-        p.Ti48Nucleus,
-        p.V51Nucleus,
-        p.Cr52Nucleus,
-        p.Mn55Nucleus,
-        p.Fe56Nucleus,
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.Li7Nucleus,
+        PDGCode.Be9Nucleus,
+        PDGCode.B11Nucleus,
+        PDGCode.C12Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.O16Nucleus,
+        PDGCode.F19Nucleus,
+        PDGCode.Ne20Nucleus,
+        PDGCode.Na23Nucleus,
+        PDGCode.Mg24Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Si28Nucleus,
+        PDGCode.P31Nucleus,
+        PDGCode.S32Nucleus,
+        PDGCode.Cl35Nucleus,
+        PDGCode.Ar40Nucleus,
+        PDGCode.K39Nucleus,
+        PDGCode.Ca40Nucleus,
+        PDGCode.Sc45Nucleus,
+        PDGCode.Ti48Nucleus,
+        PDGCode.V51Nucleus,
+        PDGCode.Cr52Nucleus,
+        PDGCode.Mn55Nucleus,
+        PDGCode.Fe56Nucleus,
     ]
     _funcs = [
         lambda E: 11776.445965025136 * E ** -2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
@@ -164,21 +169,17 @@ class Hoerandel(CosmicRayFlux):
 
 
 class Hoerandel5(CosmicRayFlux):
+    r"""
+    Hoerandel with only 5 components, after Becherini et al.\ [#Becherini]_
+    (These are the same as used by Arne Schoenwald's version\ [#Schoenwald]_)
     """
-    Hoerandel_ with only 5 components, after Becherini_ et al. (also the same as Arne_ Schoenwald's version)
-
-    J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
-    `Astropart. Phys. **19**, 193 (2003) <http://dx.doi.org/10.1016/S0927-6505(02)00198-6>`_.
-    `astro-ph/0210453 <https://arxiv.org/abs/astro-ph/0210453>`_.
-
-    Y. Becherini et al., "A parameterisation of single and multiple muons in the deep water or ice,"
-    `Astropart. Phys. **25**, 1 (2006) <http://dx.doi.org/10.1016/j.astropartphys.2005.10.005>`_.
-    `hep-ph/0507228 <https://arxiv.org/abs/hep-ph/0507228>`_.
-
-    Arne [DEAD link] _Arne: http://www.ifh.de/~arnes/Forever/Hoerandel_Plots/[Dead Link]
-    """
-
-    ptypes = [p.PPlus, p.He4Nucleus, p.N14Nucleus, p.Al27Nucleus, p.Fe56Nucleus]
+    ptypes = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Fe56Nucleus,
+    ]
     _funcs = [
         lambda E: 11776.445965025136 * E ** -2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 4749.371132996256 * E ** -2.64 * (1 + (E / (4.49e6 * 2)) ** 1.9) ** (-2.1 / 1.9),
@@ -193,7 +194,8 @@ class Hoerandel_IT(CosmicRayFlux):
     Modified 5-component Hoerandel spectrum with N and Al replaced by O.
     """
 
-    ptypes = [p.PPlus, p.He4Nucleus, p.O16Nucleus, p.Fe56Nucleus]
+    # pylint: disable=invalid-name
+    ptypes = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
     _funcs = [
         lambda E: 11776.445965025136 * E ** -2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 4749.371132996256 * E ** -2.64 * (1 + (E / (4.49e6 * 2)) ** 1.9) ** (-2.1 / 1.9),
@@ -203,20 +205,16 @@ class Hoerandel_IT(CosmicRayFlux):
 
 
 class GaisserHillas(CosmicRayFlux):
+    r"""
+    Spectral fits from an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
     """
-    Spectral fits from an internal report (also on the arXiv) by Tom Gaisser.
-
-    T. Gaisser, "Cosmic ray spectrum and composition > 100 TeV," IceCube Internal Report
-    `icecube/201102004-v2
-    <https://internal-apps.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004>`_
-    (2011).
-
-    T. Gaisser, "Spectrum of cosmic-ray nucleons and the atmospheric muon charge ratio,"
-    `Astropart. Phys. **35**, 801 (2012) <https://doi.org/10.1016/j.astropartphys.2012.02.010>`_.
-    `arXiv:1111.6675v2 <https://arxiv.org/abs/1111.6675v2>`_.
-    """
-
-    ptypes = [p.PPlus, p.He4Nucleus, p.N14Nucleus, p.Al27Nucleus, p.Fe56Nucleus]
+    ptypes = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Fe56Nucleus,
+    ]
     _funcs = [
         lambda E: 7860 * E ** (-2.66) * exp(-E / (4e6 * 1)),
         lambda E: 3550 * E ** (-2.58) * exp(-E / (4e6 * 2)),
@@ -227,12 +225,8 @@ class GaisserHillas(CosmicRayFlux):
 
 
 class GaisserH3a(CosmicRayFlux):
-    """
-    Spectral fits from an `internal report`_ (also on the arXiv) by `Tom Gaisser`_.
-
-    .. _`internal report`:
-    http://internal.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004
-    .. _`Tom Gaisser`: http://arxiv.org/abs/1111.6675v2
+    r"""
+    Spectral fits from an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
 
     The model H3a with a mixed extra-galactic population (Fig. 2)
     has all iron at the highest energy and would represent a
@@ -240,18 +234,14 @@ class GaisserH3a(CosmicRayFlux):
     in propagation over cosmic distances through the CMB but is
     instead just the extra-galactic accelerators reaching their
     highest energy.
-
-    T. Gaisser, "Cosmic ray spectrum and composition > 100 TeV," IceCube Internal Report
-    `icecube/201102004-v2
-    <https://internal-apps.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004>`_
-    (2011).
-
-    T. Gaisser, "Spectrum of cosmic-ray nucleons and the atmospheric muon charge ratio,"
-    `Astropart. Phys. **35**, 801 (2012) <https://doi.org/10.1016/j.astropartphys.2012.02.010>`_.
-    `arXiv:1111.6675v2 <https://arxiv.org/abs/1111.6675v2>`_.
     """
-
-    ptypes = [p.PPlus, p.He4Nucleus, p.N14Nucleus, p.Al27Nucleus, p.Fe56Nucleus]
+    ptypes = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Fe56Nucleus,
+    ]
     _funcs = [
         lambda E: 7860 * E ** -2.66 * exp(-E / (4e6 * 1))
         + 20.0 * E ** -2.4 * exp(-E / (3e7 * 1))
@@ -272,27 +262,19 @@ class GaisserH3a(CosmicRayFlux):
 
 
 class GaisserH4a(CosmicRayFlux):
-    """
-    Spectral fits from an `internal report`_ (also on the arXiv) by `Tom Gaisser`_.
-
-    .. _`internal report`:
-    http://internal.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004
-    .. _`Tom Gaisser`: http://arxiv.org/abs/1111.6675v2
+    r"""
+    Spectral fits from an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
 
     In the model H4a, on the other hand, the extra-galactic component
     is assumed to be all protons.
-
-    T. Gaisser, "Cosmic ray spectrum and composition > 100 TeV," IceCube Internal Report
-    `icecube/201102004-v2
-    <https://internal-apps.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004>`_
-    (2011).
-
-    T. Gaisser, "Spectrum of cosmic-ray nucleons and the atmospheric muon charge ratio,"
-    `Astropart. Phys. **35**, 801 (2012) <https://doi.org/10.1016/j.astropartphys.2012.02.010>`_.
-    `arXiv:1111.6675v2 <https://arxiv.org/abs/1111.6675v2>`_.
     """
-
-    ptypes = [p.PPlus, p.He4Nucleus, p.N14Nucleus, p.Al27Nucleus, p.Fe56Nucleus]
+    ptypes = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Fe56Nucleus,
+    ]
     _funcs = [
         lambda E: 7860 * E ** -2.66 * exp(-E / (4e6 * 1))
         + 20.0 * E ** -2.4 * exp(-E / (3e7 * 1))
@@ -305,20 +287,15 @@ class GaisserH4a(CosmicRayFlux):
 
 
 class GaisserH4a_IT(CosmicRayFlux):
-    """
+    r"""
     Variation of Gaisser's H4a flux using only four components.
 
     *This is not a very physical flux*: The Oxygen group is the sum of H4a's Nitrogen and Aluminum groups.
-    This is the flux used as an "a priori" estimate of mass-composition to produce the IceTop-only flux.
-
-    Reference: M. G. Aartsen et al. PHYSICAL REVIEW D 88, 042004 (2013)
-
-    M. G. Aartsen et al. "Measurement of the cosmic ray energy spectrum with IceTop-73,"
-    `Phys. Rev. D **88**, 042004 (2013) <https://doi.org/10.1103/PhysRevD.88.042004>`_.
-    `arXiv:1307.3795v1 <https://arxiv.org/abs/1307.3795v1>`_.
+    This is the flux used as an "a priori" estimate of mass-composition to produce the IceTop-only
+    flux\ [#Aartsen]_.
     """
-
-    ptypes = [p.PPlus, p.He4Nucleus, p.O16Nucleus, p.Fe56Nucleus]
+    # pylint: disable=invalid-name
+    ptypes = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
     _funcs = [
         lambda E: 7860 * E ** -2.66 * exp(-E / (4e6 * 1))
         + 20.0 * E ** -2.4 * exp(-E / (3e7 * 1))
@@ -333,22 +310,20 @@ class GaisserH4a_IT(CosmicRayFlux):
 
 
 class Honda2004(CosmicRayFlux):
-    """
-    Spectrum used to calculate neutrino fluxes in `Honda et al. (2004)`_
+    r"""
+    Spectrum used to calculate neutrino fluxes in Honda et al. (2004)\ [#Honda]_.
     (Table 1, with modification from the text).
-    ptypes = [p.PPlus,p.He4Nucleus,p.N14Nucleus,p.Al27Nucleus,p.Fe56Nucleus]
 
-    NB: the E_k notation means energy per nucleon!
-
-    .. _`Honda et al. (2004)`: http://link.aps.org/doi/10.1103/PhysRevD.70.043008
-
-    M. Honda, T. Kajita, K. Kasahara, and S. Midorikawa,
-    "New calculation of the atmospheric neutrino flux in a three-dimensional scheme,"
-    `Phys. Rev. D **70**, 043008 (2004) <https://doi.org/10.1103/PhysRevD.70.043008>`_.
-    `astro-ph/0404457v4 <https://arxiv.org/abs/astro-ph/0404457v4>`_.
+    Note:
+        the E_k notation means energy per nucleon!
     """
-
-    ptypes = [p.PPlus, p.He4Nucleus, p.N14Nucleus, p.Al27Nucleus, p.Fe56Nucleus]
+    ptypes = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Fe56Nucleus,
+    ]
     _funcs = [
         lambda E: (14900) * (E + 2.15 * exp(-0.21 * sqrt(E))) ** (-2.74),
         lambda E: (14900) * (100 ** (2.71 - 2.74)) * (E + 2.15 * exp(-0.21 * sqrt(E))) ** (-2.71),
@@ -358,58 +333,41 @@ class Honda2004(CosmicRayFlux):
         lambda E: (4.45 / 56.26) * (E / 56.26 + 3.07 * exp(-0.41 * sqrt(E / 56.26))) ** (-2.68),
     ]
 
-    def _condition(self, E, pt):
+    def _condition(self, energy, pdgid):
         return [
-            (pt == 2212) * (E < 100),
-            (pt == 2212) * (E >= 100),
-            pt == 1000020040,
-            pt == 1000070140,
-            pt == 1000130270,
-            pt == 1000260560,
+            (pdgid == 2212) * (energy < 100),
+            (pdgid == 2212) * (energy >= 100),
+            pdgid == 1000020040,
+            pdgid == 1000070140,
+            pdgid == 1000130270,
+            pdgid == 1000260560,
         ]
 
 
 class TIG1996(CosmicRayFlux):
-    """
-    Spectrum used to calculate prompt neutrino fluxes in `Enberg et al. (2008)`_ (Eq. 30).
-    The parameterization was taken directly from an earlier paper by Thunman_ et al.
+    r"""
+    Spectrum used to calculate prompt neutrino fluxes in Enberg et al. (2008)\ [#Enberg]_ (Eq. 30).
+    The parameterization was taken directly from an earlier paper by Thunman et al\ [#Thunman]_.
     Only the nucleon flux was given, so for simplicity we treat it as a proton-only flux.
-
-    .. _`Enberg et al. (2008)`: http://dx.doi.org/10.1103/PhysRevD.78.043005
-    .. _Thunman: http://arxiv.org/abs/hep-ph/9505417
-
-    R. Enberg, M. H. Reno, I. Sarcevic, "Prompt neutrino fluxes from atmospheric charm,"
-    `Phys. Rev. D **78**, 043005 (2008) <https://doi.org/10.1103/PhysRevD.78.043005>`_.
-    `arXiv:0806.0418 <https://arxiv.org/abs/0806.0418>`_.
-
-    M. Thunman, G. Ingelman, P. Gondolo,
-    "Charm Production and High Energy Atmospheric Muon and Neutrino Fluxes,"
-    `Astropart. Phys. **5**, 309 (1996) <https://doi.org/10.1016/0927-6505(96)00033-3>`_.
-    `hep-ph/9505417 <https://arxiv.org/abs/hep-ph/9505417>`_.
-
     """
-
-    ptypes = [p.PPlus]
+    ptypes = [PDGCode.PPlus]
     _funcs = [lambda E: 1.70e4 * E ** -2.7, lambda E: 1.74e6 * E ** -3.0, 0]
 
-    def _condition(self, E, pt):
-        return [(pt == 2212) * (E < 5e6), (pt == 2212) * (E >= 5e6)]
+    def _condition(self, energy, pdgid):
+        return [(pdgid == 2212) * (energy < 5e6), (pdgid == 2212) * (energy >= 5e6)]
 
 
 class GlobalFitGST(CosmicRayFlux):
+    r"""
+    Spectral fits by Gaisser, Stanev and Tilav\ [#GaisserStanevTilav]_.
     """
-    Spectral fits_ by Gaisser, Stanev and Tilav.
-
-    .. _fits: http://arxiv.org/pdf/1303.3565v1.pdf
-
-
-    T. K. Gaisser, T. Stanev, and S. Tilav,
-    "Cosmic ray energy spectrum from measurements of air showers,"
-    `Frontiers of Physics **8**, 748 (2013) https://doi.org/10.1007/s11467-013-0319-7>`_.
-    `arXiv:1303.3565 <https://arxiv.org/abs/1303.3565v1>`_.
-    """
-
-    ptypes = [p.PPlus, p.He4Nucleus, p.N14Nucleus, p.Al27Nucleus, p.Fe56Nucleus]
+    ptypes = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Fe56Nucleus,
+    ]
     _funcs = [
         lambda E: 7000 * E ** -2.66 * exp(-E / 1.2e5)
         + 150 * E ** -2.4 * exp(-E / 4e6)
@@ -440,20 +398,63 @@ class FixedFractionFlux(CosmicRayFlux):
         :type fractions: a dictionary with dataclasses.ParticleType as keys
         """
         self.flux = basis
-        f = {int(k): 0 for k in basis.ptypes}
-        f.update({int(k): v for k, v in fractions.items()})
-        self.ptypes = list(f.keys())
-        self.fracs = list(f.values())
+        fluxes = {int(k): 0 for k in basis.ptypes}
+        fluxes.update({int(k): v for k, v in fractions.items()})
+        self.ptypes = list(fluxes.keys())
+        self.fracs = list(fluxes.values())
         if normalized:
             assert sum(self.fracs) == 1.0
 
-    def __call__(self, E, ptype):
+    def __call__(self, energy, pdgid):
         """
         :param E: particle energy in GeV
         :param ptype: particle type code
         :type ptype: int
         """
-        E, ptype = broadcast_arrays(E, ptype)
-        v = sum(self.flux(E, p) for p in self.ptypes)
-        cond = self._condition(E, ptype)
-        return v * piecewise(E, cond, self.fracs)
+        energy, pdgid = broadcast_arrays(energy, pdgid)
+        fluxsum = sum(self.flux(energy, p) for p in self.ptypes)
+        cond = self._condition(energy, pdgid)
+        return fluxsum * piecewise(energy, cond, self.fracs)
+
+
+class References:
+    """
+    .. [#Hoerandel] J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
+       `Astropart. Phys. 19, 193 (2003)
+       <http://dx.doi.org/10.1016/S0927-6505(02)00198-6>`_.
+       `astro-ph/0210453 <https://arxiv.org/abs/astro-ph/0210453>`_.
+    .. [#Becherini] Y. Becherini et al.,
+       "A parameterisation of single and multiple muons in the deep water or ice,"
+       `Astropart. Phys. 25, 1 (2006)
+       <http://dx.doi.org/10.1016/j.astropartphys.2005.10.005>`_.
+       `hep-ph/0507228 <https://arxiv.org/abs/hep-ph/0507228>`_.
+    .. [#Schoenwald] A. Schoenwald, http://www.ifh.de/~arnes/Forever/Hoerandel_Plots/ [Dead Link]
+    .. [#Gaisser1] T. Gaisser,
+       "Cosmic ray spectrum and composition > 100 TeV," IceCube Internal Report
+       `icecube/201102004-v2
+       <https://internal-apps.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004>`_
+       (2011).
+    .. [#Gaisser2] T. Gaisser,
+       "Spectrum of cosmic-ray nucleons and the atmospheric muon charge ratio,"
+       `Astropart. Phys. 35, 801 (2012)
+       <https://doi.org/10.1016/j.astropartphys.2012.02.010>`_.
+       `arXiv:1111.6675v2 <https://arxiv.org/abs/1111.6675v2>`_.
+    .. [#Aartsen] M. G. Aartsen et al. "Measurement of the cosmic ray energy spectrum with IceTop-73,"
+       `Phys. Rev. D 88, 042004 (2013) <https://doi.org/10.1103/PhysRevD.88.042004>`_.
+       `arXiv:1307.3795v1 <https://arxiv.org/abs/1307.3795v1>`_.
+    .. [#Honda] M. Honda, T. Kajita, K. Kasahara, and S. Midorikawa,
+       "New calculation of the atmospheric neutrino flux in a three-dimensional scheme,"
+       `Phys. Rev. D 70, 043008 (2004) <https://doi.org/10.1103/PhysRevD.70.043008>`_.
+       `astro-ph/0404457v4 <https://arxiv.org/abs/astro-ph/0404457v4>`_.
+    .. [#Enberg] R. Enberg, M. H. Reno, I. Sarcevic, "Prompt neutrino fluxes from atmospheric charm,"
+       `Phys. Rev. D 78, 043005 (2008) <https://doi.org/10.1103/PhysRevD.78.043005>`_.
+       `arXiv:0806.0418 <https://arxiv.org/abs/0806.0418>`_.
+    .. [#Thunman] M. Thunman, G. Ingelman, P. Gondolo,
+       "Charm Production and High Energy Atmospheric Muon and Neutrino Fluxes,"
+       `Astropart. Phys. 5, 309 (1996) <https://doi.org/10.1016/0927-6505(96)00033-3>`_.
+       `hep-ph/9505417 <https://arxiv.org/abs/hep-ph/9505417>`_.
+    .. [#GaisserStanevTilav] T. K. Gaisser, T. Stanev, and S. Tilav,
+       "Cosmic ray energy spectrum from measurements of air showers,"
+       `Frontiers of Physics 8, 748 (2013) <https://doi.org/10.1007/s11467-013-0319-7>`_.
+       `arXiv:1303.3565 <https://arxiv.org/abs/1303.3565v1>`_.
+    """
