@@ -1,6 +1,12 @@
 #!/usr/bin/env python
-import os, unittest, h5py, tables, pandas
+import os
+import unittest
+
+import h5py
 import numpy as np
+import pandas
+import tables
+
 import simweights
 
 weight_dtype = [
@@ -91,7 +97,7 @@ class TestTriggeredCorsikaWeighter(unittest.TestCase):
         f.close()
         with self.assertRaises(RuntimeError):
             simfile1 = h5py.File("nothing.h5", "r")
-            wf1 = simweights.TriggeredCorsikaWeighter(simfile1)
+            simweights.TriggeredCorsikaWeighter(simfile1)
         os.unlink("nothing.h5")
 
 
