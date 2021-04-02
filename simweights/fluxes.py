@@ -417,7 +417,7 @@ class FixedFractionFlux(CosmicRayFlux):
         return fluxsum * piecewise(energy, cond, self.fracs)
 
 
-class References:
+class _references:
     """
     .. [#Hoerandel] J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
        `Astropart. Phys. 19, 193 (2003)
