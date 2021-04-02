@@ -24,7 +24,7 @@ __all__ = [
     "GenerationSurfaceCollection",
     "NuGenWeighter",
     "PowerLaw",
-    "PrimaryWeighter",
+    "TriggeredCorsikaWeighter",
 ]
 
 from .corsika_weighter import CorsikaWeighter
@@ -47,4 +47,4 @@ from .fluxes import (
 from .generation_surface import GenerationSurface, GenerationSurfaceCollection
 from .nugen_weighter import NuGenWeighter
 from .powerlaw import PowerLaw
-from .primary_weighter import PrimaryWeighter
+from .triggered_corsika_weighter import TriggeredCorsikaWeighter

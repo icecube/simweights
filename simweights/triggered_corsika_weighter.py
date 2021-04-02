@@ -4,7 +4,7 @@ from .utils import Null, get_table, has_table
 from .weighter import Weighter
 
 
-class PrimaryWeighter(Weighter):
+class TriggeredCorsikaWeighter(Weighter):
     """
     Weighter for triggered (dynamic-stack) CORSIKA simulation.
 

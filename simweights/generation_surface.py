@@ -10,19 +10,19 @@ class GenerationSurface:
     This is a booking class which represents the surface in which Monte Carlo simulation is generated on.
 
     In IceCube the surface is an combines an energy, an area, and a solid angle as well as the number of
-    events generated. This uses composision to store the energy spectrum in spectrum and the area and solid
-    angle stored in the surface.
+    events generated. This uses composision to store the energy spectrum in energy_dist and the area and
+    solid angle stored in the surface.
     """
 
-    def __init__(self, particle_type, nevents, spectrum, surface):
+    def __init__(self, particle_type, nevents, energy_dist, spatial_dist):
         self.particle_type = particle_type
         try:
             self.particle_name = PDGCode(particle_type).name
         except ValueError:
             self.particle_name = str(particle_type)
         self.nevents = nevents
-        self.spectrum = deepcopy(spectrum)
-        self.surface = deepcopy(surface)
+        self.energy_dist = deepcopy(energy_dist)
+        self.spatial_dist = deepcopy(spatial_dist)
 
     def get_epdf(self, particle_type, energy, cos_zen):
         """
@@ -32,13 +32,13 @@ class GenerationSurface:
         by the number of events.
         """
         assert np.all(particle_type == self.particle_type)
-        return self.nevents * self.spectrum.pdf(energy) * self.surface.pdf(cos_zen)
+        return self.nevents * self.energy_dist.pdf(energy) * self.spatial_dist.pdf(cos_zen)
 
     def get_surface_area(self):
         """
         Get the surface area in E * sr * m^2
         """
-        return self.spectrum.span * self.surface.etendue
+        return self.energy_dist.span * self.spatial_dist.etendue
 
     def is_compatible(self, other):
         """
@@ -47,8 +47,8 @@ class GenerationSurface:
         return (
             isinstance(other, type(self))
             and self.particle_type == other.particle_type
-            and self.spectrum == other.spectrum
-            and self.surface == other.surface
+            and self.energy_dist == other.energy_dist
+            and self.spatial_dist == other.spatial_dist
         )
 
     def get_energy_range(self, ptype):
@@ -56,13 +56,13 @@ class GenerationSurface:
         Return the energy range for given particle type over all surfaces
         """
         assert ptype == self.particle_type
-        return self.spectrum.a, self.spectrum.b
+        return self.energy_dist.a, self.energy_dist.b
 
     def __eq__(self, other):
         return self.is_compatible(other) and self.nevents == other.nevents
 
     def __add__(self, other):
-        if isinstance(other, type(self)):
+        if isinstance(other, GenerationSurface):
             if self.is_compatible(other):
                 new_surface = deepcopy(self)
                 new_surface.nevents = self.nevents + other.nevents
@@ -84,7 +84,7 @@ class GenerationSurface:
 
     def __repr__(self):
         return "{}({}, {:7.3e}, {}, {})".format(
-            self.__class__.__name__, self.particle_name, self.nevents, self.spectrum, self.surface
+            self.__class__.__name__, self.particle_name, self.nevents, self.energy_dist, self.spatial_dist
         )
 
 
@@ -166,8 +166,8 @@ class GenerationSurfaceCollection:
         emin = np.inf
         emax = -np.inf
         for surf in self.spectra[ptype]:
-            emin = min(emin, surf.spectrum.a)
-            emax = max(emax, surf.spectrum.b)
+            emin = min(emin, surf.energy_dist.a)
+            emax = max(emax, surf.energy_dist.b)
         assert np.isfinite(emin)
         assert np.isfinite(emax)
         return emin, emax
@@ -182,7 +182,7 @@ class GenerationSurfaceCollection:
             # must have the same number of unique spectra
             if len(spec1) != len(spec2):
                 return False
-            # exactly one match for each spectrum
+            # exactly one match for each energy_dist
             for subspec1 in spec1:
                 if sum(subspec1 == subspec2 for subspec2 in spec2) != 1:
                     return False
@@ -202,7 +202,7 @@ class GenerationSurfaceCollection:
             collections = []
             for subspec in specs:
                 collections.append(
-                    "N={:8.4g} {} {}".format(subspec.nevents, subspec.spectrum, subspec.surface)
+                    "N={:8.4g} {} {}".format(subspec.nevents, subspec.energy_dist, subspec.spatial_dist)
                 )
             outstrs.append(
                 "     {:11} : ".format(specs[0].particle_name) + "\n                   ".join(collections)

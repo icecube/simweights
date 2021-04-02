@@ -171,13 +171,13 @@ class TestGenerationSurface(unittest.TestCase):
                                           * (self.c1.radius + self.c1.length))
 
         self.assertAlmostEqual(area, self.s0.get_surface_area())
-        self.assertAlmostEqual(area, self.s0.spectrum.span * self.s0.surface.etendue)
+        self.assertAlmostEqual(area, self.s0.energy_dist.span * self.s0.spatial_dist.etendue)
         self.assertAlmostEqual(w.sum()/area, 1, 4)
 
-        self.assertEqual(self.s0.surface,self.c1)
-        self.assertIsNot(self.s0.surface,self.c1)
-        self.assertEqual(self.s0.spectrum,self.p1)
-        self.assertIsNot(self.s0.spectrum,self.p1)
+        self.assertEqual(self.s0.spatial_dist,self.c1)
+        self.assertIsNot(self.s0.spatial_dist,self.c1)
+        self.assertEqual(self.s0.energy_dist,self.p1)
+        self.assertIsNot(self.s0.energy_dist,self.p1)
 
     def test_two_surfaces(self):
         N=self.s0.nevents
@@ -195,32 +195,32 @@ class TestGenerationSurface(unittest.TestCase):
 
         self.assertAlmostEqual(wc.sum() / (self.p2.b - self.p1.a) / self.c1.etendue, 1, 3)
 
-        self.assertEqual(self.s0.surface, self.c1)
-        self.assertIsNot(self.s0.surface, self.c1)
-        self.assertEqual(self.s0.spectrum, self.p1)
-        self.assertIsNot(self.s0.spectrum, self.p1)
+        self.assertEqual(self.s0.spatial_dist, self.c1)
+        self.assertIsNot(self.s0.spatial_dist, self.c1)
+        self.assertEqual(self.s0.energy_dist, self.p1)
+        self.assertIsNot(self.s0.energy_dist, self.p1)
 
-        self.assertEqual(self.s2.surface, self.c1)
-        self.assertIsNot(self.s2.surface, self.c1)
-        self.assertEqual(self.s2.spectrum, self.p2)
-        self.assertIsNot(self.s2.spectrum, self.p2)
+        self.assertEqual(self.s2.spatial_dist, self.c1)
+        self.assertIsNot(self.s2.spatial_dist, self.c1)
+        self.assertEqual(self.s2.energy_dist, self.p2)
+        self.assertIsNot(self.s2.energy_dist, self.p2)
 
         self.assertEqual(len(surf.spectra), 1)
         np.testing.assert_array_equal(list(surf.spectra.keys()), [2212])
         
         self.assertEqual(surf.spectra[2212][0],self.s0)
         self.assertIsNot(surf.spectra[2212][0],self.s0)
-        self.assertEqual(surf.spectra[2212][0].surface,self.s0.surface)
-        self.assertIsNot(surf.spectra[2212][0].surface,self.s0.surface)
-        self.assertEqual(surf.spectra[2212][0].spectrum,self.s0.spectrum)
-        self.assertIsNot(surf.spectra[2212][0].spectrum,self.s0.spectrum)      
+        self.assertEqual(surf.spectra[2212][0].spatial_dist,self.s0.spatial_dist)
+        self.assertIsNot(surf.spectra[2212][0].spatial_dist,self.s0.spatial_dist)
+        self.assertEqual(surf.spectra[2212][0].energy_dist,self.s0.energy_dist)
+        self.assertIsNot(surf.spectra[2212][0].energy_dist,self.s0.energy_dist)      
         
         self.assertEqual(surf.spectra[2212][1],self.s2)
         self.assertIsNot(surf.spectra[2212][1],self.s2)
-        self.assertEqual(surf.spectra[2212][1].surface, self.s2.surface)
-        self.assertIsNot(surf.spectra[2212][1].surface, self.s2.surface)
-        self.assertEqual(surf.spectra[2212][1].spectrum, self.s2.spectrum)
-        self.assertIsNot(surf.spectra[2212][1].spectrum, self.s2.spectrum)
+        self.assertEqual(surf.spectra[2212][1].spatial_dist, self.s2.spatial_dist)
+        self.assertIsNot(surf.spectra[2212][1].spatial_dist, self.s2.spatial_dist)
+        self.assertEqual(surf.spectra[2212][1].energy_dist, self.s2.energy_dist)
+        self.assertIsNot(surf.spectra[2212][1].energy_dist, self.s2.energy_dist)
 
     def test_instantiation(self):
         s02 = GenerationSurfaceCollection(self.s0, self.s0)
