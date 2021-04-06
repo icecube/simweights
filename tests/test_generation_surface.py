@@ -4,15 +4,15 @@ from copy import deepcopy
 
 import numpy as np
 
-from simweights import GenerationSurface, GenerationSurfaceCollection, PDGCode, PowerLaw, VolumeCorrCylinder
+from simweights import GenerationSurface, GenerationSurfaceCollection, PDGCode, PowerLaw, NaturalRateCylinder
 
 
 class TestGenerationSurface(unittest.TestCase):
     def setUp(self):
         self.p1 = PowerLaw(-1, 10, 100)
         self.p2 = PowerLaw(-2, 50, 500)
-        self.c1 = VolumeCorrCylinder(3, 8, -1, 1)
-        self.c2 = VolumeCorrCylinder(4, 8, -1, 1)
+        self.c1 = NaturalRateCylinder(3, 8, -1, 1)
+        self.c2 = NaturalRateCylinder(4, 8, -1, 1)
 
         self.s0 = GenerationSurface(2212, 10000, self.p1, self.c1)
         self.s1 = GenerationSurface(2212, 20000, self.p1, self.c1)

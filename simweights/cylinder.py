@@ -59,11 +59,18 @@ class CylinderBase:
         )
 
 
-class VolumeDetCylinder(CylinderBase):  # pragma: no cover
-    """
-    A Cylinder where the primary zenith distribution was uniform and then
-    the events were sampled on the cross section perpendicular to the direction
-    of the primary.
+class UniformSolidAngleCylinder(CylinderBase):
+    r"""
+    A Cylinder where the the angular distribution was sampled as if it were uniform on
+    the surface of a sphere. The area of the location surface is porportional to the
+    cross section of the cylinder perpendicular to the direction of the primary.
+
+    The Monte Carlo must have been generated with the following zenith angle intensity:
+
+    .. math::
+
+      I \propto \cos\theta
+
     """
 
     def _pdf(self, cos_zen):
@@ -76,7 +83,7 @@ class VolumeDetCylinder(CylinderBase):  # pragma: no cover
         )
 
 
-class VolumeCorrCylinder(CylinderBase):
+class NaturalRateCylinder(CylinderBase):
     r"""
     This is the angular distribution used where the primary zenith distribution matched the natural rate of
     an isotropic source incident on a cylinder.

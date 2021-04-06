@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from .cylinder import VolumeCorrCylinder
+from .cylinder import NaturalRateCylinder
 from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
 from .utils import Null, get_column, get_table
@@ -56,7 +56,7 @@ class Weighter:
     @staticmethod
     def _get_surface(smap):
         assert smap["power_law_index"] < 0
-        surface = VolumeCorrCylinder(
+        surface = NaturalRateCylinder(
             smap["cylinder_height"],
             smap["cylinder_radius"],
             np.cos(smap["max_zenith"]),

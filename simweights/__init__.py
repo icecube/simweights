@@ -6,7 +6,8 @@ __version__ = "0.1"
 
 __all__ = [
     "CorsikaWeighter",
-    "VolumeCorrCylinder",
+    "NaturalRateCylinder",
+    "UniformSolidAngleCylinder",
     "TIG1996",
     "FixedFractionFlux",
     "GaisserH3a",
@@ -28,7 +29,7 @@ __all__ = [
 ]
 
 from .corsika_weighter import CorsikaWeighter
-from .cylinder import VolumeCorrCylinder
+from .cylinder import NaturalRateCylinder, UniformSolidAngleCylinder
 from .fluxes import (
     TIG1996,
     FixedFractionFlux,

@@ -51,7 +51,7 @@ class TestTriggeredCorsikaWeighter(unittest.TestCase):
     def setUpClass(cls):
         make_hdf5_file("file1.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
         make_hdf5_file("file2.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
-        cls.etendue = simweights.VolumeCorrCylinder(600, 1200, 0, 1).etendue
+        cls.etendue = simweights.NaturalRateCylinder(600, 1200, 0, 1).etendue
         cls.flux_model = lambda cls, E, ptype: 1 / cls.etendue
 
     @classmethod

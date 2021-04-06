@@ -3,7 +3,7 @@ import unittest
 
 import numpy as np
 
-from simweights import VolumeCorrCylinder
+from simweights import NaturalRateCylinder, UniformSolidAngleCylinder
 from simweights.cylinder import CylinderBase
 
 
@@ -72,14 +72,14 @@ class TestCylinder(unittest.TestCase):
         last_c1 = None
         for le in range(100, 1000, 300):
             for r in range(100, 1000, 300):
-                c1 = VolumeCorrCylinder(le, r, -1, 1)
+                c1 = NaturalRateCylinder(le, r, -1, 1)
                 self.check_diff_etendue(c1, le, r)
                 self.check_pdf_etendue(c1, 2 * np.pi ** 2 * r * (r + le))
 
-                c2 = VolumeCorrCylinder(le, r, -1, 0)
+                c2 = NaturalRateCylinder(le, r, -1, 0)
                 self.check_pdf_etendue(c2, np.pi ** 2 * r * (r + le))
 
-                c3 = VolumeCorrCylinder(le, r, 0, 1)
+                c3 = NaturalRateCylinder(le, r, 0, 1)
                 self.check_pdf_etendue(c3, np.pi ** 2 * r * (r + le))
 
                 self.assertEqual(c1, c1)
@@ -92,12 +92,58 @@ class TestCylinder(unittest.TestCase):
                 last_c1 = c1
 
                 s = str(c1)
-                self.assertEqual(s[:19], "VolumeCorrCylinder(")
-                x = s[19:-1].split(",")
+                self.assertEqual(s[:20], "NaturalRateCylinder(")
+                x = s[20:-1].split(",")
                 self.assertEqual(float(x[0]), le)
                 self.assertEqual(float(x[1]), r)
                 self.assertEqual(float(x[2]), -1)
                 self.assertEqual(float(x[3]), 1)
+
+
+    def check_uniform_pdf(self, c, etendue):
+        self.assertAlmostEqual(c.etendue, etendue)
+
+        x = np.linspace(c.cos_zen_min, c.cos_zen_max)
+        np.testing.assert_array_almost_equal(c.pdf(x), 1 / 2 / np.pi / c.projected_area(x))
+
+        x = np.linspace(-2, np.nextafter(c.cos_zen_min, -np.inf))
+        np.testing.assert_array_equal(c.pdf(x), 0)
+
+        x = np.linspace(np.nextafter(c.cos_zen_max, np.inf), 2)
+        np.testing.assert_array_equal(c.pdf(x), 0)
+
+
+    def test_uniform_solid_angle(self):
+        last_c1 = None
+        for le in range(100, 1000, 300):
+            for r in range(100, 1000, 300):
+                c1 = UniformSolidAngleCylinder(le, r, -1, 1)
+                self.check_diff_etendue(c1, le, r)
+                self.check_uniform_pdf(c1, 2 * np.pi ** 2 * r * (r + le))
+
+                c2 = UniformSolidAngleCylinder(le, r, -1, 0)
+                self.check_uniform_pdf(c2, np.pi ** 2 * r * (r + le))
+
+                c3 = UniformSolidAngleCylinder(le, r, 0, 1)
+                self.check_uniform_pdf(c3, np.pi ** 2 * r * (r + le))
+
+                self.assertEqual(c1, c1)
+                self.assertNotEqual(c1, c2)
+                self.assertNotEqual(c1, c3)
+                self.assertEqual(c2, c2)
+                self.assertNotEqual(c2, c3)
+                self.assertEqual(c3, c3)
+                self.assertNotEqual(c1, last_c1)
+                last_c1 = c1
+
+                s = str(c1)
+                self.assertEqual(s[:26], "UniformSolidAngleCylinder(")
+                x = s[26:-1].split(",")
+                self.assertEqual(float(x[0]), le)
+                self.assertEqual(float(x[1]), r)
+                self.assertEqual(float(x[2]), -1)
+                self.assertEqual(float(x[3]), 1)
+
 
 
 if __name__ == "__main__":
