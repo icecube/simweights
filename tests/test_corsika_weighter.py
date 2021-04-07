@@ -81,8 +81,8 @@ class TestCorsikaWeighter(unittest.TestCase):
         np.testing.assert_array_almost_equal(y / Ewidth, 1, 2)
 
         w2 = wf.get_weights(self.flux_model2)
-        surface2 = quad(self.flux_model2,emin,emax,args=(2212,))[0]*self.etendue    
-        self.assertAlmostEqual(w2.sum()/surface2,1 ,4)
+        surface2 = quad(self.flux_model2, emin, emax, args=(2212,))[0] * self.etendue
+        self.assertAlmostEqual(w2.sum() / surface2, 1, 4)
 
     def test_h5py(self):
         simfile = h5py.File("file1.h5", "r")

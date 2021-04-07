@@ -99,7 +99,6 @@ class TestCylinder(unittest.TestCase):
                 self.assertEqual(float(x[2]), -1)
                 self.assertEqual(float(x[3]), 1)
 
-
     def check_uniform_pdf(self, c, etendue):
         self.assertAlmostEqual(c.etendue, etendue)
 
@@ -111,7 +110,6 @@ class TestCylinder(unittest.TestCase):
 
         x = np.linspace(np.nextafter(c.cos_zen_max, np.inf), 2)
         np.testing.assert_array_equal(c.pdf(x), 0)
-
 
     def test_uniform_solid_angle(self):
         last_c1 = None
@@ -143,7 +141,6 @@ class TestCylinder(unittest.TestCase):
                 self.assertEqual(float(x[1]), r)
                 self.assertEqual(float(x[2]), -1)
                 self.assertEqual(float(x[3]), 1)
-
 
 
 if __name__ == "__main__":

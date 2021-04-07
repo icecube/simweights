@@ -7,7 +7,7 @@ import numpy as np
 import pandas
 import tables
 
-from simweights import NuGenWeighter, NaturalRateCylinder
+from simweights import NaturalRateCylinder, NuGenWeighter
 
 weight_dtype = [
     ("PrimaryNeutrinoType", np.int32),

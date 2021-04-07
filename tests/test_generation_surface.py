@@ -4,7 +4,13 @@ from copy import deepcopy
 
 import numpy as np
 
-from simweights import GenerationSurface, GenerationSurfaceCollection, PDGCode, PowerLaw, NaturalRateCylinder
+from simweights import (
+    GenerationSurface,
+    GenerationSurfaceCollection,
+    NaturalRateCylinder,
+    PDGCode,
+    PowerLaw,
+)
 
 
 class TestGenerationSurface(unittest.TestCase):

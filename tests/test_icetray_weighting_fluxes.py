@@ -19,16 +19,16 @@ class TestCosmicRayModels(unittest.TestCase):
         f2 = getattr(newfluxes, name)()
         N = 1000
         E = np.logspace(2, 10, N)
-        self.assertEqual([CorsikaToPDG(p) for p in f1.ptypes], f2.ptypes)
+        self.assertEqual([CorsikaToPDG(p) for p in f1.ptypes], f2.pdgids)
 
         if isinstance(f1, oldfluxes.CompiledFlux):
             f1._translator = None
             ptypes = f1.ptypes
         else:
-            ptypes = f2.ptypes
+            ptypes = f2.pdgids
         for j in range(len(ptypes)):
             v1 = f1(E, ptypes[j])
-            v2 = f2(E, f2.ptypes[j])
+            v2 = f2(E, f2.pdgids[j])
             for i in range(len(E)):
                 self.assertAlmostEqual(v1[i], v2[i], 17)
                 if v2[i] != 0:
@@ -44,8 +44,8 @@ class TestCosmicRayModels(unittest.TestCase):
         f2 = newfluxes.FixedFractionFlux(f)
         N = 1000
         E = np.logspace(2, 10, N)
-        self.assertEqual([CorsikaToPDG(p) for p in f1.ptypes], f2.ptypes)
-        for p in f2.ptypes:
+        self.assertEqual([CorsikaToPDG(p) for p in f1.ptypes], f2.pdgids)
+        for p in f2.pdgids:
             v1 = [f1(EE, PDGToCorsika(p)) for EE in E]
             v2 = f2(E, p)
             for i in range(N):
