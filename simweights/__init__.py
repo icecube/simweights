@@ -42,10 +42,10 @@ from .fluxes import (
     Hoerandel5,
     Hoerandel_IT,
     Honda2004,
-    PDGCode,
-    corsika_to_pdg,
 )
 from .generation_surface import GenerationSurface, GenerationSurfaceCollection
 from .nugen_weighter import NuGenWeighter
+from .pdgcode import PDGCode
 from .powerlaw import PowerLaw
 from .triggered_corsika_weighter import TriggeredCorsikaWeighter
+from .utils import corsika_to_pdg

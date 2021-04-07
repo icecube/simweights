@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from .fluxes import PDGCode
+from .pdgcode import PDGCode
 
 
 class GenerationSurface:

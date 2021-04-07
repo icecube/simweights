@@ -55,8 +55,32 @@ def get_constant_column(col):
     """
     val = col[0]
     assert np.ndim(val) == 0
-    np.array_equal(val, col, equal_nan=True)
+    assert (val == col).all()
     return val
+
+
+def corsika_to_pdg(cid):
+    """
+    Convert CORSIKA particle code to particle data group (PDG) Monte Carlo
+    numbering scheme.
+
+    Note:
+        This function will only convert codes that correspond to
+        nuclei needed for the flux models in this module. That includes PPlus (14)
+        and He4Nucleus (402) through Fe56Nucleus (5626).
+
+    Args:
+        code (array_like): CORSIKA codes
+
+    Returns:
+        array_like: PDG codes
+    """
+    cid = np.asarray(cid)
+    return np.piecewise(
+        cid,
+        [cid == 14, (cid >= 100) & (cid <= 9999)],
+        [2212, lambda c: 1000000000 + 10000 * (c % 100) + 10 * (c // 100)],
+    )
 
 
 def append_dicts(first, second):  # pragma: no cover

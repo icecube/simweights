@@ -9,6 +9,7 @@ import unittest
 
 import numpy as np
 
+from simweights import corsika_to_pdg
 from simweights import fluxes as newfluxes
 
 
@@ -55,9 +56,7 @@ class TestCosmicRayModels(unittest.TestCase):
 
     def test_corsika_to_pdg(self):
         ctypes = [14, 402, 1407, 1608, 2713, 5626]
-        assert np.all(
-            oldfluxes.FixedFractionFlux.corsika_to_pdg(ctypes) == newfluxes.corsika_to_pdg(ctypes)
-        )
+        assert np.all(oldfluxes.FixedFractionFlux.corsika_to_pdg(ctypes) == corsika_to_pdg(ctypes))
 
 
 models = [

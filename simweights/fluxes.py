@@ -9,73 +9,9 @@ However they have been refactored to:
 * Follow :py:mod:`numpy` broadcasting rules
 
 """
-from enum import IntEnum
+from numpy import broadcast_arrays, exp, piecewise, sqrt
 
-from numpy import asarray, broadcast_arrays, exp, piecewise, sqrt
-
-
-class PDGCode(IntEnum):
-    """
-    Enumeration of the PDG particle numbering scheme by the Particle Data Group (PDG) for cosmic-ray
-    primaries
-
-    The PDG assigns a unique code to each type of particle. The numbering includes all known elementary
-    particles, composite particles, and atomic nuclei. However this enumeration is only used for cosmic-ray
-    flux models and is limited to particle types in these models.
-    """
-
-    # pylint: disable=invalid-name
-    PPlus = 2212
-    He4Nucleus = 1000020040
-    Li7Nucleus = 1000030070
-    Be9Nucleus = 1000040090
-    B11Nucleus = 1000050110
-    C12Nucleus = 1000060120
-    N14Nucleus = 1000070140
-    O16Nucleus = 1000080160
-    F19Nucleus = 1000090190
-    Ne20Nucleus = 1000100200
-    Na23Nucleus = 1000110230
-    Mg24Nucleus = 1000120240
-    Al27Nucleus = 1000130270
-    Si28Nucleus = 1000140280
-    P31Nucleus = 1000150310
-    S32Nucleus = 1000160320
-    Cl35Nucleus = 1000170350
-    Ar40Nucleus = 1000180400
-    K39Nucleus = 1000190390
-    Ca40Nucleus = 1000200400
-    Sc45Nucleus = 1000210450
-    Ti48Nucleus = 1000220480
-    V51Nucleus = 1000230510
-    Cr52Nucleus = 1000240520
-    Mn55Nucleus = 1000250550
-    Fe56Nucleus = 1000260560
-
-
-def corsika_to_pdg(cid):
-    """
-    Convert CORSIKA particle code to particle data group (PDG) Monte Carlo
-    numbering scheme.
-
-    Note:
-        This function will only convert codes that correspond to
-        nuclei needed for the flux models in this module. That includes PPlus (14)
-        and He4Nucleus (402) through Fe56Nucleus (5626).
-
-    Args:
-        code (array_like): CORSIKA codes
-
-    Returns:
-        array_like: PDG codes
-    """
-    cid = asarray(cid)
-    return piecewise(
-        cid,
-        [cid == 14, (cid >= 100) & (cid <= 9999)],
-        [2212, lambda c: 1000000000 + 10000 * (c % 100) + 10 * (c // 100)],
-    )
-
+from .pdgcode import PDGCode
 
 # pylint: disable=too-few-public-methods
 

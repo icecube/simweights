@@ -6,7 +6,7 @@ import unittest
 
 import numpy as np
 
-from simweights import fluxes
+from simweights import corsika_to_pdg, fluxes
 
 E = np.logspace(2, 10, 9)
 
@@ -93,7 +93,7 @@ class TestCosmicRayModels(unittest.TestCase):
             5626,
         ]
         pdgid = [int(i) for i in self.flux_values["Hoerandel"].keys()]
-        np.testing.assert_array_equal(fluxes.corsika_to_pdg(c), pdgid)
+        np.testing.assert_array_equal(corsika_to_pdg(c), pdgid)
 
 
 if __name__ == "__main__":
