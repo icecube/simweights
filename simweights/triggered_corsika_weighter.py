@@ -29,14 +29,14 @@ class TriggeredCorsikaWeighter(Weighter):
 
     def _get_surface_params(self):
         return dict(
-            particle_type=self.get_column("I3CorsikaWeight", "type"),
+            pdgid=self.get_column("I3CorsikaWeight", "type"),
             energy=self.get_column("I3CorsikaWeight", "energy"),
             cos_zen=np.cos(self.get_column("I3CorsikaWeight", "zenith")),
         )
 
     def _get_flux_params(self):
         return dict(
-            E=self.get_column("I3CorsikaWeight", "energy"), ptype=self.get_column("I3CorsikaWeight", "type")
+            E=self.get_column("I3CorsikaWeight", "energy"), pdgid=self.get_column("I3CorsikaWeight", "type")
         )
 
     def _get_event_weight(self):

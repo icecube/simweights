@@ -12,7 +12,7 @@ class CylinderBase:
                 self.__class__.__name__ + ": both cos_zen_min and cos_zen_max must be between -1 and +1"
             )
         if cos_zen_min >= cos_zen_max:
-            raise ValueError(self.__class__.__name__ + ": cos_zen_min must be less than cos_zen_min")
+            raise ValueError(self.__class__.__name__ + ": cos_zen_min must be less than cos_zen_max")
         self.length = length
         self.radius = radius
         self.cos_zen_min = cos_zen_min

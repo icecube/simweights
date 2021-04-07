@@ -6,6 +6,7 @@ import h5py
 import numpy as np
 import pandas
 import tables
+from scipy.integrate import quad
 
 import simweights
 
@@ -62,7 +63,8 @@ class TestCorsikaWeighter(unittest.TestCase):
         make_hdf5_file("file1.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
         make_hdf5_file("file2.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
         cls.etendue = simweights.NaturalRateCylinder(600, 1200, 0, 1).etendue
-        cls.flux_model = lambda cls, E, ptype: 1 / cls.etendue
+        cls.flux_model1 = lambda cls, energy, pdgid: 1 / cls.etendue
+        cls.flux_model2 = simweights.TIG1996()
 
     @classmethod
     def tearDownClass(cls):
@@ -70,13 +72,17 @@ class TestCorsikaWeighter(unittest.TestCase):
         os.unlink("file2.h5")
 
     def check_weights(self, wf):
-        w = wf.get_weights(self.flux_model)
+        w1 = wf.get_weights(self.flux_model1)
         emin, emax = wf.surface.get_energy_range(2212)
-        self.assertAlmostEqual(w.sum() / (emax - emin), 1, 4)
+        self.assertAlmostEqual(w1.sum() / (emax - emin), 1, 4)
         E = wf.get_column("PolyplopiaPrimary", "energy")
-        y, x = np.histogram(E, weights=w, bins=50, range=[emin, emax])
+        y, x = np.histogram(E, weights=w1, bins=50, range=[emin, emax])
         Ewidth = x[1:] - x[:-1]
         np.testing.assert_array_almost_equal(y / Ewidth, 1, 2)
+
+        w2 = wf.get_weights(self.flux_model2)
+        surface2 = quad(self.flux_model2,emin,emax,args=(2212,))[0]*self.etendue    
+        self.assertAlmostEqual(w2.sum()/surface2,1 ,4)
 
     def test_h5py(self):
         simfile = h5py.File("file1.h5", "r")

@@ -85,18 +85,18 @@ class CosmicRayFlux:
     Base class for cosmic ray fluxes that uses :py:func:`numpy.piecewise` for effient
     mathematical evaluation
 
-    Derived must set `ptypes` to enumerate the particle types in this model.
+    Derived must set `pdgids` to enumerate the particle types in this model.
     :py:func:`_funcs` must be set to a list of functions to be called for each particle
     type. :py:func:`_condition()` can be overidden if additional piecewise conditions are
     desired.
     """
 
-    ptypes = []
+    pdgids = []
     _funcs = []
 
     def _condition(self, energy, pdgid):
         # pylint: disable=unused-argument
-        return [pdgid == p for p in self.ptypes]
+        return [pdgid == p for p in self.pdgids]
 
     def __call__(self, energy, pdgid):
         energy, pdgid = broadcast_arrays(energy, pdgid)
@@ -110,7 +110,7 @@ class Hoerandel(CosmicRayFlux):
     in dCORSIKA.
     """
 
-    ptypes = [
+    pdgids = [
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.Li7Nucleus,
@@ -173,7 +173,7 @@ class Hoerandel5(CosmicRayFlux):
     Hoerandel with only 5 components, after Becherini et al.\ [#Becherini]_
     (These are the same as used by Arne Schoenwald's version\ [#Schoenwald]_)
     """
-    ptypes = [
+    pdgids = [
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
@@ -195,7 +195,7 @@ class Hoerandel_IT(CosmicRayFlux):
     """
 
     # pylint: disable=invalid-name
-    ptypes = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
+    pdgids = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
     _funcs = [
         lambda E: 11776.445965025136 * E ** -2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 4749.371132996256 * E ** -2.64 * (1 + (E / (4.49e6 * 2)) ** 1.9) ** (-2.1 / 1.9),
@@ -208,7 +208,7 @@ class GaisserHillas(CosmicRayFlux):
     r"""
     Spectral fits from an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
     """
-    ptypes = [
+    pdgids = [
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
@@ -235,7 +235,7 @@ class GaisserH3a(CosmicRayFlux):
     instead just the extra-galactic accelerators reaching their
     highest energy.
     """
-    ptypes = [
+    pdgids = [
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
@@ -268,7 +268,7 @@ class GaisserH4a(CosmicRayFlux):
     In the model H4a, on the other hand, the extra-galactic component
     is assumed to be all protons.
     """
-    ptypes = [
+    pdgids = [
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
@@ -295,7 +295,7 @@ class GaisserH4a_IT(CosmicRayFlux):
     flux\ [#Aartsen]_.
     """
     # pylint: disable=invalid-name
-    ptypes = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
+    pdgids = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
     _funcs = [
         lambda E: 7860 * E ** -2.66 * exp(-E / (4e6 * 1))
         + 20.0 * E ** -2.4 * exp(-E / (3e7 * 1))
@@ -317,7 +317,7 @@ class Honda2004(CosmicRayFlux):
     Note:
         the E_k notation means energy per nucleon!
     """
-    ptypes = [
+    pdgids = [
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
@@ -350,7 +350,7 @@ class TIG1996(CosmicRayFlux):
     The parameterization was taken directly from an earlier paper by Thunman et al\ [#Thunman]_.
     Only the nucleon flux was given, so for simplicity we treat it as a proton-only flux.
     """
-    ptypes = [PDGCode.PPlus]
+    pdgids = [PDGCode.PPlus]
     _funcs = [lambda E: 1.70e4 * E ** -2.7, lambda E: 1.74e6 * E ** -3.0, 0]
 
     def _condition(self, energy, pdgid):
@@ -361,7 +361,7 @@ class GlobalFitGST(CosmicRayFlux):
     r"""
     Spectral fits by Gaisser, Stanev and Tilav\ [#GaisserStanevTilav]_.
     """
-    ptypes = [
+    pdgids = [
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
@@ -393,14 +393,14 @@ class FixedFractionFlux(CosmicRayFlux):
     def __init__(self, fractions, basis=GaisserH4a_IT(), normalized=True):
         """
         :param fractions: A dictionary of fractions. They must add up to one and they
-        should correspond to the ptypes in basis
+        should correspond to the pdgids in basis
 
         :type fractions: a dictionary with dataclasses.ParticleType as keys
         """
         self.flux = basis
-        fluxes = {int(k): 0 for k in basis.ptypes}
+        fluxes = {int(k): 0 for k in basis.pdgids}
         fluxes.update({int(k): v for k, v in fractions.items()})
-        self.ptypes = list(fluxes.keys())
+        self.pdgids = list(fluxes.keys())
         self.fracs = list(fluxes.values())
         if normalized:
             assert sum(self.fracs) == 1.0
@@ -408,11 +408,11 @@ class FixedFractionFlux(CosmicRayFlux):
     def __call__(self, energy, pdgid):
         """
         :param E: particle energy in GeV
-        :param ptype: particle type code
-        :type ptype: int
+        :param pdgid: particle type code
+        :type pdgid: int
         """
         energy, pdgid = broadcast_arrays(energy, pdgid)
-        fluxsum = sum(self.flux(energy, p) for p in self.ptypes)
+        fluxsum = sum(self.flux(energy, p) for p in self.pdgids)
         cond = self._condition(energy, pdgid)
         return fluxsum * piecewise(energy, cond, self.fracs)
 

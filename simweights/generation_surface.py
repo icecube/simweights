@@ -14,24 +14,24 @@ class GenerationSurface:
     solid angle stored in the surface.
     """
 
-    def __init__(self, particle_type, nevents, energy_dist, spatial_dist):
-        self.particle_type = particle_type
+    def __init__(self, pdgid, nevents, energy_dist, spatial_dist):
+        self.pdgid = pdgid
         try:
-            self.particle_name = PDGCode(particle_type).name
+            self.particle_name = PDGCode(pdgid).name
         except ValueError:
-            self.particle_name = str(particle_type)
+            self.particle_name = str(pdgid)
         self.nevents = nevents
         self.energy_dist = deepcopy(energy_dist)
         self.spatial_dist = deepcopy(spatial_dist)
 
-    def get_epdf(self, particle_type, energy, cos_zen):
+    def get_epdf(self, pdgid, energy, cos_zen):
         """
         Get the extended pdf of an event.
 
         The pdf is the probability that an event with these parameters is generated. The pdf is multiplied
         by the number of events.
         """
-        assert np.all(particle_type == self.particle_type)
+        assert np.all(pdgid == self.pdgid)
         return self.nevents * self.energy_dist.pdf(energy) * self.spatial_dist.pdf(cos_zen)
 
     def get_surface_area(self):
@@ -46,16 +46,16 @@ class GenerationSurface:
         """
         return (
             isinstance(other, type(self))
-            and self.particle_type == other.particle_type
+            and self.pdgid == other.pdgid
             and self.energy_dist == other.energy_dist
             and self.spatial_dist == other.spatial_dist
         )
 
-    def get_energy_range(self, ptype):
+    def get_energy_range(self, pdgid):
         """
         Return the energy range for given particle type over all surfaces
         """
-        assert ptype == self.particle_type
+        assert pdgid == self.pdgid
         return self.energy_dist.a, self.energy_dist.b
 
     def __eq__(self, other):
@@ -103,7 +103,7 @@ class GenerationSurfaceCollection:
 
     def _insert(self, surface):
         assert isinstance(surface, GenerationSurface)
-        key = int(surface.particle_type)
+        key = int(surface.pdgid)
         if key not in self.spectra:
             self.spectra[key] = []
 
@@ -136,7 +136,7 @@ class GenerationSurfaceCollection:
     def __rmul__(self, factor):
         return self.__mul__(factor)
 
-    def get_epdf(self, particle_type, energy, cos_zen):
+    def get_epdf(self, pdgid, energy, cos_zen):
         """
         Get the extended pdf of an event.
 
@@ -147,8 +147,8 @@ class GenerationSurfaceCollection:
         cos_zen = np.asarray(cos_zen)
         count = np.zeros_like(energy, dtype=float)
 
-        for ptype in np.unique(particle_type):
-            mask = particle_type == ptype
+        for ptype in np.unique(pdgid):
+            mask = ptype == pdgid
             if np.any(mask):
                 masked_energy = energy[mask]
                 masked_cos_zen = cos_zen[mask]
@@ -157,15 +157,15 @@ class GenerationSurfaceCollection:
                 )
         return count
 
-    def get_energy_range(self, ptype):
+    def get_energy_range(self, pdgid):
         """
         Return the energy range for given particle type over all surfaces
         """
-        assert ptype in self.spectra
-        assert len(self.spectra[ptype])
+        assert pdgid in self.spectra
+        assert len(self.spectra[pdgid])
         emin = np.inf
         emax = -np.inf
-        for surf in self.spectra[ptype]:
+        for surf in self.spectra[pdgid]:
             emin = min(emin, surf.energy_dist.a)
             emax = max(emax, surf.energy_dist.b)
         assert np.isfinite(emin)

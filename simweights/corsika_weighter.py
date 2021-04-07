@@ -45,15 +45,15 @@ class CorsikaWeighter(MapWeighter):
 
     def _get_surface_params(self):
         return dict(
-            particle_type=self.get_column("PolyplopiaPrimary", "type"),
+            pdgid=self.get_column("PolyplopiaPrimary", "type"),
             energy=self.get_column("PolyplopiaPrimary", "energy"),
             cos_zen=np.cos(self.get_column("PolyplopiaPrimary", "zenith")),
         )
 
     def _get_flux_params(self):
         return dict(
-            ptype=self.get_column("PolyplopiaPrimary", "type"),
-            E=self.get_column("PolyplopiaPrimary", "energy"),
+            pdgid=self.get_column("PolyplopiaPrimary", "type"),
+            energy=self.get_column("PolyplopiaPrimary", "energy"),
         )
 
     def _get_event_weight(self):

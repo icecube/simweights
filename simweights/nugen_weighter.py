@@ -42,7 +42,7 @@ class NuGenWeighter(MapWeighter):
     def _get_surface_params(self):
         return dict(
             energy=self.get_column("I3MCWeightDict", "PrimaryNeutrinoEnergy"),
-            particle_type=self.get_column("I3MCWeightDict", "PrimaryNeutrinoType"),
+            pdgid=self.get_column("I3MCWeightDict", "PrimaryNeutrinoType"),
             cos_zen=np.cos(self.get_column("I3MCWeightDict", "PrimaryNeutrinoZenith")),
         )
 
