@@ -60,9 +60,9 @@ def make_hdf5_file(fname, v):
 class TestCorsikaWeighter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        make_hdf5_file("file1.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
-        make_hdf5_file("file2.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
-        cls.etendue = simweights.NaturalRateCylinder(600, 1200, 0, 1).etendue
+        make_hdf5_file("file1.h5", (2212, 100000, 1200, 600, 0, np.pi / 2, 1e4, 1e6, -1))
+        make_hdf5_file("file2.h5", (2212, 100000, 1200, 600, 0, np.pi / 2, 1e5, 1e7, -1.5))
+        cls.etendue = simweights.NaturalRateCylinder(1200, 600, 0, 1).etendue
         cls.flux_model1 = lambda cls, energy, pdgid: 1 / cls.etendue
         cls.flux_model2 = simweights.TIG1996()
 
