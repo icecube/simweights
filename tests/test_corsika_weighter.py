@@ -21,8 +21,8 @@ weight_dtype = [
     ("OverSampling", np.float64),
     ("Weight", np.float64),
     ("NEvents", np.float64),
-    ("EnergyPrimaryMax", np.float64),
     ("EnergyPrimaryMin", np.float64),
+    ("EnergyPrimaryMax", np.float64),
     ("PrimarySpectralIndex", np.float64),
 ]
 
@@ -107,16 +107,21 @@ class TestCorsikaWeighter(unittest.TestCase):
         wf = wf1 + wf2
         self.check_weights(wf)
 
-    """
-    def test_no_info(self):
-        f = h5py.File('nothing.h5','w')
-        f.create_dataset("Poly", data = [])
-        f.close()
-        with self.assertRaises(RuntimeError):
-            simfile1 = h5py.File('nothing.h5','r')
-            wf1 = simweights.PrimaryWeighter(simfile1)
-        os.unlink('nothing.h5')
-    """
+    def test_outside(self):
+        # make sure we give a warning if energy or zenith angle is out of bounds
+        wei = np.array([(2212, 1200, 600, 0, np.pi / 2, 1, 1, 1, 1e3, 1e4, -2)], dtype=weight_dtype)
+        pri = np.array([(2212, 3e2, 1)], dtype=primary_dtype)
+        x = dict(CorsikaWeightMap=wei, PolyplopiaPrimary=pri)
+        wf1 = simweights.CorsikaWeighter(x, nfiles=1)
+        with self.assertWarns(UserWarning):
+            wf1.get_weights(self.flux_model1)
+
+        wei = np.array([(2212, 1200, 600, 0, np.pi / 2, 1, 1, 1, 1e3, 1e4, -2)], dtype=weight_dtype)
+        pri = np.array([(2212, 3e3, 1.6)], dtype=primary_dtype)
+        x = dict(CorsikaWeightMap=wei, PolyplopiaPrimary=pri)
+        wf1 = simweights.CorsikaWeighter(x, nfiles=1)
+        with self.assertWarns(UserWarning):
+            wf1.get_weights(self.flux_model1)
 
 
 if __name__ == "__main__":

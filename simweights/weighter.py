@@ -75,7 +75,7 @@ class Weighter:
         raise NotImplementedError()
 
     def __add__(self, other):
-        if type(self) is not type(self):
+        if type(self) is not type(other):
             raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
         self.surface += other.surface
         self.data += other.data

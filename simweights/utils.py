@@ -11,7 +11,10 @@ class Null:
         total += SomeClassThatImplementsAddition(i)
     """
 
-    def __iadd__(self, other):
+    def __add__(self, other):
+        return other
+
+    def __radd__(self, other):
         return other
 
     def __eq__(self, other):
