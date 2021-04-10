@@ -1,4 +1,5 @@
 import warnings
+from copy import copy
 
 import numpy as np
 
@@ -55,7 +56,7 @@ class Weighter:
 
     @staticmethod
     def _get_surface(smap):
-        assert smap["power_law_index"] < 0
+        assert smap["power_law_index"] <= 0
         surface = NaturalRateCylinder(
             smap["cylinder_height"],
             smap["cylinder_radius"],
@@ -77,9 +78,10 @@ class Weighter:
     def __add__(self, other):
         if type(self) is not type(other):
             raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
-        self.surface += other.surface
-        self.data += other.data
-        return self
+        ret = copy(self)
+        ret.surface += other.surface
+        ret.data = self.data + other.data
+        return ret
 
 
 class MapWeighter(Weighter):
