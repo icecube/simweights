@@ -157,7 +157,7 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(",".join(v[2:5]).strip(), repr(self.p1))
         self.assertEqual(",".join(v[5:9]).strip(), repr(self.c1))
 
-        PPlus = PDGCode.PPlus
+        PPlus = PDGCode.PPlus  # noqa: F841
         self.assertEqual(eval(repr(self.s0)), self.s0)
         self.assertEqual(eval(repr(self.s1)), self.s1)
         self.assertEqual(eval(repr(self.s2)), self.s2)
@@ -343,7 +343,7 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(self.gsc4, GenerationSurfaceCollection(self.s4, self.s0))
 
     def test_repr_gsc(self):
-        PPlus = PDGCode.PPlus
+        PPlus = PDGCode.PPlus  # noqa: F841
         self.assertEqual(self.gsc1, eval(repr(self.gsc1)))
         self.assertEqual(self.gsc2, eval(repr(self.gsc2)))
         self.assertEqual(self.gsc3, eval(repr(self.gsc3)))

@@ -54,6 +54,50 @@ class Weighter:
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
         return weights
 
+    def effective_area(self, pdgid, energy_bins=None, cos_zenith_bins=None):
+
+        """
+        Calculate The effective area for a given energy and zenith bins.
+
+        Args:
+            pdgid (PGDCode): The particle to calculate Effective area for
+            energy_bins(array_like): an length N+1 array of energy bin edges
+            coz_zenith_bins(array_like): an length M+1 array of energy bin edges
+
+        Returns:
+            array_like: An NxM array of effective areas
+
+        """
+
+        if energy_bins is None:
+            energy_bins = self.surface.get_energy_range(pdgid)
+
+        if cos_zenith_bins is None:
+            cos_zenith_bins = self.surface.get_cos_zenith_range(pdgid)
+
+        energy_bins = np.array(energy_bins)
+        cos_zenith_bins = np.array(cos_zenith_bins)
+
+        assert energy_bins.ndim == 1
+        assert cos_zenith_bins.ndim == 1
+        assert len(energy_bins) >= 2
+        assert len(cos_zenith_bins) >= 2
+
+        sparam = self._get_surface_params()
+        mask = pdgid == sparam["pdgid"]
+        weights = self.get_weights(lambda energy, pdgid: 1)
+        hist_val, czbin, enbin = np.histogram2d(
+            sparam["cos_zen"][mask],
+            sparam["energy"][mask],
+            weights=weights[mask],
+            bins=[cos_zenith_bins, energy_bins],
+        )
+
+        assert np.array_equal(enbin, energy_bins)
+        assert np.array_equal(czbin, cos_zenith_bins)
+        e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
+        return hist_val / (e_width * 2 * np.pi * z_width)
+
     @staticmethod
     def _get_surface(smap):
         assert smap["power_law_index"] <= 0

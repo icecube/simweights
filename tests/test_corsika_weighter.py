@@ -55,6 +55,8 @@ def make_corsika_data(pdgid, nevents, c, emin, emax, egamma):
     primary = np.zeros(nevents, dtype=primary_dtype)
     primary["type"] = pdgid
     primary["zenith"] = np.arccos(get_cos_zenith_dist(c, nevents))
+    np.random.shuffle(primary["zenith"])
+
     if egamma == -1:
         primary["energy"] = np.geomspace(emin, emax, nevents)
     else:
@@ -158,6 +160,44 @@ class TestCorsikaWeighter(unittest.TestCase):
         self.assertEqual(type(wf2.surface), simweights.GenerationSurface)
         self.assertEqual(type(wfc.surface), simweights.GenerationSurfaceCollection)
         self.assertEqual(len(wfc.surface.spectra[2212]), 2)
+
+    def test_effective_area_simple(self):
+        for x in np.linspace(-1, 1, 21):
+            c = simweights.NaturalRateCylinder(1000, 500, *sorted((x, x + (1 if x < 0 else -1) * 1e-9)))
+            wf1 = simweights.CorsikaWeighter(make_corsika_data(2212, 1000, c, 1e3, 1e4, 0), nfiles=1)
+            if abs(x) == 0:
+                self.assertEqual(1000 * 500 * 2, c.projected_area(x))
+            if abs(x) == 1:
+                self.assertEqual(np.pi * 500 ** 2, c.projected_area(x))
+            ea = wf1.effective_area(2212)
+            self.assertEqual(ea.shape, (1, 1))
+            self.assertAlmostEqual(ea[0, 0] / c.projected_area(x), 1, 4)
+
+    def test_effective_area_binned(self):
+        c = simweights.NaturalRateCylinder(1000, 500, -1, 1)
+        wf1 = simweights.CorsikaWeighter(make_corsika_data(2212, 100000, c, 1e3, 1e4, 0), nfiles=1)
+
+        ea = wf1.effective_area(2212)
+        self.assertEqual(ea.shape, (1, 1))
+        self.assertAlmostEqual(ea[0, 0] / c.etendue * 4 * np.pi, 1)
+
+        eb = np.linspace(1e3, 1e4, 5)
+        ea = wf1.effective_area(2212, energy_bins=eb)
+        self.assertEqual(ea.shape, (1, 4))
+        np.testing.assert_array_almost_equal(ea / c.etendue * 4 * np.pi, 1)
+
+        czb = np.linspace(-1, 1, 21)
+        detendue = np.array([c._diff_etendue(x) for x in czb])
+        actual_etendue = np.ediff1d(detendue) / np.ediff1d(czb) / 2 / np.pi
+
+        ea = wf1.effective_area(2212, cos_zenith_bins=czb)
+        self.assertEqual(ea.shape, (20, 1))
+        np.testing.assert_array_almost_equal(ea[:, 0] / actual_etendue, 1, 3)
+
+        ea = wf1.effective_area(2212, energy_bins=eb, cos_zenith_bins=czb)
+        aee = np.repeat(actual_etendue, 4).reshape(20, 4)
+        self.assertEqual(ea.shape, (20, 4))
+        np.testing.assert_array_almost_equal(ea / aee, 1, 1)
 
     def test_outside(self):
         # make sure we give a warning if energy or zenith angle is out of bounds

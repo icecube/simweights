@@ -58,6 +58,13 @@ class GenerationSurface:
         assert pdgid == self.pdgid
         return self.energy_dist.a, self.energy_dist.b
 
+    def get_cos_zenith_range(self, pdgid):
+        """
+        Return the cos_zenith range for given particle type over all surfaces
+        """
+        assert pdgid == self.pdgid
+        return self.spatial_dist.cos_zen_min, self.spatial_dist.cos_zen_max
+
     def __eq__(self, other):
         return self.is_compatible(other) and self.nevents == other.nevents
 
@@ -171,6 +178,21 @@ class GenerationSurfaceCollection:
         assert np.isfinite(emin)
         assert np.isfinite(emax)
         return emin, emax
+
+    def get_cos_zenith_range(self, pdgid):
+        """
+        Return the cos zenith range for given particle type over all surfaces
+        """
+        assert pdgid in self.spectra
+        assert len(self.spectra[pdgid])
+        czmin = np.inf
+        czmax = -np.inf
+        for surf in self.spectra[pdgid]:
+            czmin = min(czmin, surf.spatial_dist.cos_zen_min)
+            czmax = max(czmax, surf.spatial_dist.cos_zen_min)
+        assert np.isfinite(czmin)
+        assert np.isfinite(czmax)
+        return czmin, czmax
 
     def __eq__(self, other):
         # must handle the same set of particle types
