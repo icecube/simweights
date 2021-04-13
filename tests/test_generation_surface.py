@@ -14,22 +14,23 @@ from simweights import (
 
 
 class TestGenerationSurface(unittest.TestCase):
-    def setUp(self):
-        self.p1 = PowerLaw(-1, 10, 100)
-        self.p2 = PowerLaw(-2, 50, 500)
-        self.c1 = NaturalRateCylinder(3, 8, -1, 1)
-        self.c2 = NaturalRateCylinder(4, 8, -1, 1)
+    @classmethod
+    def setUpClass(cls):
+        cls.p1 = PowerLaw(-1, 10, 100)
+        cls.p2 = PowerLaw(-2, 50, 500)
+        cls.c1 = NaturalRateCylinder(3, 8, -1, 1)
+        cls.c2 = NaturalRateCylinder(4, 8, -1, 1)
 
-        self.s0 = GenerationSurface(2212, 10000, self.p1, self.c1)
-        self.s1 = GenerationSurface(2212, 20000, self.p1, self.c1)
-        self.s2 = GenerationSurface(2212, 10000, self.p2, self.c1)
-        self.s3 = GenerationSurface(2212, 10000, self.p1, self.c2)
-        self.s4 = GenerationSurface(2213, 10000, self.p1, self.c1)
+        cls.s0 = GenerationSurface(2212, 10000, cls.p1, cls.c1)
+        cls.s1 = GenerationSurface(2212, 20000, cls.p1, cls.c1)
+        cls.s2 = GenerationSurface(2212, 10000, cls.p2, cls.c1)
+        cls.s3 = GenerationSurface(2212, 10000, cls.p1, cls.c2)
+        cls.s4 = GenerationSurface(2213, 10000, cls.p1, cls.c1)
 
-        self.gsc1 = GenerationSurfaceCollection(self.s0, self.s1)
-        self.gsc2 = GenerationSurfaceCollection(self.s0, self.s2)
-        self.gsc3 = GenerationSurfaceCollection(self.s0, self.s3)
-        self.gsc4 = GenerationSurfaceCollection(self.s0, self.s4)
+        cls.gsc1 = GenerationSurfaceCollection(cls.s0, cls.s1)
+        cls.gsc2 = GenerationSurfaceCollection(cls.s0, cls.s2)
+        cls.gsc3 = GenerationSurfaceCollection(cls.s0, cls.s3)
+        cls.gsc4 = GenerationSurfaceCollection(cls.s0, cls.s4)
 
     def test_compatible(self):
         assert self.s0.is_compatible(self.s0)
@@ -71,6 +72,24 @@ class TestGenerationSurface(unittest.TestCase):
             self.gsc1.get_energy_range(2213)
         with self.assertRaises(AssertionError):
             self.gsc2.get_energy_range(2213)
+
+    def test_cos_zenith_range(self):
+        self.assertEqual(self.s0.get_cos_zenith_range(2212), (-1, 1))
+        self.assertEqual(self.s2.get_cos_zenith_range(2212), (-1, 1))
+        self.assertEqual(self.s4.get_cos_zenith_range(2213), (-1, 1))
+        with self.assertRaises(AssertionError):
+            self.s0.get_cos_zenith_range(2213)
+        with self.assertRaises(AssertionError):
+            self.s4.get_cos_zenith_range(2212)
+
+        self.assertEqual(self.gsc1.get_cos_zenith_range(2212), (-1, 1))
+        self.assertEqual(self.gsc2.get_cos_zenith_range(2212), (-1, 1))
+        self.assertEqual(self.gsc4.get_cos_zenith_range(2212), (-1, 1))
+        self.assertEqual(self.gsc4.get_cos_zenith_range(2213), (-1, 1))
+        with self.assertRaises(AssertionError):
+            self.gsc1.get_cos_zenith_range(2213)
+        with self.assertRaises(AssertionError):
+            self.gsc2.get_cos_zenith_range(2213)
 
     def test_addition(self):
         n0 = self.s0.nevents

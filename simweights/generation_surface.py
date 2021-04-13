@@ -189,7 +189,7 @@ class GenerationSurfaceCollection:
         czmax = -np.inf
         for surf in self.spectra[pdgid]:
             czmin = min(czmin, surf.spatial_dist.cos_zen_min)
-            czmax = max(czmax, surf.spatial_dist.cos_zen_min)
+            czmax = max(czmax, surf.spatial_dist.cos_zen_max)
         assert np.isfinite(czmin)
         assert np.isfinite(czmax)
         return czmin, czmax
