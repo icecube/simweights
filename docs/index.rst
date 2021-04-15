@@ -4,13 +4,14 @@
    contain the root `toctree` directive.
 
 .. include:: ../README.rst
-	:end-before: doc-break
+    :end-before: doc-break
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    overview
+   background
    apireference  
 
 
