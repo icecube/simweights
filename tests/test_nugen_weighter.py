@@ -22,6 +22,7 @@ weight_dtype = [
     ("PrimaryNeutrinoZenith", np.float64),
     ("PrimaryNeutrinoEnergy", np.float64),
     ("TotalWeight", np.float64),
+    ("TypeWeight", np.float64),
 ]
 
 
@@ -38,6 +39,7 @@ def make_hdf5_file(fname, v):
     weight["PowerLawIndex"] = -v[8]
     weight["PrimaryNeutrinoZenith"] = np.linspace(v[4], v[5], v[1])
     weight["TotalWeight"] = 1
+    weight["TypeWeight"] = 0.5
     if v[8] == -1:
         weight["PrimaryNeutrinoEnergy"] = np.geomspace(v[6], v[7], v[1])
     else:

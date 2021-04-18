@@ -1,5 +1,3 @@
-from copy import copy
-
 import numpy as np
 
 from .utils import get_column, get_constant_column, get_table
@@ -18,26 +16,28 @@ class NuGenWeighter(MapWeighter):
 
     @staticmethod
     def _get_surface_map(infile):
-        # nugen generates an equal number of nu's and nubar's so you need to make two surfaces
-        # each with an n_events of half the number in the NEvents column
+        # nugen generates both nu and nubar with the fraction stored in TypeWeight and the total stored
+        # in NEvents
         table = get_table(infile, "I3MCWeightDict")
-        neutrino_surface = dict(
-            n_events=0.5 * get_constant_column(get_column(table, "NEvents")),
-            primary_type=get_constant_column(abs(get_column(table, "PrimaryNeutrinoType"))),
-            cylinder_height=get_constant_column(get_column(table, "CylinderHeight")),
-            cylinder_radius=get_constant_column(get_column(table, "CylinderRadius")),
-            min_energy=10 ** get_constant_column(get_column(table, "MinEnergyLog")),
-            max_energy=10 ** get_constant_column(get_column(table, "MaxEnergyLog")),
-            min_zenith=get_constant_column(get_column(table, "MinZenith")),
-            max_zenith=get_constant_column(get_column(table, "MaxZenith")),
-            power_law_index=-get_constant_column(get_column(table, "PowerLawIndex")),
-        )
-        # create a copy for the nubar and change the value of the type
-        anti_neutrino_surface = copy(neutrino_surface)
-        anti_neutrino_surface.update(dict(primary_type=-neutrino_surface["primary_type"]))
-        assert neutrino_surface["primary_type"] in [12, 14, 16]
-        assert anti_neutrino_surface["primary_type"] in [-12, -14, -16]
-        return [neutrino_surface, anti_neutrino_surface]
+        pdgids = np.unique(get_column(table, "PrimaryNeutrinoType"))
+        surfaces = []
+        for pid in pdgids:
+            mask = pid == get_column(table, "PrimaryNeutrinoType")
+            surfaces.append(
+                dict(
+                    n_events=get_constant_column(get_column(table, "TypeWeight")[mask])
+                    * get_constant_column(get_column(table, "NEvents")[mask]),
+                    primary_type=get_constant_column(get_column(table, "PrimaryNeutrinoType")[mask]),
+                    cylinder_height=get_constant_column(get_column(table, "CylinderHeight")[mask]),
+                    cylinder_radius=get_constant_column(get_column(table, "CylinderRadius")[mask]),
+                    min_energy=10 ** get_constant_column(get_column(table, "MinEnergyLog")[mask]),
+                    max_energy=10 ** get_constant_column(get_column(table, "MaxEnergyLog")[mask]),
+                    min_zenith=get_constant_column(get_column(table, "MinZenith")[mask]),
+                    max_zenith=get_constant_column(get_column(table, "MaxZenith")[mask]),
+                    power_law_index=-get_constant_column(get_column(table, "PowerLawIndex")[mask]),
+                )
+            )
+        return surfaces
 
     def _get_surface_params(self):
         return dict(
