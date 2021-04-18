@@ -66,7 +66,7 @@ class TestTriggeredCorsikaWeighter(unittest.TestCase):
         E = wf.get_column("I3CorsikaWeight", "energy")
         y, x = np.histogram(E, weights=w, bins=50, range=[emin, emax])
         Ewidth = x[1:] - x[:-1]
-        np.testing.assert_array_almost_equal(y / Ewidth, 1, 2)
+        np.testing.assert_allclose(y, Ewidth, 7e-3)
 
     def test_h5py(self):
         simfile = h5py.File("file1.h5", "r")

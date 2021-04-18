@@ -26,9 +26,7 @@ class TestCosmicRayModels(unittest.TestCase):
         v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name].keys()]))
         v2 = np.array(list(self.flux_values[name].values()))
 
-        m = v2 != 0
-        np.testing.assert_array_almost_equal(v1, v2, 17)
-        np.testing.assert_array_almost_equal(v1[m] / v2[m], 1, 13)
+        np.testing.assert_allclose(v1, v2, 1e-13)
 
     def test_Hoerandel(self):
         self.flux_cmp("Hoerandel")

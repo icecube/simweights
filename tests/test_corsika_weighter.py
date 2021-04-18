@@ -95,7 +95,7 @@ class TestCorsikaWeighter(unittest.TestCase):
         E = wf.get_column("PolyplopiaPrimary", "energy")
         y, x = np.histogram(E, weights=w1, bins=50, range=[emin, emax])
         Ewidth = x[1:] - x[:-1]
-        np.testing.assert_array_almost_equal(y / Ewidth / self.c.etendue, 1, 2)
+        np.testing.assert_allclose(y, Ewidth * self.c.etendue, 7e-3)
 
         w2 = wf.get_weights(self.flux_model2)
         surface2 = quad(self.flux_model2, emin, emax, args=(2212,))[0] * self.c.etendue
@@ -184,7 +184,7 @@ class TestCorsikaWeighter(unittest.TestCase):
         eb = np.linspace(1e3, 1e4, 5)
         ea = wf1.effective_area(2212, energy_bins=eb)
         self.assertEqual(ea.shape, (1, 4))
-        np.testing.assert_array_almost_equal(ea / c.etendue * 4 * np.pi, 1)
+        np.testing.assert_allclose(ea, c.etendue / (4 * np.pi), 1e-12)
 
         czb = np.linspace(-1, 1, 21)
         detendue = np.array([c._diff_etendue(x) for x in czb])
@@ -192,12 +192,12 @@ class TestCorsikaWeighter(unittest.TestCase):
 
         ea = wf1.effective_area(2212, cos_zenith_bins=czb)
         self.assertEqual(ea.shape, (20, 1))
-        np.testing.assert_array_almost_equal(ea[:, 0] / actual_etendue, 1, 3)
+        np.testing.assert_allclose(ea[:, 0], actual_etendue, 1e-3)
 
         ea = wf1.effective_area(2212, energy_bins=eb, cos_zenith_bins=czb)
         aee = np.repeat(actual_etendue, 4).reshape(20, 4)
         self.assertEqual(ea.shape, (20, 4))
-        np.testing.assert_array_almost_equal(ea / aee, 1, 1)
+        np.testing.assert_allclose(ea, aee, 8e-2)
 
     def test_outside(self):
         # make sure we give a warning if energy or zenith angle is out of bounds

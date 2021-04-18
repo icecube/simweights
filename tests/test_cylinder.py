@@ -45,7 +45,7 @@ class TestCylinder(unittest.TestCase):
         self.assertAlmostEqual(c.etendue, etendue)
 
         x = np.linspace(c.cos_zen_min, c.cos_zen_max)
-        np.testing.assert_array_almost_equal(c.pdf(x), 1 / etendue)
+        np.testing.assert_allclose(c.pdf(x), 1 / etendue, 1e-15)
 
         x = np.linspace(-2, np.nextafter(c.cos_zen_min, -np.inf))
         np.testing.assert_array_equal(c.pdf(x), 0)
@@ -103,7 +103,7 @@ class TestCylinder(unittest.TestCase):
         self.assertAlmostEqual(c.etendue, etendue)
 
         x = np.linspace(c.cos_zen_min, c.cos_zen_max)
-        np.testing.assert_array_almost_equal(c.pdf(x), 1 / 2 / np.pi / c.projected_area(x))
+        np.testing.assert_allclose(c.pdf(x), 1 / 2 / np.pi / c.projected_area(x), 1e-15)
 
         x = np.linspace(-2, np.nextafter(c.cos_zen_min, -np.inf))
         np.testing.assert_array_equal(c.pdf(x), 0)

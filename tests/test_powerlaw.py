@@ -25,9 +25,9 @@ class TestPowerLaw(unittest.TestCase):
 
         self.assertIn(0, x)
         self.assertIn(s, x)
-        np.testing.assert_array_almost_equal(v0, v1)
-        np.testing.assert_array_almost_equal(c0, c1)
-        np.testing.assert_array_almost_equal(x0, x1)
+        np.testing.assert_allclose(v0, v1)
+        np.testing.assert_allclose(c0, c1)
+        np.testing.assert_allclose(x0, x1)
 
         rep = str(p1)
         self.assertEqual(rep[:9], "PowerLaw(")
@@ -48,12 +48,12 @@ class TestPowerLaw(unittest.TestCase):
     def check_vals(self, p):
         x = np.linspace(p.a, p.b, 51)
         v1 = p.pdf(x) * x ** -p.g
-        np.testing.assert_array_almost_equal(v1, v1[0])
+        np.testing.assert_allclose(v1, v1[0])
 
         c0 = [quad(p.pdf, p.a, xx)[0] for xx in x]
         c1 = p.cdf(x)
-        np.testing.assert_array_almost_equal(c0, c1)
-        np.testing.assert_array_almost_equal(p.ppf(c1), x)
+        np.testing.assert_allclose(c0, c1)
+        np.testing.assert_allclose(p.ppf(c1), x)
         self.assertEqual(c1[0], 0)
         self.assertEqual(c1[-1], 1)
 

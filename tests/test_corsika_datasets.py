@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import unittest
 
@@ -41,7 +42,7 @@ class TestCorsikaDatasets(unittest.TestCase):
             * cwm.cols.AreaSum[:]
             / (cwm.cols.NEvents[:] * cwm.cols.OverSampling[:])
         )
-        np.testing.assert_allclose(w1, w2, atol=1e-7, rtol=0)
+        np.testing.assert_allclose(w1, w2, 1e-6)
 
         f.close()
 
