@@ -1,5 +1,6 @@
 import numpy as np
 
+from .cylinder import NaturalRateCylinder
 from .utils import get_column, get_constant_column, get_table
 from .weighter import MapWeighter
 
@@ -12,6 +13,8 @@ class CorsikaWeighter(MapWeighter):
     the user does not know how many jobs contributed to the current sample, so it needs to know the number
     of files.
     """
+
+    _spatial_distribution = NaturalRateCylinder
 
     @staticmethod
     def _get_surface_map(infile):

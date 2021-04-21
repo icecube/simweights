@@ -7,7 +7,7 @@ import numpy as np
 import pandas
 import tables
 
-from simweights import NaturalRateCylinder, NuGenWeighter
+from simweights import NuGenWeighter, UniformSolidAngleCylinder
 
 weight_dtype = [
     ("PrimaryNeutrinoType", np.int32),
@@ -37,7 +37,7 @@ def make_hdf5_file(fname, v):
     weight["MinEnergyLog"] = np.log10(v[6])
     weight["MaxEnergyLog"] = np.log10(v[7])
     weight["PowerLawIndex"] = -v[8]
-    weight["PrimaryNeutrinoZenith"] = np.linspace(v[4], v[5], v[1])
+    weight["PrimaryNeutrinoZenith"] = np.arccos(np.linspace(np.cos(v[4]), np.cos(v[5]), v[1]))
     weight["TotalWeight"] = 1
     weight["TypeWeight"] = 0.5
     if v[8] == -1:
@@ -52,12 +52,13 @@ def make_hdf5_file(fname, v):
     f.close()
 
 
-class TestCorsikaWeighter(unittest.TestCase):
+@unittest.skip
+class TestNugenWeighter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         make_hdf5_file("file1.h5", (12, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
         make_hdf5_file("file2.h5", (12, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
-        cls.etendue = NaturalRateCylinder(600, 1200, 0, 1).etendue
+        cls.etendue = UniformSolidAngleCylinder(600, 1200, 0, 1).etendue
         cls.flux_model = lambda cls, energy, pdgid, cos_zen: 1 / cls.etendue
 
     @classmethod

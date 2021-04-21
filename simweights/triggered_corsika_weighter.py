@@ -1,5 +1,6 @@
 import numpy as np
 
+from .cylinder import NaturalRateCylinder
 from .utils import Null, get_table, has_table
 from .weighter import Weighter
 
@@ -14,6 +15,8 @@ class TriggeredCorsikaWeighter(Weighter):
     These showers can be biased toward events with higher energy leading edge muons the weight from this
     process is stored in the frame as ``I3CorsikaWeight.weight`` which is used as the event weight.
     """
+
+    _spatial_distribution = NaturalRateCylinder
 
     def __init__(self, infile):
         info_obj = "I3PrimaryInjectorInfo"

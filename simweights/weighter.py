@@ -3,7 +3,6 @@ from copy import copy
 
 import numpy as np
 
-from .cylinder import NaturalRateCylinder
 from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
 from .utils import Null, get_column, get_table
@@ -19,6 +18,8 @@ class Weighter:
     added together to form samples with differnt simulation parameters
     """
 
+    _spatial_distribution = NotImplementedError
+
     def __init__(self, surface, data):
         self.surface = surface
         self.data = data
@@ -27,7 +28,10 @@ class Weighter:
         """
         Helper function to get a specific column from the file
         """
-        return np.ravel([get_column(get_table(d, table), column) for d in self.data])
+        retval = []
+        for datafile in self.data:
+            retval = np.append(retval, get_column(get_table(datafile, table), column))
+        return retval
 
     def get_weights(self, flux):
         """
@@ -49,12 +53,12 @@ class Weighter:
                 "simweights :: {} events out of {} were found to be "
                 "outside the generation surface".format(np.logical_not(mask).sum(), mask.size)
             )
-
         weights = np.zeros_like(epdf)
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
+
         return weights
 
-    def effective_area(self, pdgid, energy_bins=None, cos_zenith_bins=None):
+    def effective_area(self, pdgid=None, energy_bins=None, cos_zenith_bins=None):
 
         """
         Calculate The effective area for a given energy and zenith bins.
@@ -84,7 +88,13 @@ class Weighter:
         assert len(cos_zenith_bins) >= 2
 
         sparam = self._get_surface_params()
-        mask = pdgid == sparam["pdgid"]
+        if pdgid is None:
+            mask = np.ones_like(sparam["pdgid"], dtype=bool)
+            nspecies = len(self.surface.get_pdgids())
+        else:
+            mask = pdgid == sparam["pdgid"]
+            nspecies = 1
+
         weights = self.get_weights(lambda energy, pdgid: 1)
         hist_val, czbin, enbin = np.histogram2d(
             sparam["cos_zen"][mask],
@@ -96,19 +106,19 @@ class Weighter:
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
-        return hist_val / (e_width * 2 * np.pi * z_width)
+        return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
 
-    @staticmethod
-    def _get_surface(smap):
+    @classmethod
+    def _get_surface(cls, smap):
         assert smap["power_law_index"] <= 0
-        surface = NaturalRateCylinder(
+        spatial = cls._spatial_distribution(
             smap["cylinder_height"],
             smap["cylinder_radius"],
             np.cos(smap["max_zenith"]),
             np.cos(smap["min_zenith"]),
         )
         spectrum = PowerLaw(smap["power_law_index"], smap["min_energy"], smap["max_energy"])
-        return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, surface)
+        return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, spatial)
 
     def _get_surface_params(self):
         raise NotImplementedError()

@@ -51,11 +51,17 @@ class GenerationSurface:
             and self.spatial_dist == other.spatial_dist
         )
 
+    def get_pdgids(self):
+        """
+        Return a list of pdgids that this surface represents
+        """
+        return [self.pdgid]
+
     def get_energy_range(self, pdgid):
         """
         Return the energy range for given particle type over all surfaces
         """
-        assert pdgid == self.pdgid
+        assert (pdgid is None) or (pdgid == self.pdgid)
         return self.energy_dist.a, self.energy_dist.b
 
     def get_cos_zenith_range(self, pdgid):
@@ -164,17 +170,28 @@ class GenerationSurfaceCollection:
                 )
         return count
 
+    def get_pdgids(self):
+        """
+        Return a list of pdgids that this surface represents
+        """
+        return sorted(self.spectra.keys())
+
     def get_energy_range(self, pdgid):
         """
         Return the energy range for given particle type over all surfaces
         """
-        assert pdgid in self.spectra
-        assert len(self.spectra[pdgid])
+        if pdgid is None:
+            pdgids = sorted(self.spectra.keys())
+        else:
+            pdgids = [pdgid]
+
+        assert set(pdgids).issubset(self.spectra.keys())
         emin = np.inf
         emax = -np.inf
-        for surf in self.spectra[pdgid]:
-            emin = min(emin, surf.energy_dist.a)
-            emax = max(emax, surf.energy_dist.b)
+        for pid in pdgids:
+            for surf in self.spectra[pid]:
+                emin = min(emin, surf.energy_dist.a)
+                emax = max(emax, surf.energy_dist.b)
         assert np.isfinite(emin)
         assert np.isfinite(emax)
         return emin, emax
@@ -183,13 +200,19 @@ class GenerationSurfaceCollection:
         """
         Return the cos zenith range for given particle type over all surfaces
         """
-        assert pdgid in self.spectra
-        assert len(self.spectra[pdgid])
+
+        if pdgid is None:
+            pdgids = sorted(self.spectra.keys())
+        else:
+            pdgids = [pdgid]
+
+        assert set(pdgids).issubset(self.spectra.keys())
         czmin = np.inf
         czmax = -np.inf
-        for surf in self.spectra[pdgid]:
-            czmin = min(czmin, surf.spatial_dist.cos_zen_min)
-            czmax = max(czmax, surf.spatial_dist.cos_zen_max)
+        for pid in pdgids:
+            for surf in self.spectra[pid]:
+                czmin = min(czmin, surf.spatial_dist.cos_zen_min)
+                czmax = max(czmax, surf.spatial_dist.cos_zen_max)
         assert np.isfinite(czmin)
         assert np.isfinite(czmax)
         return czmin, czmax

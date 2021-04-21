@@ -1,5 +1,6 @@
 import numpy as np
 
+from .cylinder import UniformSolidAngleCylinder
 from .utils import get_column, get_constant_column, get_table
 from .weighter import MapWeighter
 
@@ -13,6 +14,8 @@ class NuGenWeighter(MapWeighter):
     files. Nugen calculates the event weight in a column called ``TotalWeight`` which takes into account
     the netutrino cross-section, detector density, and distance traveled through the generation volume.
     """
+
+    _spatial_distribution = UniformSolidAngleCylinder
 
     @staticmethod
     def _get_surface_map(infile):

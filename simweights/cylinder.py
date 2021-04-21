@@ -74,7 +74,7 @@ class UniformSolidAngleCylinder(CylinderBase):
     """
 
     def _pdf(self, cos_zen):
-        return 1 / (2 * np.pi * self.projected_area(cos_zen))
+        return 1 / (2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self.projected_area(cos_zen))
 
     def pdf(self, cos_zen):
         cos_zen = np.asfarray(cos_zen)
