@@ -1,6 +1,8 @@
 import numpy as np
 
 from .cylinder import NaturalRateCylinder
+from .generation_surface import GenerationSurface
+from .powerlaw import PowerLaw
 from .utils import Null, get_table, has_table
 from .weighter import Weighter
 
@@ -16,7 +18,12 @@ class TriggeredCorsikaWeighter(Weighter):
     process is stored in the frame as ``I3CorsikaWeight.weight`` which is used as the event weight.
     """
 
-    _spatial_distribution = NaturalRateCylinder
+    event_map = dict(
+        pdgid=("I3CorsikaWeight", "type"),
+        energy=("I3CorsikaWeight", "energy"),
+        zenith=("I3CorsikaWeight", "zenith"),
+        event_weight=("I3CorsikaWeight", "weight"),
+    )
 
     def __init__(self, infile):
         info_obj = "I3PrimaryInjectorInfo"
@@ -30,18 +37,14 @@ class TriggeredCorsikaWeighter(Weighter):
             surface += self._get_surface(row)
         super().__init__(surface, [infile])
 
-    def _get_surface_params(self):
-        return dict(
-            pdgid=self.get_column("I3CorsikaWeight", "type"),
-            energy=self.get_column("I3CorsikaWeight", "energy"),
-            cos_zen=np.cos(self.get_column("I3CorsikaWeight", "zenith")),
+    @staticmethod
+    def _get_surface(smap):
+        assert smap["power_law_index"] <= 0
+        spatial = NaturalRateCylinder(
+            smap["cylinder_height"],
+            smap["cylinder_radius"],
+            np.cos(smap["max_zenith"]),
+            np.cos(smap["min_zenith"]),
         )
-
-    def _get_flux_params(self):
-        return dict(
-            E=self.get_column("I3CorsikaWeight", "energy"), pdgid=self.get_column("I3CorsikaWeight", "type")
-        )
-
-    def _get_event_weight(self):
-        # this is the weight from the leading edge muon shower bias
-        return self.get_column("I3CorsikaWeight", "weight")
+        spectrum = PowerLaw(smap["power_law_index"], smap["min_energy"], smap["max_energy"])
+        return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, spatial)

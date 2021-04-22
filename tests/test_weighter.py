@@ -2,7 +2,7 @@
 import unittest
 
 from simweights.utils import Null
-from simweights.weighter import MapWeighter, Weighter
+from simweights.weighter import Weighter
 
 
 class TestWeighter(unittest.TestCase):
@@ -21,16 +21,8 @@ class TestWeighter(unittest.TestCase):
 
     def test_weighter(self):
         w = Weighter(None, None)
-        with self.assertRaises(NotImplementedError):
-            w._get_surface_params()
-        with self.assertRaises(NotImplementedError):
-            w._get_flux_params()
-        with self.assertRaises(NotImplementedError):
-            w._get_event_weight()
         with self.assertRaises(ValueError):
             w + object()
-        with self.assertRaises(NotImplementedError):
-            MapWeighter._get_surface_map(None)
 
 
 if __name__ == "__main__":

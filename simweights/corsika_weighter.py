@@ -1,11 +1,13 @@
 import numpy as np
 
 from .cylinder import NaturalRateCylinder
-from .utils import get_column, get_constant_column, get_table
-from .weighter import MapWeighter
+from .generation_surface import GenerationSurface
+from .powerlaw import PowerLaw
+from .utils import Null, constcol, get_column, get_table
+from .weighter import Weighter
 
 
-class CorsikaWeighter(MapWeighter):
+class CorsikaWeighter(Weighter):
     """
     Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader
 
@@ -14,50 +16,40 @@ class CorsikaWeighter(MapWeighter):
     of files.
     """
 
-    _spatial_distribution = NaturalRateCylinder
+    event_map = dict(
+        energy=("PolyplopiaPrimary", "energy"),
+        pdgid=("PolyplopiaPrimary", "type"),
+        zenith=("PolyplopiaPrimary", "zenith"),
+        event_weight=None,
+    )
+
+    def __init__(self, infile, nfiles):
+        surface = nfiles * self._get_surface(infile)
+        super().__init__(surface, [infile])
 
     @staticmethod
-    def _get_surface_map(infile):
+    def _get_surface(infile):
         table = get_table(infile, "CorsikaWeightMap")
-        vals = {}
-        vals["ParticleType"] = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
-        for name in ("CylinderLength", "CylinderRadius", "ThetaMin", "ThetaMax", "OverSampling", "Weight"):
-            vals[name] = get_constant_column(get_column(table, name))
+        pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
+        surface = Null()
+        for pdgid in pdgids:
+            mask = pdgid == get_column(table, "ParticleType")
 
-        for i in range(len(vals["ParticleType"])):
-            mask = vals["ParticleType"][i] == get_column(table, "ParticleType")
-            for name in ("NEvents", "EnergyPrimaryMax", "EnergyPrimaryMin", "PrimarySpectralIndex"):
-                if name not in vals:
-                    vals[name] = []
-                vals[name].append(get_constant_column(get_column(table, name)[mask]))
+            def gcol(name):
+                return constcol(get_column(table, name)[mask])
 
-        return [
-            dict(
-                primary_type=p,
-                n_events=vals["OverSampling"] * vals["NEvents"][i],
-                cylinder_height=vals["CylinderLength"],
-                cylinder_radius=vals["CylinderRadius"],
-                min_zenith=vals["ThetaMin"],
-                max_zenith=vals["ThetaMax"],
-                min_energy=vals["EnergyPrimaryMin"][i],
-                max_energy=vals["EnergyPrimaryMax"][i],
-                power_law_index=round(vals["PrimarySpectralIndex"][i], 6),
+            spatial = NaturalRateCylinder(
+                gcol("CylinderLength"),
+                gcol("CylinderRadius"),
+                np.cos(gcol("ThetaMax")),
+                np.cos(gcol("ThetaMin")),
             )
-            for i, p in enumerate(vals["ParticleType"])
-        ]
 
-    def _get_surface_params(self):
-        return dict(
-            pdgid=self.get_column("PolyplopiaPrimary", "type"),
-            energy=self.get_column("PolyplopiaPrimary", "energy"),
-            cos_zen=np.cos(self.get_column("PolyplopiaPrimary", "zenith")),
-        )
+            primary_spectral_index = round(constcol(get_column(table, "PrimarySpectralIndex")[mask]), 6)
+            assert primary_spectral_index <= 0
 
-    def _get_flux_params(self):
-        return dict(
-            pdgid=self.get_column("PolyplopiaPrimary", "type"),
-            energy=self.get_column("PolyplopiaPrimary", "energy"),
-        )
+            spectrum = PowerLaw(primary_spectral_index, gcol("EnergyPrimaryMin"), gcol("EnergyPrimaryMax"))
+            nevents = gcol("OverSampling") * gcol("NEvents")
+            surface += GenerationSurface(pdgid, nevents, spectrum, spatial)
 
-    def _get_event_weight(self):
-        return np.ones_like(self.get_column("PolyplopiaPrimary", "energy"))
+        return surface

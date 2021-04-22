@@ -12,7 +12,7 @@ def unit_flux(energy, pdgid, cos_zen):
     return 1
 
 
-class TestCorsikaDatasets(unittest.TestCase):
+class TestNugenDatasets(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         datadir = os.environ.get("SIMWEIGHTS_DATA", None)
@@ -41,10 +41,11 @@ class TestCorsikaDatasets(unittest.TestCase):
         one_weight = wd["TotalWeight"] * energy_factor * wd["InjectionAreaCGS"] * wd["SolidAngle"]
         np.testing.assert_allclose(one_weight, wd["OneWeight"])
 
-        one_weight = wd["TotalWeight"] / (
-            power_law.pdf(wd["PrimaryNeutrinoEnergy"])
-            * cylinder.pdf(np.cos(wd["PrimaryNeutrinoZenith"]))
-            * 1e-4
+        one_weight = (
+            wd["TotalWeight"]
+            / power_law.pdf(wd["PrimaryNeutrinoEnergy"])
+            / cylinder.pdf(np.cos(wd["PrimaryNeutrinoZenith"]))
+            / 1e-4
         )
         np.testing.assert_allclose(one_weight, wd["OneWeight"], 1e-5)
 
@@ -61,8 +62,11 @@ class TestCorsikaDatasets(unittest.TestCase):
     def test_20895(self):
         self.cmp_dataset("Level2_IC86.2016_NuTau.020895.000000.hdf5")
 
+    def test_12646(self):
+        self.cmp_dataset("Level2_IC86.2012_nugen_nue.012646.000000.clsim-base-4.0.5.0.99_eff.hdf5")
+
     # def test_(self):
-    #     self.cmp_dataset("Level2_IC86.2015_corsika.0.000000.hdf5")
+    #     self.cmp_dataset("")
 
 
 if __name__ == "__main__":

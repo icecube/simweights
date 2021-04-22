@@ -52,7 +52,7 @@ class TestTriggeredCorsikaWeighter(unittest.TestCase):
         make_hdf5_file("file1.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
         make_hdf5_file("file2.h5", (2212, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
         cls.etendue = simweights.NaturalRateCylinder(600, 1200, 0, 1).etendue
-        cls.flux_model = lambda cls, E, pdgid: 1 / cls.etendue
+        cls.flux_model = lambda cls, energy, pdgid, cos_zen: 1 / cls.etendue
 
     @classmethod
     def tearDownClass(cls):

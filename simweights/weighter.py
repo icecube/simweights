@@ -3,9 +3,8 @@ from copy import copy
 
 import numpy as np
 
-from .generation_surface import GenerationSurface
-from .powerlaw import PowerLaw
-from .utils import Null, get_column, get_table
+from .fluxes import CosmicRayFlux
+from .utils import get_column, get_table
 
 
 class Weighter:
@@ -18,7 +17,7 @@ class Weighter:
     added together to form samples with differnt simulation parameters
     """
 
-    _spatial_distribution = NotImplementedError
+    event_map = {}
 
     def __init__(self, surface, data):
         self.surface = surface
@@ -40,14 +39,28 @@ class Weighter:
         Multiplies the flux by the event weight and devides by the surface for every event in the
         Monte Carlo sample.
         """
-        epdf = self.surface.get_epdf(**self._get_surface_params())
-        flux_val = flux(**self._get_flux_params())
-        event_weight = self._get_event_weight()
+        event_col = dict(
+            energy=self.get_column(*self.event_map["energy"]),
+            pdgid=self.get_column(*self.event_map["pdgid"]),
+            cos_zen=np.cos(self.get_column(*self.event_map["zenith"])),
+        )
+        epdf = self.surface.get_epdf(**event_col)
+
+        if isinstance(flux, CosmicRayFlux):
+            flux_val = flux(event_col["energy"], event_col["pdgid"])
+        else:
+            flux_val = flux(**event_col)
+
+        if self.event_map["event_weight"] is None:
+            event_weight = np.ones_like(epdf)
+        else:
+            event_weight = self.get_column(*self.event_map["event_weight"])
 
         # Getting events with epdf=0 indicates some sort of mismatch between the
         # the surface and the dataset that can't be solved here so print a
         # warning and ignore the events
         mask = epdf > 0
+
         if not np.all(mask):
             warnings.warn(
                 "simweights :: {} events out of {} were found to be "
@@ -87,18 +100,21 @@ class Weighter:
         assert len(energy_bins) >= 2
         assert len(cos_zenith_bins) >= 2
 
-        sparam = self._get_surface_params()
+        pdgid_col = self.get_column(*self.event_map["pdgid"])
+        energy = self.get_column(*self.event_map["energy"])
+        cos_zen = np.cos(self.get_column(*self.event_map["zenith"]))
+
         if pdgid is None:
-            mask = np.ones_like(sparam["pdgid"], dtype=bool)
+            mask = np.ones_like(pdgid_col, dtype=bool)
             nspecies = len(self.surface.get_pdgids())
         else:
-            mask = pdgid == sparam["pdgid"]
+            mask = pdgid == pdgid_col
             nspecies = 1
 
-        weights = self.get_weights(lambda energy, pdgid: 1)
+        weights = self.get_weights(lambda energy, pdgid, cos_zen: 1)
         hist_val, czbin, enbin = np.histogram2d(
-            sparam["cos_zen"][mask],
-            sparam["energy"][mask],
+            cos_zen[mask],
+            energy[mask],
             weights=weights[mask],
             bins=[cos_zenith_bins, energy_bins],
         )
@@ -108,27 +124,6 @@ class Weighter:
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
         return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
 
-    @classmethod
-    def _get_surface(cls, smap):
-        assert smap["power_law_index"] <= 0
-        spatial = cls._spatial_distribution(
-            smap["cylinder_height"],
-            smap["cylinder_radius"],
-            np.cos(smap["max_zenith"]),
-            np.cos(smap["min_zenith"]),
-        )
-        spectrum = PowerLaw(smap["power_law_index"], smap["min_energy"], smap["max_energy"])
-        return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, spatial)
-
-    def _get_surface_params(self):
-        raise NotImplementedError()
-
-    def _get_flux_params(self):
-        raise NotImplementedError()
-
-    def _get_event_weight(self):
-        raise NotImplementedError()
-
     def __add__(self, other):
         if type(self) is not type(other):
             raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
@@ -136,24 +131,3 @@ class Weighter:
         ret.surface += other.surface
         ret.data = self.data + other.data
         return ret
-
-
-class MapWeighter(Weighter):
-    """
-    Abstract base class for weighter which don't have S-frames
-
-    These generators (CorsikaReader and neutrion-generator) store the surface information in an
-    I3MapStringDouble and do not know how many jobs contributed to the current sample.
-    So the user must provide nfiles
-    """
-
-    def __init__(self, infile, nfiles):
-        assert nfiles is not None
-        surface = Null()
-        for smap in self._get_surface_map(infile):
-            surface += nfiles * self._get_surface(smap)
-        super().__init__(surface, [infile])
-
-    @staticmethod
-    def _get_surface_map(infile):
-        raise NotImplementedError()

@@ -39,6 +39,15 @@ def get_table(file_obj, name: str):
     return file_obj[name]
 
 
+def has_column(table, name: str):
+    """
+    Helper function for determining if a table has a column, works with h5py, pytables, and pandas
+    """
+    if hasattr(table, "cols"):
+        return hasattr(table.cols, name)
+    return name in table
+
+
 def get_column(table, name: str):
     """
     Helper function getting a column from a table, works with h5py, pytables, and pandas
@@ -48,9 +57,9 @@ def get_column(table, name: str):
     return table[name]
 
 
-def get_constant_column(col):
+def constcol(col):
     """
-    Helper function which makesure that all of the entries in a column are exactly the same, and returns
+    Helper function which makes sure that all of the entries in a column are exactly the same, and returns
     that value.
 
     This is nescessary because CORSIKA and NuGen store generation surface parameters in every frame and we
