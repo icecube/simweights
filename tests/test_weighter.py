@@ -20,9 +20,10 @@ class TestWeighter(unittest.TestCase):
         self.assertEqual(5 + n1, 5)
 
     def test_weighter(self):
-        w = Weighter(None, None, None)
+        w1 = Weighter([], Null(), {"event_weight": ("a", "b")})
+        w2 = Weighter([], Null(), {"event_weight": ("a", "c")})
         with self.assertRaises(ValueError):
-            w + object()
+            w1 + w2
 
 
 if __name__ == "__main__":

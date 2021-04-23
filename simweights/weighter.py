@@ -1,5 +1,4 @@
 import warnings
-from copy import copy
 
 import numpy as np
 
@@ -18,7 +17,7 @@ class Weighter:
     """
 
     def __init__(self, data, surface, event_map):
-        self.data = data
+        self.data = list(data)
         self.surface = surface
         self.event_map = event_map
 
@@ -123,10 +122,13 @@ class Weighter:
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
         return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
 
-    def __add__(self, other):
-        if type(self) is not type(other):
+    def __iadd__(self, other):
+        if self.event_map != other.event_map:
             raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
-        ret = copy(self)
-        ret.surface += other.surface
-        ret.data = self.data + other.data
-        return ret
+        self.data += other.data
+        self.surface += other.surface
+
+    def __add__(self, other):
+        if self.event_map != other.event_map:
+            raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
+        return Weighter(self.data + other.data, self.surface + other.surface, self.event_map)
