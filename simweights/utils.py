@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import stats
 
 
 class Null:
@@ -132,10 +131,13 @@ def check_run_counts(table, nfiles):  # pragma: no cover
 
 
 def check_nfiles(runcol):  # pragma: no cover
+    # pylint: disable=import-outside-toplevel
     """
     check that the number of jobs in the file is what the user claims they are
     Not Currently used
     """
+    from scipy import stats
+
     unique_runs, run_counts = np.unique(runcol, return_counts=True)
     nfiles = unique_runs.size
 
