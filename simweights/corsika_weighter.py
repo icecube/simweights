@@ -1,8 +1,8 @@
 import numpy as np
 
-from .cylinder import NaturalRateCylinder
 from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
+from .spatial import NaturalRateCylinder
 from .utils import Null, constcol, get_column, get_table
 from .weighter import Weighter
 

@@ -110,3 +110,36 @@ class NaturalRateCylinder(CylinderBase):
         return np.piecewise(
             cos_zen, [(cos_zen >= self.cos_zen_min) & (cos_zen <= self.cos_zen_max)], [self._normalization]
         )
+
+
+class CircleInjector:
+    """
+    This represents the spatial distribution used by older neutrino-genertor versions
+    where the particle is injected in a cylinder that is parallel to momentum vector of the primary.
+    The etendue is just the area of the circle times the solid angle.
+    """
+
+    def __init__(self, radius, cos_zen_min, cos_zen_max):
+        self.radius = radius
+        self.cos_zen_min = cos_zen_min
+        self.cos_zen_max = cos_zen_max
+        self._cap = np.pi * self.radius ** 2
+        self.etendue = 2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
+        self._normalization = 1 / self.etendue
+
+    def projected_area(self, cos_zen):
+        """
+        Returns the cross sectional area of the injection area
+        """
+        # pylint: disable=unused-argument
+        return self._cap
+
+    def pdf(self, cos_zen):
+        """
+        Returns:
+          the probability density function for the given zenith angle.
+        """
+        cos_zen = np.asfarray(cos_zen)
+        return np.piecewise(
+            cos_zen, [(cos_zen >= self.cos_zen_min) & (cos_zen <= self.cos_zen_max)], [self._normalization]
+        )

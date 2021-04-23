@@ -1,8 +1,8 @@
 import numpy as np
 
-from .cylinder import UniformSolidAngleCylinder
 from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
+from .spatial import CircleInjector, UniformSolidAngleCylinder
 from .utils import Null, constcol, get_column, get_table, has_column
 from .weighter import Weighter
 
@@ -37,10 +37,13 @@ class NuGenWeighter(Weighter):
 
         min_zenith = constcol(get_column(table, "MinZenith"))
         max_zenith = constcol(get_column(table, "MaxZenith"))
-        if has_column(table, "InjectionRadius"):
-            # older data
-            raise NotImplementedError()
+
+        if has_column(table, "InjectionSurfaceR"):
+            injection_radius = constcol(get_column(table, "InjectionSurfaceR"))
         else:
+            injection_radius = -1
+
+        if injection_radius <= 0:
             if has_column(table, "CylinderHeight"):
                 cylinder_height = constcol(get_column(table, "CylinderHeight"))
             else:
@@ -52,6 +55,8 @@ class NuGenWeighter(Weighter):
             spatial = UniformSolidAngleCylinder(
                 cylinder_height, cylinder_radius, np.cos(max_zenith), np.cos(min_zenith)
             )
+        else:
+            spatial = CircleInjector(injection_radius, np.cos(max_zenith), np.cos(min_zenith))
 
         min_energy = 10 ** constcol(get_column(table, "MinEnergyLog"))
         max_energy = 10 ** constcol(get_column(table, "MaxEnergyLog"))
@@ -62,9 +67,26 @@ class NuGenWeighter(Weighter):
         surfaces = Null()
         for pid in pdgids:
             mask = pid == get_column(table, "PrimaryNeutrinoType")
+            if has_column(table, "TypeWeight"):
+                type_weight = constcol(get_column(table, "TypeWeight")[mask])
+            else:
+                type_weight = 0.5
+
             primary_type = constcol(get_column(table, "PrimaryNeutrinoType")[mask])
-            n_events = constcol(get_column(table, "TypeWeight")[mask]) * constcol(
-                get_column(table, "NEvents")[mask]
-            )
+            n_events = type_weight * constcol(get_column(table, "NEvents")[mask])
             surfaces += GenerationSurface(primary_type, n_events, spectrum, spatial)
+
+        if has_column(table, "TotalWeight"):
+            total_weight = "TotalWeight"
+        elif has_column(table, "TotalInteractionProbabilityWeight"):
+            total_weight = "TotalInteractionProbabilityWeight"
+        else:
+            total_weight = None
+
+        self.event_map = dict(
+            energy=("I3MCWeightDict", "PrimaryNeutrinoEnergy"),
+            pdgid=("I3MCWeightDict", "PrimaryNeutrinoType"),
+            zenith=("I3MCWeightDict", "PrimaryNeutrinoZenith"),
+            event_weight=("I3MCWeightDict", total_weight),
+        )
         return surfaces
