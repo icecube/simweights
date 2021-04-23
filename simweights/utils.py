@@ -57,7 +57,7 @@ def get_column(table, name: str):
     return table[name]
 
 
-def constcol(col):
+def constcol(table, colname, mask=None):
     """
     Helper function which makes sure that all of the entries in a column are exactly the same, and returns
     that value.
@@ -65,6 +65,9 @@ def constcol(col):
     This is nescessary because CORSIKA and NuGen store generation surface parameters in every frame and we
     want to verify that they are all the same.
     """
+    col = get_column(table, colname)
+    if mask is not None:
+        col = col[mask]
     val = col[0]
     assert np.ndim(val) == 0
     assert (val == col).all()

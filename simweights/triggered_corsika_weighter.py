@@ -7,7 +7,25 @@ from .utils import Null, get_table, has_table
 from .weighter import Weighter
 
 
-class TriggeredCorsikaWeighter(Weighter):
+def triggered_corsika_surface(smap):
+    """
+    Inspect a row of "I3PrimaryInjectorInfo" table object of a triggered corsika file to generate a
+    surface object
+
+    """
+    assert smap["power_law_index"] <= 0
+    spatial = NaturalRateCylinder(
+        smap["cylinder_height"],
+        smap["cylinder_radius"],
+        np.cos(smap["max_zenith"]),
+        np.cos(smap["min_zenith"]),
+    )
+    spectrum = PowerLaw(smap["power_law_index"], smap["min_energy"], smap["max_energy"])
+    return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, spatial)
+
+
+def TriggeredCorsikaWeighter(infile):
+    # pylint: disable=invalid-name
     """
     Weighter for triggered (dynamic-stack) CORSIKA simulation.
 
@@ -25,26 +43,14 @@ class TriggeredCorsikaWeighter(Weighter):
         event_weight=("I3CorsikaWeight", "weight"),
     )
 
-    def __init__(self, infile):
-        info_obj = "I3PrimaryInjectorInfo"
-        if not has_table(infile, info_obj):
-            raise RuntimeError(
-                "File `{}` is Missing S-Frames table `I3PrimaryInjectorInfo`, "
-                "this is required for PrimaryInjector files".format(infile.filename)
-            )
-        surface = Null()
-        for row in get_table(infile, info_obj):
-            surface += self._get_surface(row)
-        super().__init__(surface, [infile])
-
-    @staticmethod
-    def _get_surface(smap):
-        assert smap["power_law_index"] <= 0
-        spatial = NaturalRateCylinder(
-            smap["cylinder_height"],
-            smap["cylinder_radius"],
-            np.cos(smap["max_zenith"]),
-            np.cos(smap["min_zenith"]),
+    info_obj = "I3PrimaryInjectorInfo"
+    if not has_table(infile, info_obj):
+        raise RuntimeError(
+            "File `{}` is Missing S-Frames table `I3PrimaryInjectorInfo`, "
+            "this is required for PrimaryInjector files".format(infile.filename)
         )
-        spectrum = PowerLaw(smap["power_law_index"], smap["min_energy"], smap["max_energy"])
-        return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, spatial)
+
+    surface = Null()
+    for row in get_table(infile, info_obj):
+        surface += triggered_corsika_surface(row)
+    return Weighter([infile], surface, event_map)

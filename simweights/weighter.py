@@ -17,11 +17,10 @@ class Weighter:
     added together to form samples with differnt simulation parameters
     """
 
-    event_map = {}
-
-    def __init__(self, surface, data):
-        self.surface = surface
+    def __init__(self, data, surface, event_map):
         self.data = data
+        self.surface = surface
+        self.event_map = event_map
 
     def get_column(self, table: str, column: str):
         """

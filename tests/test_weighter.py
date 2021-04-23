@@ -20,7 +20,7 @@ class TestWeighter(unittest.TestCase):
         self.assertEqual(5 + n1, 5)
 
     def test_weighter(self):
-        w = Weighter(None, None)
+        w = Weighter(None, None, None)
         with self.assertRaises(ValueError):
             w + object()
 

@@ -7,7 +7,39 @@ from .utils import Null, constcol, get_column, get_table
 from .weighter import Weighter
 
 
-class CorsikaWeighter(Weighter):
+def corsika_surface(table):
+    """
+    Inspect the `CorsikaWeightMap` table object of a corsika file to generate a surface object
+
+    """
+    pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
+    surface = Null()
+    for pdgid in pdgids:
+        mask = pdgid == get_column(table, "ParticleType")
+
+        spatial = NaturalRateCylinder(
+            constcol(table, "CylinderLength", mask),
+            constcol(table, "CylinderRadius", mask),
+            np.cos(constcol(table, "ThetaMax", mask)),
+            np.cos(constcol(table, "ThetaMin", mask)),
+        )
+
+        primary_spectral_index = round(constcol(table, "PrimarySpectralIndex", mask), 6)
+        assert primary_spectral_index <= 0
+
+        spectrum = PowerLaw(
+            primary_spectral_index,
+            constcol(table, "EnergyPrimaryMin", mask),
+            constcol(table, "EnergyPrimaryMax", mask),
+        )
+        nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
+        surface += GenerationSurface(pdgid, nevents, spectrum, spatial)
+
+    return surface
+
+
+def CorsikaWeighter(infile, nfiles):
+    # pylint: disable=invalid-name
     """
     Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader
 
@@ -22,34 +54,10 @@ class CorsikaWeighter(Weighter):
         zenith=("PolyplopiaPrimary", "zenith"),
         event_weight=None,
     )
+    table = get_table(infile, "CorsikaWeightMap")
+    surface = nfiles * corsika_surface(table)
+    return Weighter([infile], surface, event_map)
 
-    def __init__(self, infile, nfiles):
-        surface = nfiles * self._get_surface(infile)
-        super().__init__(surface, [infile])
-
-    @staticmethod
-    def _get_surface(infile):
-        table = get_table(infile, "CorsikaWeightMap")
-        pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
-        surface = Null()
-        for pdgid in pdgids:
-            mask = pdgid == get_column(table, "ParticleType")
-
-            def gcol(name):
-                return constcol(get_column(table, name)[mask])
-
-            spatial = NaturalRateCylinder(
-                gcol("CylinderLength"),
-                gcol("CylinderRadius"),
-                np.cos(gcol("ThetaMax")),
-                np.cos(gcol("ThetaMin")),
-            )
-
-            primary_spectral_index = round(constcol(get_column(table, "PrimarySpectralIndex")[mask]), 6)
-            assert primary_spectral_index <= 0
-
-            spectrum = PowerLaw(primary_spectral_index, gcol("EnergyPrimaryMin"), gcol("EnergyPrimaryMax"))
-            nevents = gcol("OverSampling") * gcol("NEvents")
-            surface += GenerationSurface(pdgid, nevents, spectrum, spatial)
-
-        return surface
+    # def __init__(self, infile, nfiles):
+    #    surface = nfiles * self._get_surface(infile)
+    #    super().__init__(surface, [infile])
