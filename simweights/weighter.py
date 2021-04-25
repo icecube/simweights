@@ -1,3 +1,5 @@
+import sys
+import types
 import warnings
 
 import numpy as np
@@ -32,23 +34,50 @@ class Weighter:
 
     def get_weights(self, flux):
         """
-        Calculate the weights for the sample in the weighter function.
+        Calculate the weights for the sample for the given flux.
 
-        Multiplies the flux by the event weight and devides by the surface for every event in the
-        Monte Carlo sample.
+        :param:`flux` can be any one of several types:
+
+        * An instance of :py:class:`nuflux.FluxFunction` from `nuflux <https://github.com/icecube/nuflux>`_
+        * An instance of :py:class:`simweights.CosmicRays`
+        * A function with 2 to 3 parameters. If the function takes two parameter it will be pdgid and
+          energy. if three it will be pdgid, energy, and cos_zenith.
+        * An iterable the same length os the datasample. If you have other means of calculating the flux
+          for each event than the above options this can be useful.
+        * A scalar number. calculate the unrealisitc scenario where all events have the same flux, this can
+          be useful for testing. If the value is 1 then the return value will be the well known quantity
+          OneWeight
         """
         event_col = dict(
             energy=self.get_column(*self.event_map["energy"]),
-            pdgid=self.get_column(*self.event_map["pdgid"]),
+            pdgid=self.get_column(*self.event_map["pdgid"]).astype(np.int32),
             cos_zen=np.cos(self.get_column(*self.event_map["zenith"])),
         )
         epdf = self.surface.get_epdf(**event_col)
 
-        if isinstance(flux, CosmicRayFlux):
-            flux_val = flux(event_col["energy"], event_col["pdgid"])
+        # if nuflux is already loaded git a reference to it otherwise create a dummy class
+        # that will cause isinstance to always return false
+        if "nuflux" in sys.modules:
+            nuflux_funtion = sys.modules["nuflux"].FluxFunction
         else:
-            flux_val = flux(**event_col)
+            nuflux_funtion = types.new_class("DummyFluxFunction")
 
+        # calculate the flux based on which type of flux it is
+        if isinstance(flux, nuflux_funtion):
+            flux_val = 1e4 * flux.getFlux(event_col["pdgid"], event_col["energy"], event_col["cos_zen"])
+        elif isinstance(flux, CosmicRayFlux):
+            flux_val = flux(event_col["energy"], event_col["pdgid"])
+        elif callable(flux):
+            flux_val = flux(**event_col)
+        elif hasattr(flux, "__len__"):
+            flux_val = np.array(flux, dtype=float)
+            assert flux_val.shape == epdf.shape
+        elif np.isscalar(flux):
+            flux_val = np.full(epdf.shape, flux)
+        else:
+            raise ValueError("I do not understand what to do with flux {}".format(flux))
+
+        # Some generators don't have an event weight so just let them use None
         if self.event_map["event_weight"] is None:
             event_weight = np.ones_like(epdf)
         else:
@@ -61,8 +90,10 @@ class Weighter:
 
         if not np.all(mask):
             warnings.warn(
-                "simweights :: {} events out of {} were found to be "
-                "outside the generation surface".format(np.logical_not(mask).sum(), mask.size)
+                "simweights :: {} events out of {} were found to be outside the generation surface."
+                "This could indicate a problem with this dataset.".format(
+                    np.logical_not(mask).sum(), mask.size
+                )
             )
         weights = np.zeros_like(epdf)
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
