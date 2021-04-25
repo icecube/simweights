@@ -55,6 +55,17 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertNotEqual(self.s0, self.s3)
         self.assertNotEqual(self.s0, self.s4)
 
+    def test_get_pdgids(self):
+        self.assertEqual(self.s0.get_pdgids(), [2212])
+        self.assertEqual(self.s1.get_pdgids(), [2212])
+        self.assertEqual(self.s2.get_pdgids(), [2212])
+        self.assertEqual(self.s3.get_pdgids(), [2212])
+        self.assertEqual(self.s4.get_pdgids(), [2213])
+        self.assertEqual(self.gsc1.get_pdgids(), [2212])
+        self.assertEqual(self.gsc2.get_pdgids(), [2212])
+        self.assertEqual(self.gsc3.get_pdgids(), [2212])
+        self.assertEqual(self.gsc4.get_pdgids(), [2212, 2213])
+
     def test_energy_range(self):
         self.assertEqual(self.s0.get_energy_range(2212), (10, 100))
         self.assertEqual(self.s2.get_energy_range(2212), (50, 500))
@@ -66,8 +77,8 @@ class TestGenerationSurface(unittest.TestCase):
 
         self.assertEqual(self.gsc1.get_energy_range(2212), (10, 100))
         self.assertEqual(self.gsc2.get_energy_range(2212), (10, 500))
-        self.assertEqual(self.gsc4.get_energy_range(2212), (10, 100))
-        self.assertEqual(self.gsc4.get_energy_range(2213), (10, 100))
+        self.assertEqual(self.gsc4.get_energy_range(None), (10, 100))
+        self.assertEqual(self.gsc4.get_energy_range(None), (10, 100))
         with self.assertRaises(AssertionError):
             self.gsc1.get_energy_range(2213)
         with self.assertRaises(AssertionError):
@@ -84,8 +95,8 @@ class TestGenerationSurface(unittest.TestCase):
 
         self.assertEqual(self.gsc1.get_cos_zenith_range(2212), (-1, 1))
         self.assertEqual(self.gsc2.get_cos_zenith_range(2212), (-1, 1))
-        self.assertEqual(self.gsc4.get_cos_zenith_range(2212), (-1, 1))
-        self.assertEqual(self.gsc4.get_cos_zenith_range(2213), (-1, 1))
+        self.assertEqual(self.gsc4.get_cos_zenith_range(None), (-1, 1))
+        self.assertEqual(self.gsc4.get_cos_zenith_range(None), (-1, 1))
         with self.assertRaises(AssertionError):
             self.gsc1.get_cos_zenith_range(2213)
         with self.assertRaises(AssertionError):

@@ -1,29 +1,144 @@
 #!/usr/bin/env python
-import unittest
 
-from simweights.utils import Null
+import unittest
+from copy import copy
+
+import numpy as np
+
+from simweights import TIG1996, GenerationSurface, NaturalRateCylinder, PowerLaw
 from simweights.weighter import Weighter
 
 
+def fluxfun(energy, pdgid, cos_zen):
+    return energy ** 2
+
+
 class TestWeighter(unittest.TestCase):
-    def test_null(self):
-        n1 = Null()
-        n2 = Null()
-        self.assertEqual(n1, n2)
-        self.assertNotEqual(n1, None)
+    @classmethod
+    def setUpClass(cls):
 
-        self.assertEqual(n1 + None, None)
-        self.assertEqual(n1 + [], [])
-        self.assertEqual(n1 + 5, 5)
-        self.assertEqual(None + n1, None)
-        self.assertEqual({} + n1, {})
-        self.assertEqual(5 + n1, 5)
+        cls.N1 = 15
+        cls.data1 = dict(
+            weight=dict(
+                pdgid=np.full(cls.N1, 2212),
+                energy=np.linspace(5e5, 5e6, cls.N1),  # np.full(N,1e6),
+                zenith=np.full(cls.N1, np.pi / 4),
+            )
+        )
+        cls.c1 = NaturalRateCylinder(100, 200, 0, 1)
+        cls.p1 = PowerLaw(0, 5e5, 5e6)
+        cls.s1 = GenerationSurface(2212, cls.N1, cls.p1, cls.c1)
+        cls.m1 = dict(
+            pdgid=("weight", "pdgid"),
+            energy=("weight", "energy"),
+            zenith=("weight", "zenith"),
+            event_weight=None,
+        )
+        cls.weighter1 = Weighter([cls.data1], cls.s1, cls.m1)
 
-    def test_weighter(self):
-        w1 = Weighter([], Null(), {"event_weight": ("a", "b")})
-        w2 = Weighter([], Null(), {"event_weight": ("a", "c")})
+        cls.data2 = dict(
+            weight=dict(
+                pdgid=np.full(cls.N1, 2212),
+                energy=np.full(cls.N1, 1e6),
+                zenith=np.full(cls.N1, np.pi / 4),
+                ev=np.full(cls.N1, 8),
+            )
+        )
+        cls.m2 = dict(
+            pdgid=("weight", "pdgid"),
+            energy=("weight", "energy"),
+            zenith=("weight", "zenith"),
+            event_weight=("weight", "ev"),
+        )
+        cls.weighter2 = Weighter([cls.data2], cls.s1, cls.m2)
+
+    def check_weight(self, weighter, N, data, val):
+        flux = 6
+        weights = weighter.get_weights(flux)
+        self.assertAlmostEqual(weights.sum(), flux * val, 1)
+
+        flux = list(range(0, N))
+        weights = weighter.get_weights(flux)
+        np.testing.assert_allclose(weights, np.array(flux) * val / N)
+
+        flux = np.linspace(1, 2, N)
+        weights = weighter.get_weights(flux)
+        np.testing.assert_allclose(weights, flux * val / N)
+
+        weights = weighter.get_weights(fluxfun)
+        flux_vals = fluxfun(
+            data["weight"]["energy"], data["weight"]["pdgid"], np.cos(data["weight"]["zenith"])
+        )
+        np.testing.assert_allclose(weights, flux_vals * val / N)
+
+        flux = TIG1996()
+        weights = weighter.get_weights(flux)
+        flux_vals = flux(data["weight"]["energy"], data["weight"]["pdgid"])
+        np.testing.assert_allclose(weights, flux_vals * val / N)
+
         with self.assertRaises(ValueError):
-            w1 + w2
+            self.weighter1.get_weights("flux")
+
+        with self.assertRaises(ValueError):
+            self.weighter1.get_weights(None)
+
+    def test_weights(self):
+        self.check_weight(self.weighter1, self.N1, self.data1, self.p1.integral * self.c1.etendue)
+        self.check_weight(self.weighter2, self.N1, self.data2, 8 * self.p1.integral * self.c1.etendue)
+
+    def test_outside(self):
+        data = dict(
+            weight=dict(
+                pdgid=np.full(self.N1, 2212),
+                energy=np.full(self.N1, 1e6),
+                zenith=-np.full(self.N1, 3 * np.pi / 4),
+            )
+        )
+        weighter = Weighter([data], self.s1, self.m1)
+        with self.assertWarns(UserWarning):
+            weights = weighter.get_weights(1)
+        np.testing.assert_array_equal(weights, 0)
+
+    def test_effective_area(self):
+        self.assertAlmostEqual(self.weighter1.effective_area(2212)[0][0], self.c1.etendue / 2 / np.pi)
+        self.assertAlmostEqual(self.weighter1.effective_area()[0][0], self.c1.etendue / 2 / np.pi)
+        np.testing.assert_allclose(
+            self.weighter1.effective_area(2212, np.linspace(5e5, 5e6, self.N1 + 1)),
+            [np.full(self.N1, self.c1.etendue / 2 / np.pi)],
+        )
+
+    def test_weighter_addition(self):
+
+        # weighter1 = copy(self.weighter1)
+
+        weighter_sum = self.weighter1 + self.weighter1
+        w1 = self.weighter1.get_weights(1)
+        ws = weighter_sum.get_weights(1)
+        self.assertAlmostEqual(w1.sum(), ws.sum())
+        self.assertEqual(2 * len(w1), len(ws))
+        self.assertIsNot(self.weighter1, weighter_sum)
+        self.assertEqual(2 * len(self.weighter1.data), len(weighter_sum.data))
+        self.assertEqual(2 * self.weighter1.surface, weighter_sum.surface)
+        self.assertEqual(self.weighter1.event_map, weighter_sum.event_map)
+
+        weightera = copy(self.weighter1)
+        holder = weightera
+        weightera += self.weighter1
+        print(weightera)
+        self.assertAlmostEqual(w1.sum(), ws.sum())
+        self.assertEqual(2 * len(w1), len(ws))
+        self.assertIs(holder, weightera)
+        self.assertIsNot(self.weighter1, weightera)
+        self.assertEqual(2 * len(self.weighter1.data), len(weightera.data))
+        self.assertEqual(2 * self.weighter1.surface, weightera.surface)
+        self.assertEqual(self.weighter1.event_map, weightera.event_map)
+
+        weighterb = copy(self.weighter1)
+        with self.assertRaises(ValueError):
+            weighterb += self.weighter2
+
+        with self.assertRaises(ValueError):
+            self.weighter1 + self.weighter2
 
 
 if __name__ == "__main__":

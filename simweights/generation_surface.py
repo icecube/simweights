@@ -68,7 +68,7 @@ class GenerationSurface:
         """
         Return the cos_zenith range for given particle type over all surfaces
         """
-        assert pdgid == self.pdgid
+        assert (pdgid is None) or pdgid == self.pdgid
         return self.spatial_dist.cos_zen_min, self.spatial_dist.cos_zen_max
 
     def __eq__(self, other):

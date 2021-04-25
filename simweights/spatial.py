@@ -45,7 +45,7 @@ class CylinderBase:
         raise NotImplementedError()
 
     def __repr__(self):
-        return "{}({},{},{:4.2f},{:4.2f})".format(
+        return "{}({},{},{},{})".format(
             self.__class__.__name__, self.length, self.radius, self.cos_zen_min, self.cos_zen_max
         )
 
@@ -142,4 +142,15 @@ class CircleInjector:
         cos_zen = np.asfarray(cos_zen)
         return np.piecewise(
             cos_zen, [(cos_zen >= self.cos_zen_min) & (cos_zen <= self.cos_zen_max)], [self._normalization]
+        )
+
+    def __repr__(self):
+        return "CircleInjector({},{},{})".format(self.radius, self.cos_zen_min, self.cos_zen_max)
+
+    def __eq__(self, other):
+        return (
+            type(self) is type(other)
+            and self.radius == other.radius
+            and self.cos_zen_min == other.cos_zen_min
+            and self.cos_zen_max == other.cos_zen_max
         )

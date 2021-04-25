@@ -18,7 +18,7 @@ class Weighter:
     added together to form samples with differnt simulation parameters
     """
 
-    def __init__(self, data, surface, event_map):
+    def __init__(self, data: list, surface, event_map: dict):
         self.data = list(data)
         self.surface = surface
         self.event_map = event_map
@@ -58,13 +58,15 @@ class Weighter:
         # if nuflux is already loaded git a reference to it otherwise create a dummy class
         # that will cause isinstance to always return false
         if "nuflux" in sys.modules:
-            nuflux_funtion = sys.modules["nuflux"].FluxFunction
+            nuflux_funtion = sys.modules["nuflux"].FluxFunction  # pragma: no cover
         else:
             nuflux_funtion = types.new_class("DummyFluxFunction")
 
         # calculate the flux based on which type of flux it is
         if isinstance(flux, nuflux_funtion):
-            flux_val = 1e4 * flux.getFlux(event_col["pdgid"], event_col["energy"], event_col["cos_zen"])
+            flux_val = 1e4 * flux.getFlux(
+                event_col["pdgid"], event_col["energy"], event_col["cos_zen"]
+            )  # pragma: no cover
         elif isinstance(flux, CosmicRayFlux):
             flux_val = flux(event_col["energy"], event_col["pdgid"])
         elif callable(flux):
@@ -156,10 +158,11 @@ class Weighter:
     def __iadd__(self, other):
         if self.event_map != other.event_map:
             raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
-        self.data += other.data
+        self.data = [*self.data, *other.data]
         self.surface += other.surface
+        return self
 
     def __add__(self, other):
         if self.event_map != other.event_map:
             raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
-        return Weighter(self.data + other.data, self.surface + other.surface, self.event_map)
+        return Weighter([*self.data, *other.data], self.surface + other.surface, self.event_map)

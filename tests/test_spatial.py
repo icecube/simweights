@@ -3,11 +3,11 @@ import unittest
 
 import numpy as np
 
-from simweights import NaturalRateCylinder, UniformSolidAngleCylinder
+from simweights import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
 from simweights.spatial import CylinderBase
 
 
-class TestCylinder(unittest.TestCase):
+class TestSpatial(unittest.TestCase):
     def check_diff_etendue(self, c, le, r):
         self.assertAlmostEqual(c.projected_area(-1), np.pi * r ** 2)
         self.assertAlmostEqual(c.projected_area(-0.5), np.pi * r ** 2 / 2 + 3 ** 0.5 * le * r)
@@ -68,7 +68,7 @@ class TestCylinder(unittest.TestCase):
             c.pdf(0.5)
         self.assertEqual(c, c)
 
-    def test_volume_corr(self):
+    def test_natural_rate_cylinder(self):
         last_c1 = None
         for le in range(100, 1000, 300):
             for r in range(100, 1000, 300):
@@ -143,6 +143,49 @@ class TestCylinder(unittest.TestCase):
                 self.assertEqual(float(x[1]), r)
                 self.assertEqual(float(x[2]), -1)
                 self.assertEqual(float(x[3]), 1)
+
+    def check_circle(self, c, etendue):
+        self.assertAlmostEqual(c.etendue, etendue)
+
+        x = np.linspace(c.cos_zen_min, c.cos_zen_max, 10000)
+        np.testing.assert_allclose(c.projected_area(x), np.pi * c.radius ** 2)
+        pdfs = c.pdf(x)
+        np.testing.assert_allclose(pdfs, 1 / etendue, 1e-15)
+        self.assertAlmostEqual((1 / pdfs).sum() / len(x) / c.etendue, 1)
+
+        x = np.linspace(-2, np.nextafter(c.cos_zen_min, -np.inf))
+        np.testing.assert_array_equal(c.pdf(x), 0)
+
+        x = np.linspace(np.nextafter(c.cos_zen_max, np.inf), 2)
+        np.testing.assert_array_equal(c.pdf(x), 0)
+
+    def test_circle_injector(self):
+        last_c1 = None
+        for r in range(100, 1000, 300):
+            c1 = CircleInjector(r, -1, 1)
+            self.check_circle(c1, 4 * np.pi ** 2 * r ** 2)
+
+            c2 = CircleInjector(r, -1, 0)
+            self.check_circle(c2, 2 * np.pi ** 2 * r ** 2)
+
+            c3 = CircleInjector(r, 0, 1)
+            self.check_circle(c3, 2 * np.pi ** 2 * r ** 2)
+
+            self.assertEqual(c1, c1)
+            self.assertNotEqual(c1, c2)
+            self.assertNotEqual(c1, c3)
+            self.assertEqual(c2, c2)
+            self.assertNotEqual(c2, c3)
+            self.assertEqual(c3, c3)
+            self.assertNotEqual(c1, last_c1)
+            last_c1 = c1
+
+            s = str(c1)
+            self.assertEqual(s[:15], "CircleInjector(")
+            x = s[15:-1].split(",")
+            self.assertEqual(float(x[0]), r)
+            self.assertEqual(float(x[1]), -1)
+            self.assertEqual(float(x[2]), 1)
 
 
 if __name__ == "__main__":

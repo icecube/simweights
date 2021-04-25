@@ -5,6 +5,7 @@ simweights is a pure python library for weighting IceCube Monte Carlo simulation
 __version__ = "0.1"
 
 __all__ = [
+    "CircleInjector",
     "CorsikaWeighter",
     "NaturalRateCylinder",
     "UniformSolidAngleCylinder",
@@ -46,6 +47,6 @@ from .generation_surface import GenerationSurface, GenerationSurfaceCollection
 from .nugen_weighter import NuGenWeighter
 from .pdgcode import PDGCode
 from .powerlaw import PowerLaw
-from .spatial import NaturalRateCylinder, UniformSolidAngleCylinder
+from .spatial import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
 from .triggered_corsika_weighter import TriggeredCorsikaWeighter
 from .utils import corsika_to_pdg
