@@ -6,7 +6,7 @@ import unittest
 
 import numpy as np
 
-from simweights import corsika_to_pdg, fluxes
+from simweights import fluxes
 
 E = np.logspace(2, 10, 9)
 
@@ -60,38 +60,6 @@ class TestCosmicRayModels(unittest.TestCase):
 
     def test_FixedFractionFlux(self):
         self.flux_cmp("FixedFractionFlux")
-
-    def test_corsika_to_pdg(self):
-        c = [
-            14,
-            402,
-            703,
-            904,
-            1105,
-            1206,
-            1407,
-            1608,
-            1909,
-            2010,
-            2311,
-            2412,
-            2713,
-            2814,
-            3115,
-            3216,
-            3517,
-            4018,
-            3919,
-            4020,
-            4521,
-            4822,
-            5123,
-            5224,
-            5525,
-            5626,
-        ]
-        pdgid = [int(i) for i in self.flux_values["Hoerandel"].keys()]
-        np.testing.assert_array_equal(corsika_to_pdg(c), pdgid)
 
 
 if __name__ == "__main__":
