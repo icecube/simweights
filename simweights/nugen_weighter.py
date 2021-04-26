@@ -17,9 +17,10 @@ def nugen_spatial(table):
     max_cos = np.cos(constcol(table, "MinZenith"))
     min_cos = np.cos(constcol(table, "MaxZenith"))
 
-    # older nugen used circle injection mode this can be determied by checking `InjectionSurfaceR` it will
-    # be > 0 for circle injection and -1 for surface injection. In new versions it is not even present
-    # indicating surface mode
+    # Before V04-01-00, nugen injection primaries on the surface of a circle perpendicular to the momentum
+    # vector of the primary, this can be determied by checking `InjectionSurfaceR`. It will
+    # be > 0 for circle injection and -1 for surface injection. In new versions >V6-00-00 it is not even 
+    # present indicating surface mode
     if has_column(table, "InjectionSurfaceR"):
         injection_radius = constcol(table, "InjectionSurfaceR")
     else:
@@ -28,8 +29,9 @@ def nugen_spatial(table):
     if injection_radius > 0:
         return CircleInjector(injection_radius, min_cos, max_cos)
 
-    # CylinderHeight and CylinderRadius were added after the introduction of surface mode
-    # os if they are not there they are probabally ( 1900, 950 )
+    # Surface mode was added in V04-01-00 but the cylinder size was hard coded, `CylinderHeight` and
+    # `CylinderRadius` were added after later V06-00-00. If they are not in the table then use the
+    # hardcoded values
     if has_column(table, "CylinderHeight"):
         cylinder_height = constcol(table, "CylinderHeight")
     else:

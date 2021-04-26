@@ -1,102 +1,105 @@
 #!/usr/bin/env python
-import os
 import unittest
 
-import h5py
 import numpy as np
-import pandas
-import tables
+import pandas as pd
 
-from simweights import NuGenWeighter, UniformSolidAngleCylinder
+from simweights import CircleInjector, NaturalRateCylinder, NuGenWeighter, PowerLaw
 
-weight_dtype = [
-    ("PrimaryNeutrinoType", np.int32),
-    ("NEvents", np.float64),
-    ("CylinderHeight", np.float64),
-    ("CylinderRadius", np.float64),
-    ("MinZenith", np.float64),
-    ("MaxZenith", np.float64),
-    ("MinEnergyLog", np.float64),
-    ("MaxEnergyLog", np.float64),
-    ("PowerLawIndex", np.float64),
-    ("PrimaryNeutrinoZenith", np.float64),
-    ("PrimaryNeutrinoEnergy", np.float64),
-    ("TotalWeight", np.float64),
-    ("TypeWeight", np.float64),
+base_keys = [
+    "NEvents",
+    "MinZenith",
+    "MaxZenith",
+    "PowerLawIndex",
+    "MinEnergyLog",
+    "MaxEnergyLog",
+    "PrimaryNeutrinoType",
+    "PrimaryNeutrinoZenith",
+    "PrimaryNeutrinoEnergy",
 ]
 
 
-def make_hdf5_file(fname, v):
-    weight = np.zeros(v[1], dtype=weight_dtype)
-    weight["NEvents"] = v[1]
-    weight["PrimaryNeutrinoType"] = v[0]
-    weight["CylinderHeight"] = v[2]
-    weight["CylinderRadius"] = v[3]
-    weight["MinZenith"] = v[4]
-    weight["MaxZenith"] = v[5]
-    weight["MinEnergyLog"] = np.log10(v[6])
-    weight["MaxEnergyLog"] = np.log10(v[7])
-    weight["PowerLawIndex"] = -v[8]
-    weight["PrimaryNeutrinoZenith"] = np.arccos(np.linspace(np.cos(v[4]), np.cos(v[5]), v[1]))
-    weight["TotalWeight"] = 1
-    weight["TypeWeight"] = 0.5
-    if v[8] == -1:
-        weight["PrimaryNeutrinoEnergy"] = np.geomspace(v[6], v[7], v[1])
-    else:
-        q = np.linspace(1 / 2 / v[1], 1 - 1 / 2 / v[1], v[1])
-        G = v[8] + 1
-        weight["PrimaryNeutrinoEnergy"] = (q * (v[7] ** G - v[6] ** G) + v[6] ** G) ** (1 / G)
-
-    f = h5py.File(fname, "w")
-    f.create_dataset("I3MCWeightDict", data=weight)
-    f.close()
+def make_new_table(pdgid, nevents, spatial, spectrum):
+    dtype = [(k, float) for k in base_keys]
+    weight = np.zeros(nevents, dtype=dtype)
+    weight["PrimaryNeutrinoType"] = pdgid
+    weight["NEvents"] = nevents
+    weight["MinZenith"] = np.arccos(spatial.cos_zen_max)
+    weight["MaxZenith"] = np.arccos(spatial.cos_zen_min)
+    weight["PowerLawIndex"] = spectrum.g
+    weight["MinEnergyLog"] = np.log10(spectrum.a)
+    weight["MaxEnergyLog"] = np.log10(spectrum.b)
+    weight["PrimaryNeutrinoZenith"] = np.arccos(
+        np.linspace(spatial.cos_zen_max, spatial.cos_zen_min, nevents)
+    )
+    weight["PrimaryNeutrinoEnergy"] = spectrum.ppf(np.linspace(0, 1, nevents))
+    return weight
 
 
-@unittest.skip
 class TestNugenWeighter(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        make_hdf5_file("file1.h5", (12, 100000, 1200, 600, 0, np.pi, 1e4, 1e6, -1))
-        make_hdf5_file("file2.h5", (12, 100000, 1200, 600, 0, np.pi, 1e5, 1e7, -1.5))
-        cls.etendue = UniformSolidAngleCylinder(600, 1200, 0, 1).etendue
-        cls.flux_model = lambda cls, energy, pdgid, cos_zen: 1 / cls.etendue
+    def test_nugen_energy_post_V6(self):
+        p1 = PowerLaw(0, 1e3, 1e4)
+        c1 = NaturalRateCylinder(200, 100, 0, 0.001)
+        t1 = pd.DataFrame(make_new_table(14, 10000, c1, p1))
+        t1["CylinderHeight"] = c1.length
+        t1["CylinderRadius"] = c1.radius
+        t1["TypeWeight"] = 0.5
 
-    @classmethod
-    def tearDownClass(cls):
-        os.unlink("file1.h5")
-        os.unlink("file2.h5")
+        for weight in 0.1, 1, 10:
+            t1["TotalWeight"] = weight
+            f1 = dict(I3MCWeightDict=t1)
+            for nfiles in [1, 10, 100]:
+                wf = NuGenWeighter(f1, nfiles=nfiles)
+                for flux in [1e-6, 1, 1e6]:
+                    w1 = wf.get_weights(flux)
+                    np.testing.assert_allclose(
+                        w1.sum(), 2 * weight * flux * p1.integral * c1.etendue / nfiles
+                    )
+                    E = t1["PrimaryNeutrinoEnergy"]
+                    y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])
+                    Ewidth = np.ediff1d(x)
+                    np.testing.assert_allclose(y, 2 * weight * flux * Ewidth * c1.etendue / nfiles, 6e-3)
 
-    def check_weights(self, wf):
-        w = wf.get_weights(self.flux_model)
-        emin, emax = wf.surface.get_energy_range(12)
-        self.assertAlmostEqual(w.sum() / (emax - emin), 2, 4)
-        E = wf.get_column("I3MCWeightDict", "PrimaryNeutrinoEnergy")
-        y, x = np.histogram(E, weights=w, bins=50, range=[emin, emax])
-        Ewidth = x[1:] - x[:-1]
-        np.testing.assert_allclose(y, 2 * Ewidth, 7e-3)
+    def test_nugen_energy_pre_V6(self):
+        p1 = PowerLaw(0, 1e3, 1e4)
+        c1 = NaturalRateCylinder(1900, 950, 0, 0.001)
+        t1 = pd.DataFrame(make_new_table(14, 10000, c1, p1))
+        for weight in 0.1, 1, 10:
+            t1["TotalWeight"] = weight
+            t1["InjectionSurfaceR"] = -1
+            t1["TypeWeight"] = 0.5
+            f1 = dict(I3MCWeightDict=t1)
+            for nfiles in [1, 10, 100]:
+                wf = NuGenWeighter(f1, nfiles=nfiles)
+                for flux in [1e-6, 1, 1e6]:
+                    w1 = wf.get_weights(flux)
+                    np.testing.assert_allclose(
+                        w1.sum(), 2 * weight * flux * p1.integral * c1.etendue / nfiles
+                    )
+                    E = t1["PrimaryNeutrinoEnergy"]
+                    y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])
+                    Ewidth = np.ediff1d(x)
+                    np.testing.assert_allclose(y, 2 * weight * flux * Ewidth * c1.etendue / nfiles, 6e-3)
 
-    def test_h5py(self):
-        simfile = h5py.File("file1.h5", "r")
-        wf = NuGenWeighter(simfile, nfiles=1)
-        self.check_weights(wf)
-
-    def test_pytables(self):
-        simfile = tables.open_file("file2.h5", "r")
-        wf = NuGenWeighter(simfile, nfiles=1)
-        self.check_weights(wf)
-
-    def test_pandas(self):
-        simfile = pandas.HDFStore("file1.h5", "r")
-        wf = NuGenWeighter(simfile, nfiles=1)
-        self.check_weights(wf)
-
-    def test_addition(self):
-        simfile1 = h5py.File("file1.h5", "r")
-        simfile2 = pandas.HDFStore("file2.h5", "r")
-        wf1 = NuGenWeighter(simfile1, nfiles=1)
-        wf2 = NuGenWeighter(simfile2, nfiles=1)
-        wf = wf1 + wf2
-        self.check_weights(wf)
+    def test_nugen_energy_pre_V04_00(self):
+        p1 = PowerLaw(0, 1e3, 1e4)
+        c1 = CircleInjector(500, 0, 0.001)
+        t1 = pd.DataFrame(make_new_table(14, 10000, c1, p1))
+        for weight in 0.1, 1, 10:
+            t1["TotalInteractionProbabilityWeight"] = weight
+            t1["InjectionSurfaceR"] = c1.radius
+            f1 = dict(I3MCWeightDict=t1)
+            for nfiles in [1, 10, 100]:
+                wf = NuGenWeighter(f1, nfiles=nfiles)
+                for flux in [1e-6, 1, 1e6]:
+                    w1 = wf.get_weights(flux)
+                    np.testing.assert_allclose(
+                        w1.sum(), 2 * weight * flux * p1.integral * c1.etendue / nfiles
+                    )
+                    E = t1["PrimaryNeutrinoEnergy"]
+                    y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])
+                    Ewidth = np.ediff1d(x)
+                    np.testing.assert_allclose(y, 2 * weight * flux * Ewidth * c1.etendue / nfiles, 6e-3)
 
 
 if __name__ == "__main__":

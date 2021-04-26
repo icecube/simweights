@@ -1,5 +1,4 @@
 import sys
-import types
 import warnings
 
 import numpy as np
@@ -55,15 +54,8 @@ class Weighter:
         )
         epdf = self.surface.get_epdf(**event_col)
 
-        # if nuflux is already loaded git a reference to it otherwise create a dummy class
-        # that will cause isinstance to always return false
-        if "nuflux" in sys.modules:
-            nuflux_funtion = sys.modules["nuflux"].FluxFunction  # pragma: no cover
-        else:
-            nuflux_funtion = types.new_class("DummyFluxFunction")
-
         # calculate the flux based on which type of flux it is
-        if isinstance(flux, nuflux_funtion):
+        if "nuflux" in sys.modules and isinstance(flux, sys.modules["nuflux"].FluxFunction):
             flux_val = 1e4 * flux.getFlux(
                 event_col["pdgid"], event_col["energy"], event_col["cos_zen"]
             )  # pragma: no cover

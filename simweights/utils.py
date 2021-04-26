@@ -97,22 +97,6 @@ def corsika_to_pdg(cid):
     )
 
 
-def append_dicts(first, second):  # pragma: no cover
-    """
-    concat one dict into another
-    Not Currently used
-    """
-    if not first:
-        return second
-    if not second:
-        return first
-    out = {}
-    assert first.keys() == second.keys()
-    for k in first.keys():
-        out[k] = np.r_[first[k], second[k]]
-    return out
-
-
 def check_run_counts(table, nfiles):  # pragma: no cover
     """
     check that the number of jobs in the file is what the user claims they are

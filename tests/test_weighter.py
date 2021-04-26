@@ -124,7 +124,7 @@ class TestWeighter(unittest.TestCase):
         weightera = copy(self.weighter1)
         holder = weightera
         weightera += self.weighter1
-        print(weightera)
+
         self.assertAlmostEqual(w1.sum(), ws.sum())
         self.assertEqual(2 * len(w1), len(ws))
         self.assertIs(holder, weightera)
@@ -139,6 +139,29 @@ class TestWeighter(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             self.weighter1 + self.weighter2
+
+    def test_nuflux(self):
+        try:
+            import nuflux
+        except ImportError:
+            self.skipTest("nuflux not found")
+
+        N1 = 15
+        data1 = dict(
+            weight=dict(
+                pdgid=np.full(N1, 14),
+                energy=np.linspace(5e5, 5e6, N1),
+                zenith=np.full(N1, np.pi / 4),
+            )
+        )
+        s1 = GenerationSurface(14, N1, self.p1, self.c1)
+        weighter1 = Weighter([data1], s1, self.m1)
+
+        honda = nuflux.makeFlux("honda2006")
+        w = weighter1.get_weights(honda)
+        fluxval = 1e4 * honda.getFlux(14, data1["weight"]["energy"], np.cos(data1["weight"]["zenith"]))
+        oneweight = weighter1.get_weights(1)
+        np.testing.assert_allclose(w, fluxval * oneweight)
 
 
 if __name__ == "__main__":

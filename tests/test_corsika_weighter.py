@@ -197,7 +197,7 @@ class TestCorsikaWeighter(unittest.TestCase):
         ea = wf1.effective_area(2212, energy_bins=eb, cos_zenith_bins=czb)
         aee = np.repeat(actual_etendue, 4).reshape(20, 4)
         self.assertEqual(ea.shape, (20, 4))
-        np.testing.assert_allclose(ea, aee, 8e-2)
+        np.testing.assert_allclose(ea, aee, 9e-2)
 
     def test_outside(self):
         # make sure we give a warning if energy or zenith angle is out of bounds
