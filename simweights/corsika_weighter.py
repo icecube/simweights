@@ -33,7 +33,7 @@ def corsika_surface(table):
             constcol(table, "EnergyPrimaryMax", mask),
         )
         nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
-        surface += GenerationSurface(pdgid, nevents, spectrum, spatial)
+        surface += nevents * GenerationSurface(pdgid, spectrum, spatial)
 
     return surface
 

@@ -27,7 +27,7 @@ class TestWeighter(unittest.TestCase):
         )
         cls.c1 = NaturalRateCylinder(100, 200, 0, 1)
         cls.p1 = PowerLaw(0, 5e5, 5e6)
-        cls.s1 = GenerationSurface(2212, cls.N1, cls.p1, cls.c1)
+        cls.s1 = cls.N1 * GenerationSurface(2212, cls.p1, cls.c1)
         cls.m1 = dict(
             pdgid=("weight", "pdgid"),
             energy=("weight", "energy"),
@@ -154,7 +154,7 @@ class TestWeighter(unittest.TestCase):
                 zenith=np.full(N1, np.pi / 4),
             )
         )
-        s1 = GenerationSurface(14, N1, self.p1, self.c1)
+        s1 = N1 * GenerationSurface(14, self.p1, self.c1)
         weighter1 = Weighter([data1], s1, self.m1)
 
         honda = nuflux.makeFlux("honda2006")

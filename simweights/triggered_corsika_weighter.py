@@ -21,7 +21,7 @@ def triggered_corsika_surface(smap):
         np.cos(smap["min_zenith"]),
     )
     spectrum = PowerLaw(smap["power_law_index"], smap["min_energy"], smap["max_energy"])
-    return GenerationSurface(smap["primary_type"], smap["n_events"], spectrum, spatial)
+    return smap["n_events"] * GenerationSurface(smap["primary_type"], spectrum, spatial)
 
 
 def TriggeredCorsikaWeighter(infile):

@@ -14,13 +14,13 @@ class GenerationSurface:
     solid angle stored in the surface.
     """
 
-    def __init__(self, pdgid, nevents, energy_dist, spatial_dist):
+    def __init__(self, pdgid, energy_dist, spatial_dist):
         self.pdgid = pdgid
         try:
             self.particle_name = PDGCode(pdgid).name
         except ValueError:
             self.particle_name = str(pdgid)
-        self.nevents = nevents
+        self.nevents = 1
         self.energy_dist = deepcopy(energy_dist)
         self.spatial_dist = deepcopy(spatial_dist)
 
@@ -96,8 +96,8 @@ class GenerationSurface:
         return self.__mul__(factor)
 
     def __repr__(self):
-        return "{}({}, {:7.3e}, {}, {})".format(
-            self.__class__.__name__, self.particle_name, self.nevents, self.energy_dist, self.spatial_dist
+        return "{} * {}({}, {}, {})".format(
+            self.nevents, self.__class__.__name__, self.particle_name, self.energy_dist, self.spatial_dist
         )
 
 

@@ -19,7 +19,7 @@ def nugen_spatial(table):
 
     # Before V04-01-00, nugen injection primaries on the surface of a circle perpendicular to the momentum
     # vector of the primary, this can be determied by checking `InjectionSurfaceR`. It will
-    # be > 0 for circle injection and -1 for surface injection. In new versions >V6-00-00 it is not even 
+    # be > 0 for circle injection and -1 for surface injection. In new versions >V6-00-00 it is not even
     # present indicating surface mode
     if has_column(table, "InjectionSurfaceR"):
         injection_radius = constcol(table, "InjectionSurfaceR")
@@ -79,7 +79,7 @@ def nugen_surface(table):
 
         primary_type = constcol(table, "PrimaryNeutrinoType", mask)
         n_events = type_weight * constcol(table, "NEvents", mask)
-        surfaces += GenerationSurface(primary_type, n_events, spectrum, spatial)
+        surfaces += n_events * GenerationSurface(primary_type, spectrum, spatial)
     return surfaces
 
 

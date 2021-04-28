@@ -21,11 +21,11 @@ class TestGenerationSurface(unittest.TestCase):
         cls.c1 = NaturalRateCylinder(3, 8, -1, 1)
         cls.c2 = NaturalRateCylinder(4, 8, -1, 1)
 
-        cls.s0 = GenerationSurface(2212, 10000, cls.p1, cls.c1)
-        cls.s1 = GenerationSurface(2212, 20000, cls.p1, cls.c1)
-        cls.s2 = GenerationSurface(2212, 10000, cls.p2, cls.c1)
-        cls.s3 = GenerationSurface(2212, 10000, cls.p1, cls.c2)
-        cls.s4 = GenerationSurface(2213, 10000, cls.p1, cls.c1)
+        cls.s0 = 10000 * GenerationSurface(2212, cls.p1, cls.c1)
+        cls.s1 = 20000 * GenerationSurface(2212, cls.p1, cls.c1)
+        cls.s2 = 10000 * GenerationSurface(2212, cls.p2, cls.c1)
+        cls.s3 = 10000 * GenerationSurface(2212, cls.p1, cls.c2)
+        cls.s4 = 10000 * GenerationSurface(2213, cls.p1, cls.c1)
 
         cls.gsc1 = GenerationSurfaceCollection(cls.s0, cls.s1)
         cls.gsc2 = GenerationSurfaceCollection(cls.s0, cls.s2)
@@ -178,14 +178,16 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertAlmostEqual(sc.get_epdf(2212, 50, 0), 6.6 * self.s0.get_epdf(2212, 50, 0))
 
     def test_repr(self):
-        rep = str(self.s0)
-        self.assertEqual(rep[:18], "GenerationSurface(")
-        self.assertEqual(rep[-1:], ")")
-        v = rep[18:-1].split(",")
+        rep = repr(self.s0)
+        nevents, s = rep.split("*")
+        self.assertEqual(float(nevents), 1e4)
+        s = s.strip()
+        self.assertEqual(s[:18], "GenerationSurface(")
+        self.assertEqual(s[-1:], ")")
+        v = s[18:-1].split(",")
         self.assertEqual(v[0], "PPlus")
-        self.assertEqual(float(v[1]), 1e4)
-        self.assertEqual(",".join(v[2:5]).strip(), repr(self.p1))
-        self.assertEqual(",".join(v[5:9]).strip(), repr(self.c1))
+        self.assertEqual(",".join(v[1:4]).strip(), repr(self.p1))
+        self.assertEqual(",".join(v[4:8]).strip(), repr(self.c1))
 
         PPlus = PDGCode.PPlus  # noqa: F841
         self.assertEqual(eval(repr(self.s0)), self.s0)
