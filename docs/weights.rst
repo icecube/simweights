@@ -1,9 +1,9 @@
-==========
-Background
-==========
+=================================
+Why Does Simulation Have Weights?
+=================================
 
-This section provides a brief background on the principle of Monte Carlo simulation and the 
-definition of weights in IceCube.
+This section provides a brief mathematical background on the principle of biased sampling in Monte 
+Carlo simulation and the definition of weights in IceCube.
 
 Monte Carlo Integration
 =======================
@@ -62,25 +62,26 @@ So that the Monte Carlo integral statement becomes
     I \approx \sum_{i=1}^{N_1+N_2} \frac{f(\bar{x}_i)}{N_1 \cdot p_1(\bar{x}_i) + N_2 \cdot p_2(\bar{x}_i)}
 
 
-To make things easier to to keep track of we can introduce a quantity called the weight :math:`w(\bar{x}_i)` such that
+To make things easier to to keep track of we can introduce a quantity called the generation bias 
+:math:`g(\bar{x}_i)` such that
 
 .. math:: 
 
-    I \approx \sum_{i=1}^{N} w(\bar{x}_i) \cdot f(\bar{x}_i)
+    I \approx \sum_{i=1}^{N} g(\bar{x}_i) \cdot f(\bar{x}_i)
 
-where the weight generalized to M samples is defined as
+where the generation bias generalized to M samples is defined as
 
 .. math::
 
-    w(\bar{x}_i) = \left({\sum_{j=1}^M N_j \cdot p_j(\bar{x}_i)}\right)^{-1}
+    g(\bar{x}_i) = \left({\sum_{j=1}^M N_j \cdot p_j(\bar{x}_i)}\right)^{-1}
 
 Note that this result holds even for samples drawn from disjoint surfaces. As long as the pdf for the 
 :math:`j^{th}` sample is defined such that :math:`p_j(\bar{x_i}) = 0` for events outside of 
 :math:`\Omega_j`, then the Monte Carlo integral will give the correct answer for integration on the surface
 of the union of all the :math:`\Omega_j`.
 
-IceCube Simulation
-==================
+Weights in IceCube Simulation
+=============================
 
 In IceCube, simulation is performed to predict the number of observed events that will be observed assuming
 a given flux. The Monte Carlo integral has the following form
@@ -107,7 +108,7 @@ denoted as :math:`R`
 
 .. math::
     
-    R = \frac{N_{obs}}{T} 
+    R = \frac{N_{obs}}{T_{live}} 
     = \int \mathrm{d}E \int \mathrm{d}A \int \mathrm{d}\Omega \cdot \mathcal{D}(E,\theta,\phi,\bar{x}) \cdot \Phi(E,\theta, \phi)
 
 Monte Carlo integration will be performed by sampling primary particles on a 5-dimensional surface of energy, 
@@ -115,18 +116,18 @@ direction, and impact parameter on the area perpendicular to the direction of tr
 
 .. math::
     
-    R = \sum_{i=1}^{N_{gen}} w_i \cdot \mathcal{D}_i \cdot \Phi(E_i,\theta_i,\phi_i)
+    R = \sum_{i=1}^{N_{gen}} g_i \cdot \mathcal{D}_i \cdot \Phi(E_i,\theta_i,\phi_i)
 
 The quantity :math:`\mathcal{D}_i` is a binary describing weather or not the :math:`i^{th}` event passed a series of 
-quality cuts and :math:`w_i` is weight of the :math:`i^{th}` event. Since the majority of simulated events 
+quality cuts and :math:`g_i` is generation bias of the :math:`i^{th}` event. Since the majority of simulated events 
 won't pass the cut, it is easier from a bookkeeping point of view to simply remove the events from the 
 sample that don't pass the quality cuts and only sum over the :math:`N_{pass}` events that do pass the cuts.
 
 .. math::
     
-    R = \sum_{i=1}^{N_{pass}} w_i \cdot \Phi(E_i,\theta_i,\phi_i)
+    R = \sum_{i=1}^{N_{pass}} g_i \cdot \Phi(E_i,\theta_i,\phi_i)
 
-It is clear that :math:`w_i` will have units of Energy * Area * Solid Angle, the same units as the surface 
+It is clear that :math:`g_i` will have units of Energy * Area * Solid Angle, the same units as the surface 
 on which primary particles were generated. 
 
 Simulation of IceCube events does not just entail the random sampling of primary particles on a 5 dimensional
@@ -134,7 +135,7 @@ surface. It uses random sampling to propagate particles' interaction with matter
 the detector. The number of such samplings which occur will often depend on the value of samplings which 
 occurred earlier in the particle propagation, making the dimensionality of the Monte Carlo integration vary
 from event to event.
-In principle the weight of an event should be the product of all of the pdfs from every random sampling 
+In principle the generation bias of an event should be the product of all of the pdfs from every random sampling 
 which occurs. However most of these random samplings occur at the natural rate which means that the value 
 of the pdf is one and therefore do not have to be kept track of.
 
@@ -152,31 +153,44 @@ Since most generators used in IceCube simulation do not bias based on azimuth or
 only show the energy energy and zenith terms.
 
 Assuming that the pdfs for :math:`E` and :math:`\theta` are independent and replacing :math:`p_i^{int}` 
-with a weight :math:`w_i^{int} = 1 / p_i^{int}` the expression for the weight for a single sample becomes
+with a generation bias :math:`g_i^{int} = 1 / p_i^{int}` the expression for the generation bias for a single sample becomes
 
 .. math::
 
-    w_i = \frac{w_i^{int}}{N_{gen} \cdot p(E_i) \cdot p(\theta_i)}
+    g_i = \frac{g_i^{int}}{N_{gen} \cdot p(E_i) \cdot p(\theta_i)}
 
-This is essentially the well known quantity provided by neutrino-generator as ``OneWeight``.
+:math:`g_i` is essentially the well-known quantity ``OneWeight`` provided by neutrino-generator.
 If one is only interested in calculating the weights for a single dataset or multiple datasets which 
-use exactly the same energy and zenith pdfs an expression like this can be used.
+use exactly the same pdfs for energy and zenith then an expression like this can be used.
 The only care which needs to be taken is that :math:`N_{gen}` is the sum of all generated events across
-the combined datasets.
+the combined datasets, which means keeping track of both the number of events per file and the number of
+files.
 
-If one wishes to combine multiple datasets with different energy power-law indices or 
+However, if one wishes to combine multiple datasets with different energy power-law indices or 
 non-overlapping energy or zenith ranges then more care must be taken.
-The weight will the become the sum of the pdfs for each sample multiplied by the number of events 
-generated by each sample. 
+The generation bias will then become the sum of all of the pdfs for each sample multiplied by the number 
+of events generated by each sample. 
 
 .. math::
 
-    w_i =  w_i^{int} \left(\sum_{j=1}^M N_{j} \cdot p_j(E_i) \cdot p_j(\theta_i)\right)^{-1}
+    g_i =  g_i^{int} \left(\sum_{j=1}^M N_{j} \cdot p_j(E_i) \cdot p_j(\theta_i)\right)^{-1}
 
-Note that :math:`w_i^{int}` is the same for the event regardless of which sample it was generated and 
+Note that :math:`g_i^{int}` is the same for the event regardless of which sample it was generated and 
 therefore it can be factored out of the summation. Further note that the pdf for each dataset will be 
 evaluated on every event regardless of which dataset it came from. Also, recall that pdfs are defined to be
 zero outside of the region on which the dataset generated events.
 
-The purpose of the simweights library is to correctly calculate the value of this weight for combinations
-of datasets.
+The quantity that is commonly refered to as the weight in IceCube, :math:`w_i`, is thus defined as 
+
+.. math::
+    
+    w_i = g_i \cdot \Phi(E_i,\theta_i)
+
+such that 
+
+.. math::
+
+    R = \frac{N_{obs}}{T_{live}} = \sum_i^{N_{pass}} w_i
+
+The purpose of the simweights library is to correctly calculate the values of :math:`g_i` and :math:`w_i`
+for combinations of datasets with different generation surfaces.

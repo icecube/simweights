@@ -11,7 +11,8 @@
    :caption: Contents:
 
    overview
-   background
+   weights
+   usage
    apireference  
 
 
