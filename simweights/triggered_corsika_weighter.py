@@ -3,7 +3,7 @@ import numpy as np
 from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
 from .spatial import NaturalRateCylinder
-from .utils import Null, get_table, has_table
+from .utils import get_table, has_table
 from .weighter import Weighter
 
 
@@ -50,7 +50,6 @@ def TriggeredCorsikaWeighter(infile):
             "this is required for PrimaryInjector files".format(infile.filename)
         )
 
-    surface = Null()
-    for row in get_table(infile, info_obj):
-        surface += triggered_corsika_surface(row)
+    info_table = get_table(infile, info_obj)
+    surface = sum(triggered_corsika_surface(row) for row in info_table)
     return Weighter([infile], surface, event_map)

@@ -3,7 +3,7 @@ import numpy as np
 from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
 from .spatial import CircleInjector, UniformSolidAngleCylinder
-from .utils import Null, constcol, get_column, get_table, has_column
+from .utils import constcol, get_column, get_table, has_column
 from .weighter import Weighter
 
 
@@ -65,7 +65,7 @@ def nugen_surface(table):
     spectrum = nugen_spectrum(table)
     pdgids = np.unique(get_column(table, "PrimaryNeutrinoType"))
 
-    surfaces = Null()
+    surfaces = []
     for pid in pdgids:
         mask = pid == get_column(table, "PrimaryNeutrinoType")
 
@@ -79,8 +79,8 @@ def nugen_surface(table):
 
         primary_type = constcol(table, "PrimaryNeutrinoType", mask)
         n_events = type_weight * constcol(table, "NEvents", mask)
-        surfaces += n_events * GenerationSurface(primary_type, spectrum, spatial)
-    return surfaces
+        surfaces.append(n_events * GenerationSurface(primary_type, spectrum, spatial))
+    return sum(surfaces)
 
 
 def NuGenWeighter(infile, nfiles):

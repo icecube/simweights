@@ -75,6 +75,8 @@ class GenerationSurface:
         return self.is_compatible(other) and self.nevents == other.nevents
 
     def __add__(self, other):
+        if np.isscalar(other) and other == 0:
+            return self
         if isinstance(other, GenerationSurface):
             if self.is_compatible(other):
                 new_surface = deepcopy(self)
@@ -82,6 +84,9 @@ class GenerationSurface:
                 return new_surface
             return GenerationSurfaceCollection(self, other)
         raise TypeError("Can't add %s to %s" % (type(other).__name__, type(self).__name__))
+
+    def __radd__(self, other):
+        return self + other
 
     def __imul__(self, factor):
         self.nevents *= factor
@@ -128,6 +133,8 @@ class GenerationSurfaceCollection:
             self.spectra[key].append(deepcopy(surface))
 
     def __add__(self, other):
+        if np.isscalar(other) and other == 0:
+            return self
         output = deepcopy(self)
         if isinstance(other, GenerationSurface):
             output._insert(other)
@@ -136,8 +143,11 @@ class GenerationSurfaceCollection:
                 for ospec in ospectra:
                     output._insert(ospec)
         else:
-            raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
+            raise TypeError("Cannot add {} to {}".format(type(self), type(self)))
         return output
+
+    def __radd__(self, other):
+        return self + other
 
     def __mul__(self, factor):
         new_surface = deepcopy(self)

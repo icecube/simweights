@@ -5,23 +5,10 @@ from types import SimpleNamespace
 import numpy as np
 
 from simweights import Hoerandel
-from simweights.utils import Null, constcol, corsika_to_pdg, get_column, get_table, has_column, has_table
+from simweights.utils import constcol, corsika_to_pdg, get_column, get_table, has_column, has_table
 
 
 class TestUtil(unittest.TestCase):
-    def test_null(self):
-        n1 = Null()
-        n2 = Null()
-        self.assertEqual(n1, n2)
-        self.assertNotEqual(n1, None)
-
-        self.assertEqual(n1 + None, None)
-        self.assertEqual(n1 + [], [])
-        self.assertEqual(n1 + 5, 5)
-        self.assertEqual(None + n1, None)
-        self.assertEqual({} + n1, {})
-        self.assertEqual(5 + n1, 5)
-
     def test_table_and_column(self):
         t1 = SimpleNamespace(cols=SimpleNamespace(a=np.full(10, 3), b=np.array(5 * [3] + 5 * [4])))
         f1 = SimpleNamespace(root=SimpleNamespace(x=t1))

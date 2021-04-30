@@ -1,25 +1,6 @@
 import numpy as np
 
 
-class Null:
-    """
-    An identity object, useful as a starting point for accumulators, e.g.::
-
-    total = Null()
-    for i in range(10):
-        total += SomeClassThatImplementsAddition(i)
-    """
-
-    def __add__(self, other):
-        return other
-
-    def __radd__(self, other):
-        return other
-
-    def __eq__(self, other):
-        return isinstance(other, Null)
-
-
 def has_table(file_obj, name: str):
     """
     Helper function for determining if a file has a table, works with h5py, pytables, and pandas

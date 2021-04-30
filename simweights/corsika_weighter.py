@@ -3,7 +3,7 @@ import numpy as np
 from .generation_surface import GenerationSurface
 from .powerlaw import PowerLaw
 from .spatial import NaturalRateCylinder
-from .utils import Null, constcol, get_column, get_table
+from .utils import constcol, get_column, get_table
 from .weighter import Weighter
 
 
@@ -13,7 +13,7 @@ def corsika_surface(table):
 
     """
     pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
-    surface = Null()
+    surface = []
     for pdgid in pdgids:
         mask = pdgid == get_column(table, "ParticleType")
 
@@ -33,9 +33,9 @@ def corsika_surface(table):
             constcol(table, "EnergyPrimaryMax", mask),
         )
         nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
-        surface += nevents * GenerationSurface(pdgid, spectrum, spatial)
+        surface.append(nevents * GenerationSurface(pdgid, spectrum, spatial))
 
-    return surface
+    return sum(surface)
 
 
 def CorsikaWeighter(infile, nfiles):

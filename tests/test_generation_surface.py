@@ -105,6 +105,12 @@ class TestGenerationSurface(unittest.TestCase):
     def test_addition(self):
         n0 = self.s0.nevents
         n1 = self.s1.nevents
+
+        sa = self.s0 + 0
+        self.assertIs(sa, self.s0)
+        sb = 0 + self.s0
+        self.assertIs(sb, self.s0)
+
         s = self.s0 + self.s1
         self.assertEqual(type(s), GenerationSurface)
         self.assertEqual(s.nevents, 30000)
@@ -148,13 +154,22 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertAlmostEqual(s4.get_epdf(2213, 50, 0), self.s4.get_epdf(2213, 50, 0))
 
         with self.assertRaises(TypeError):
+            self.s0 + 47
+        with self.assertRaises(TypeError):
             self.s0 + None
-
         with self.assertRaises(TypeError):
             self.s0 + int
+        with self.assertRaises(TypeError):
+            self.s0 + self.p1
 
         with self.assertRaises(TypeError):
-            self.s0 + PowerLaw
+            47 + self.s0
+        with self.assertRaises(TypeError):
+            None + self.s0
+        with self.assertRaises(TypeError):
+            int + self.s0
+        with self.assertRaises(TypeError):
+            self.p1 + self.s0
 
     def test_multiplication(self):
         sa = deepcopy(self.s0)
@@ -288,6 +303,12 @@ class TestGenerationSurface(unittest.TestCase):
             GenerationSurfaceCollection(5)
 
     def test_addition_gsc(self):
+
+        sa = self.gsc1 + 0
+        self.assertIs(sa, self.gsc1)
+        sb = 0 + self.gsc1
+        self.assertIs(sb, self.gsc1)
+
         s0 = self.gsc1 + self.s0
         self.assertEqual(type(s0), GenerationSurfaceCollection)
         self.assertEqual(len(s0.spectra), 1)
@@ -335,14 +356,27 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(s6.spectra[2212][1].nevents, 10000)
         self.assertEqual(s6.spectra[2213][0].nevents, 10000)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
+            self.gsc2 + 47
+        with self.assertRaises(TypeError):
             self.gsc2 + None
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
+            self.gsc2 + int
+        with self.assertRaises(TypeError):
             self.gsc2 + self.p1
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.gsc2 + self.c1
-        with self.assertRaises(ValueError):
-            self.gsc2 + 5
+
+        with self.assertRaises(TypeError):
+            47 + self.gsc2
+        with self.assertRaises(TypeError):
+            None + self.gsc2
+        with self.assertRaises(TypeError):
+            int + self.gsc2
+        with self.assertRaises(TypeError):
+            self.p1 + self.gsc2
+        with self.assertRaises(TypeError):
+            self.c1 + self.gsc2
 
     def test_multiplication_gsc(self):
         s0 = deepcopy(self.gsc2)
