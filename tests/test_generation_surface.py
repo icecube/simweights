@@ -383,14 +383,14 @@ class TestGenerationSurface(unittest.TestCase):
 
         s = str(self.gsc2 + self.gsc3 + self.gsc4).split("\n")
         self.assertEqual(s[0], "< GenerationSurfaceCollection")
-        self.assertEqual(eval(s[1].split()[-1]), self.c1)
-        self.assertEqual(eval(s[1].split()[-2]), self.p1)
-        self.assertEqual(eval(s[2].split()[-1]), self.c1)
-        self.assertEqual(eval(s[2].split()[-2]), self.p2)
-        self.assertEqual(eval(s[3].split()[-1]), self.c2)
-        self.assertEqual(eval(s[3].split()[-2]), self.p1)
-        self.assertEqual(eval(s[4].split()[-1]), self.c1)
-        self.assertEqual(eval(s[4].split()[-2]), self.p1)
+        self.assertEqual(eval("".join(s[1].split()[-4:])), self.c1)
+        self.assertEqual(eval("".join(s[1].split()[-7:-4])), self.p1)
+        self.assertEqual(eval("".join(s[2].split()[-4:])), self.c1)
+        self.assertEqual(eval("".join(s[2].split()[-7:-4])), self.p2)
+        self.assertEqual(eval("".join(s[3].split()[-4:])), self.c2)
+        self.assertEqual(eval("".join(s[3].split()[-7:-4])), self.p1)
+        self.assertEqual(eval("".join(s[4].split()[-4:])), self.c1)
+        self.assertEqual(eval("".join(s[4].split()[-7:-4])), self.p1)
         self.assertEqual(s[5], ">")
 
 

@@ -96,7 +96,7 @@ class GenerationSurface:
         return self.__mul__(factor)
 
     def __repr__(self):
-        return "{} * {}({}, {}, {})".format(
+        return "{:f} * {}({}, {}, {})".format(
             self.nevents, self.__class__.__name__, self.particle_name, self.energy_dist, self.spatial_dist
         )
 
@@ -247,7 +247,7 @@ class GenerationSurfaceCollection:
             collections = []
             for subspec in specs:
                 collections.append(
-                    "N={:8.4g} {} {}".format(subspec.nevents, subspec.energy_dist, subspec.spatial_dist)
+                    "N={} {} {}".format(subspec.nevents, subspec.energy_dist, subspec.spatial_dist)
                 )
             outstrs.append(
                 "     {:11} : ".format(specs[0].particle_name) + "\n                   ".join(collections)

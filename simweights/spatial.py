@@ -45,7 +45,7 @@ class CylinderBase:
         raise NotImplementedError()
 
     def __repr__(self):
-        return "{}({},{},{},{})".format(
+        return "{}({}, {}, {}, {})".format(
             self.__class__.__name__, self.length, self.radius, self.cos_zen_min, self.cos_zen_max
         )
 
@@ -145,7 +145,7 @@ class CircleInjector:
         )
 
     def __repr__(self):
-        return "CircleInjector({},{},{})".format(self.radius, self.cos_zen_min, self.cos_zen_max)
+        return "CircleInjector({}, {}, {})".format(self.radius, self.cos_zen_min, self.cos_zen_max)
 
     def __eq__(self, other):
         return (

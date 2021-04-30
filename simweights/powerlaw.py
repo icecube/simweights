@@ -105,7 +105,7 @@ class PowerLaw:
         return self._ppf(random_state.uniform(0, 1, size))
 
     def __repr__(self):
-        return "{}({:4.2f},{:6.2e},{:6.2e})".format(self.__class__.__name__, self.g, self.a, self.b)
+        return "{}({} ,{}, {})".format(self.__class__.__name__, self.g, self.a, self.b)
 
     def __eq__(self, other):
         return self.g == other.g and self.a == other.a and self.b == other.b
