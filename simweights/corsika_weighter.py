@@ -48,6 +48,9 @@ def CorsikaWeighter(infile, nfiles):
     of files.
     """
 
+    if not np.isscalar(nfiles):
+        raise TypeError("CorsikaWeighter: Nfiles must be an integer. Got " + str(nfiles))
+
     event_map = dict(
         energy=("PolyplopiaPrimary", "energy"),
         pdgid=("PolyplopiaPrimary", "type"),

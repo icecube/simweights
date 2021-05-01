@@ -19,6 +19,8 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Physics',
     ]
 
+[tool.flit.scripts]
+simweights = "simweights.cmdline:main"
 
 [tool.flit.metadata.requires-extra]
 test = ["pytest"]
@@ -32,7 +34,7 @@ source = ["simweights"]
 command_line = "-m pytest"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["simweights","tests"]
 
 [tool.isort]
 multi_line_output = 3
