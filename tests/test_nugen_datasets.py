@@ -8,10 +8,6 @@ import pandas as pd
 from simweights import NuGenWeighter
 
 
-def unit_flux(energy, pdgid, cos_zen):
-    return 1
-
-
 class TestNugenDatasets(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -66,7 +62,7 @@ class TestNugenDatasets(unittest.TestCase):
         else:
             type_weight = 0.5
         np.testing.assert_allclose(
-            w.get_weights(unit_flux), wd["OneWeight"] / (wd["NEvents"] * type_weight * 1e4), 1e-5
+            w.get_weights(1), wd["OneWeight"] / (wd["NEvents"] * type_weight * 1e4), 1e-5
         )
 
         f.close()

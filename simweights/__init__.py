@@ -26,7 +26,6 @@ __all__ = [
     "GenerationSurfaceCollection",
     "NuGenWeighter",
     "PowerLaw",
-    "TriggeredCorsikaWeighter",
 ]
 
 from .corsika_weighter import CorsikaWeighter
@@ -48,5 +47,4 @@ from .nugen_weighter import NuGenWeighter
 from .pdgcode import PDGCode
 from .powerlaw import PowerLaw
 from .spatial import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
-from .triggered_corsika_weighter import TriggeredCorsikaWeighter
 from .utils import corsika_to_pdg

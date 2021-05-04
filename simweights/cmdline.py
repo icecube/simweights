@@ -11,7 +11,7 @@ def find_weighter(fileobj, nfiles):
     Try to automatically determine which type of file this is and return the correct weighter
     """
     try:
-        return simweights.TriggeredCorsikaWeighter(fileobj)
+        return simweights.CorsikaWeighter(fileobj)
     except RuntimeError:
         pass
     try:

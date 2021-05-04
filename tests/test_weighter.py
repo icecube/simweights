@@ -109,8 +109,6 @@ class TestWeighter(unittest.TestCase):
 
     def test_weighter_addition(self):
 
-        # weighter1 = copy(self.weighter1)
-
         weighter_sum = self.weighter1 + self.weighter1
         w1 = self.weighter1.get_weights(1)
         ws = weighter_sum.get_weights(1)
