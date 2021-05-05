@@ -61,7 +61,6 @@ class PowerLaw:
         Returns:
             array_like: Probability density function evaluated at `x`
         """
-        # print('pdf',x,[x<self.a,x>self.b])
         x = np.asfarray(x)
         return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 

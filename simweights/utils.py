@@ -34,7 +34,7 @@ def get_column(table, name: str):
     """
     if hasattr(table, "cols"):
         return getattr(table.cols, name)[:]
-    return table[name]
+    return np.array(table[name])
 
 
 def constcol(table, colname, mask=None):
