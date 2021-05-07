@@ -1,5 +1,6 @@
 import argparse
 import sys
+from pprint import pprint
 
 import pandas as pd
 
@@ -29,7 +30,9 @@ def main():
     """
     Command line utility to print some basic information about how a file will be weighted
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        "A simple utility to quickly print basic info about how simweights will weight a simulation file"
+    )
     parser.add_argument("filename")
     parser.add_argument("-n", "--nfiles", type=int, default=1)
     parser.add_argument("-f", "--flux", default=None)
@@ -53,15 +56,14 @@ def main():
         flux_model = None
 
     print(wobj.surface)
-    print(dir(wobj))
-    print(wobj.event_map)
-    print("Number of Events   : {:8d}".format(len(wobj.get_weights(1))))
-    print("Effective Area     : {:8.6g} m²".format(wobj.effective_area()[0][0]))
+    pprint(wobj.event_map)
+    print("Number of Events : {:8d}".format(len(wobj.get_weights(1))))
+    print("Effective Area   : {:8.6g} m²".format(wobj.effective_area()[0][0]))
     if flux_model:
         weights = wobj.get_weights(flux_model)
-        print("Using flux model   : {}".format(flux_model))
-        print("Event Rate         : {:8.6g} Hz".format(weights.sum()))
-        print("Effective Livetime : {:8.6g} s".format(weights.sum() / (weights ** 2).sum()))
+        print("Using flux model : {}".format(flux_model.__class__.__name__))
+        print("Event Rate       : {:8.6g} Hz".format(weights.sum()))
+        print("Livetime         : {:8.6g} s".format(weights.sum() / (weights ** 2).sum()))
 
     fileobj.close()
     return 0

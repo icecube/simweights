@@ -14,7 +14,10 @@ help:
 
 .PHONY: help Makefile
 
+cmdline.txt:
+	simweights --help > cmdline.txt
+
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-%: Makefile
+%: Makefile cmdline.txt
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

@@ -10,9 +10,10 @@
    :maxdepth: 2
    :caption: Contents:
 
-   overview
+   getting_started
    weights
-   usage
+   input
+   cmdline
    apireference  
 
 
