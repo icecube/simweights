@@ -1,3 +1,10 @@
+
+|Unit Tests|
+
+
+.. |Unit Tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg
+   :target:
+
 ==========
 SimWeights
 ==========

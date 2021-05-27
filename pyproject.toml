@@ -9,6 +9,7 @@ author-email = "kmeagher@icecube.wisc.edu"
 home-page = "https://github.com/icecube/simweights"
 requires = ["numpy", "scipy"]
 classifiers = [
+    'Private :: Do Not Upload',
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
     'Operating System :: MacOS :: MacOS X',
@@ -26,7 +27,7 @@ classifiers = [
 simweights = "simweights.cmdline:main"
 
 [tool.flit.metadata.requires-extra]
-test = ["pytest"]
+test = ["pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint"]
 doc = ["sphinx"]
 h5py = ["h5py"]
 tables = ["tables"]
@@ -35,6 +36,7 @@ pandas = ["pandas"]
 [tool.coverage.run]
 source = ["simweights"]
 command_line = "-m pytest"
+omit = ["simweights/cmdline.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["simweights","tests"]
