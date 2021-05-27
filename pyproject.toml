@@ -9,12 +9,15 @@ author-email = "kmeagher@icecube.wisc.edu"
 home-page = "https://github.com/icecube/simweights"
 requires = ["numpy", "scipy"]
 classifiers = [
-    'Development Status :: 3 - Alpha',
-    'Intended Audience :: Developers',
+    'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: POSIX :: Linux',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Physics',
     ]
