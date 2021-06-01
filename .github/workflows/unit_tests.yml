@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Tests
 on: [push, pull_request]
 jobs:
   Tests:
@@ -9,6 +9,8 @@ jobs:
         python-version: [3.6, 3.7, 3.8, 3.9]
         os: [ubuntu-latest]
         include:
+          - python-version: 3.7
+            os: macos-latest
           - python-version: 3.8
             os: macos-latest
     steps:
@@ -20,7 +22,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .[test,h5py,tables,pandas] --use-feature=in-tree-build
-      - name: Unit Tests
+          python -m pip install flit
+          python -m flit install --symlink
+      - name: Tests
         run: |
           pytest --isort --black --flake8 --pylint --pylint-ignore=tests --cov=simweights
