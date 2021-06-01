@@ -8,7 +8,7 @@
    :caption: Contents:
 
    getting_started
-   weights
+   primer
    input
    cmdline
    apireference  

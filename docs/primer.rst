@@ -1,8 +1,8 @@
-=================================
-Why Does Simulation Have Weights?
-=================================
+================
+Weighting Primer
+================
 
-This section provides a brief mathematical background on the principle of biased sampling in Monte 
+This page provides an introduction to the principle of biased sampling in Monte 
 Carlo simulation and the definition of weights in IceCube.
 
 Monte Carlo Integration
