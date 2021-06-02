@@ -27,3 +27,7 @@ jobs:
       - name: Tests
         run: |
           pytest --isort --black --flake8 --pylint --pylint-ignore=tests --cov=simweights
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
