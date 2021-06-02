@@ -1,8 +1,10 @@
 
-|Unit Tests|
+|tests||codecov|
 
-.. |Unit Tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg
+.. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg
   :target: https://github.com/icecube/simweights/actions
+.. |codecov| image:: https://codecov.io/gh/icecube/simweights/branch/main/graph/badge.svg?token=LQ20TAMY9C
+  :target: https://codecov.io/gh/icecube/simweights
 
 .. badge-break
 
