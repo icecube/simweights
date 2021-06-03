@@ -10,18 +10,20 @@ from simweights.weighter import Weighter
 
 
 def fluxfun1(energy):
-    print("FLUXFUN", energy)
     return energy ** 2
 
 
 def fluxfun2(pdgid, energy):
-    print("FLUXFUN", energy)
     return energy ** 2
 
 
 def fluxfun3(pdgid, energy, cos_zen):
-    print("FLUXFUN", energy)
     return cos_zen * energy ** 2
+
+
+class fake_nuflux:
+    def getFlux(self, particle_type, energy, cos_zenith):
+        return energy ** -3 / cos_zenith
 
 
 class TestWeighter(unittest.TestCase):
@@ -86,6 +88,13 @@ class TestWeighter(unittest.TestCase):
 
         weights = weighter.get_weights(fluxfun3)
         flux_vals = fluxfun3(
+            data["weight"]["pdgid"], data["weight"]["energy"], np.cos(data["weight"]["zenith"])
+        )
+        np.testing.assert_allclose(weights, flux_vals * val / N)
+
+        flux4 = fake_nuflux()
+        weights = weighter.get_weights(flux4)
+        flux_vals = 1e4 * flux4.getFlux(
             data["weight"]["pdgid"], data["weight"]["energy"], np.cos(data["weight"]["zenith"])
         )
         np.testing.assert_allclose(weights, flux_vals * val / N)
