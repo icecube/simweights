@@ -1,9 +1,8 @@
-import sys
+import inspect
 import warnings
 
 import numpy as np
 
-from .fluxes import CosmicRayFlux
 from .utils import get_column, get_table
 
 
@@ -55,21 +54,23 @@ class Weighter:
         epdf = self.surface.get_epdf(**event_col)
 
         # calculate the flux based on which type of flux it is
-        if "nuflux" in sys.modules and isinstance(flux, sys.modules["nuflux"].FluxFunction):
-            flux_val = 1e4 * flux.getFlux(
-                event_col["pdgid"], event_col["energy"], event_col["cos_zen"]
-            )  # pragma: no cover
-        elif isinstance(flux, CosmicRayFlux):
-            flux_val = flux(event_col["energy"], event_col["pdgid"])
+        if hasattr(flux, "getFlux"):
+            # this is a nuflux model
+            assert callable(flux.getFlux)
+            flux_val = 1e4 * flux.getFlux(event_col["pdgid"], event_col["energy"], event_col["cos_zen"])
         elif callable(flux):
-            flux_val = flux(**event_col)
+            # this is a cosmic ray flux model or just a function
+            arguments = {k: event_col[k] for k in inspect.signature(flux).parameters.keys()}
+            flux_val = flux(**arguments)
         elif hasattr(flux, "__len__"):
+            # this is an array with a length equal to the number of events
             flux_val = np.array(flux, dtype=float)
-            assert flux_val.shape == epdf.shape
         elif np.isscalar(flux):
+            # this is a scalar
             flux_val = np.full(epdf.shape, flux)
         else:
             raise ValueError("I do not understand what to do with flux {}".format(flux))
+        assert flux_val.shape == epdf.shape
 
         # Some generators don't have an event weight so just let them use None
         if self.event_map["event_weight"] is None:
@@ -134,7 +135,7 @@ class Weighter:
             mask = pdgid == pdgid_col
             nspecies = 1
 
-        weights = self.get_weights(lambda energy, pdgid, cos_zen: 1)
+        weights = self.get_weights(1)
         hist_val, czbin, enbin = np.histogram2d(
             cos_zen[mask],
             energy[mask],

@@ -9,8 +9,19 @@ from simweights import TIG1996, GenerationSurface, NaturalRateCylinder, PowerLaw
 from simweights.weighter import Weighter
 
 
-def fluxfun(energy, pdgid, cos_zen):
+def fluxfun1(energy):
+    print("FLUXFUN", energy)
     return energy ** 2
+
+
+def fluxfun2(pdgid, energy):
+    print("FLUXFUN", energy)
+    return energy ** 2
+
+
+def fluxfun3(pdgid, energy, cos_zen):
+    print("FLUXFUN", energy)
+    return cos_zen * energy ** 2
 
 
 class TestWeighter(unittest.TestCase):
@@ -65,9 +76,17 @@ class TestWeighter(unittest.TestCase):
         weights = weighter.get_weights(flux)
         np.testing.assert_allclose(weights, flux * val / N)
 
-        weights = weighter.get_weights(fluxfun)
-        flux_vals = fluxfun(
-            data["weight"]["energy"], data["weight"]["pdgid"], np.cos(data["weight"]["zenith"])
+        weights = weighter.get_weights(fluxfun1)
+        flux_vals = fluxfun1(data["weight"]["energy"])
+        np.testing.assert_allclose(weights, flux_vals * val / N)
+
+        weights = weighter.get_weights(fluxfun2)
+        flux_vals = fluxfun2(data["weight"]["pdgid"], data["weight"]["energy"])
+        np.testing.assert_allclose(weights, flux_vals * val / N)
+
+        weights = weighter.get_weights(fluxfun3)
+        flux_vals = fluxfun3(
+            data["weight"]["pdgid"], data["weight"]["energy"], np.cos(data["weight"]["zenith"])
         )
         np.testing.assert_allclose(weights, flux_vals * val / N)
 
