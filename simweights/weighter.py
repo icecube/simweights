@@ -1,5 +1,6 @@
 import inspect
 import warnings
+from pprint import pformat
 
 import numpy as np
 
@@ -159,3 +160,24 @@ class Weighter:
         if self.event_map != other.event_map:
             raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
         return Weighter([*self.data, *other.data], self.surface + other.surface, self.event_map)
+
+    def tostring(self, flux=None):
+        """
+        Creates a string with important information about this weighting object:
+        generation surface, event map, number of events, and effective area.
+        if optional flux is provided the event rate and livetime are added as well.
+
+        """
+        output = str(self.surface) + "\n"
+        output += pformat(self.event_map) + "\n"
+        output += "Number of Events : {:8d}\n".format(len(self.get_weights(1)))
+        output += "Effective Area   : {:8.6g} m²\n".format(self.effective_area()[0][0])
+        if flux:
+            weights = self.get_weights(flux)
+            output += "Using flux model : {}\n".format(flux.__class__.__name__)
+            output += "Event Rate       : {:8.6g} Hz\n".format(weights.sum())
+            output += "Livetime         : {:8.6g} s\n".format(weights.sum() / (weights ** 2).sum())
+        return output
+
+    def __str__(self):
+        return self.tostring()

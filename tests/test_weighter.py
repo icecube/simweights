@@ -188,6 +188,13 @@ class TestWeighter(unittest.TestCase):
         fluxval = 1e4 * honda.getFlux(14, data1["weight"]["energy"], np.cos(data1["weight"]["zenith"]))
         oneweight = weighter1.get_weights(1)
         np.testing.assert_allclose(w, fluxval * oneweight)
+        self.assertEqual(float(weighter1.tostring(honda).split("*")[0].strip()), N1)
+
+    def test_string(self):
+        self.assertEqual(float(str(self.weighter1).split("*")[0].strip()), self.N1)
+        self.assertEqual(float(self.weighter1.tostring(fluxfun1).split("*")[0].strip()), self.N1)
+        self.assertEqual(float(str(self.weighter1).split("*")[0].strip()), self.N1)
+        self.assertEqual(float(self.weighter1.tostring(fluxfun2).split("*")[0].strip()), self.N1)
 
 
 if __name__ == "__main__":

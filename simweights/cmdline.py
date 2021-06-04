@@ -1,6 +1,5 @@
 import argparse
 import sys
-from pprint import pprint
 
 import pandas as pd
 
@@ -55,15 +54,6 @@ def main():
     else:
         flux_model = None
 
-    print(wobj.surface)
-    pprint(wobj.event_map)
-    print("Number of Events : {:8d}".format(len(wobj.get_weights(1))))
-    print("Effective Area   : {:8.6g} m²".format(wobj.effective_area()[0][0]))
-    if flux_model:
-        weights = wobj.get_weights(flux_model)
-        print("Using flux model : {}".format(flux_model.__class__.__name__))
-        print("Event Rate       : {:8.6g} Hz".format(weights.sum()))
-        print("Livetime         : {:8.6g} s".format(weights.sum() / (weights ** 2).sum()))
-
+    print(wobj.tostring(flux_model))
     fileobj.close()
     return 0
