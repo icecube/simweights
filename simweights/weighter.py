@@ -70,7 +70,7 @@ class Weighter:
         )
         epdf = self.surface.get_epdf(**event_col)
         event_weight = self.get_column("event_weight")
-        
+
         # calculate the flux based on which type of flux it is
         if hasattr(flux, "getFlux"):
             # this is a nuflux model
