@@ -33,8 +33,7 @@ Installation
 
 To install with pip: ::
 
-  git clone git@github.com:icecube/simweights.git
-  pip install [--user] ./simweights
+  pip install [--user] git+https://github.com/icecube/simweights.git
 
 If you want to develop simweights you can install directly with flit. 
 The ``-s`` option will symlink the module into site-packages rather than copying it, 
@@ -47,13 +46,13 @@ so that you can test changes without reinstalling the module: ::
 Basic Usage
 ===========
 
-For Dynamic Stack CORSIKA or CORSIKA produced by ``corsika-reader`` with S-Frames files use
+For triggered CORSIKA or CORSIKA produced by ``corsika-reader`` with S-Frames files use
 ``CorsikaWeighter()`` without any additional arguments::
 
   import simweights, pandas
   simfile = pandas.HDFStore('Level2_IC86.2020_corsika.021111.hdf5','r')
   flux_model = simweights.GaisserH4a()
-  weight_obj = simweights.TriggeredCorsikaWeighter(simfile)
+  weight_obj = simweights.CorsikaWeighter(simfile)
   weights = weight_obj.get_weights(flux_model)
 
 For traditional CORSIKA files made with ``corsika-reader`` you use the same function but you need to know 
@@ -73,7 +72,7 @@ units, SimWeights will recognize nuflux objects and automatically convert the un
   weight_obj=simweights.NuGenWeighter(simfile,nfiles=10)
   weights = weight_obj.get_weights(flux_model)
 
-The value returned by ``get_weights()`` is the rate of events in Hz such that the rate or a simulation
+The value returned by ``get_weights()`` is the rate of events in Hz such that the rate of a simulation
 sample can be calculated as::
 
   print('Rate',weights.sum(),'Hz')
