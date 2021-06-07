@@ -134,4 +134,4 @@ def CorsikaWeighter(infile, nfiles=None):
         table = get_table(infile, "CorsikaWeightMap")
         surface = nfiles * weight_map_corsika_surface(table)
 
-    return Weighter([infile], surface, event_map)
+    return Weighter([(infile, event_map)], surface)

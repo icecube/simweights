@@ -17,18 +17,33 @@ class Weighter:
     added together to form samples with differnt simulation parameters
     """
 
-    def __init__(self, data: list, surface, event_map: dict):
+    def __init__(self, data: list, surface):
+
+        colnames = set([])
+        for _, event_map in data:
+            for colname in event_map.keys():
+                colnames.add(colname)
+
         self.data = list(data)
         self.surface = surface
-        self.event_map = event_map
+        self.colnames = list(colnames)
 
-    def get_column(self, table: str, column: str):
+    def get_column(self, name: str):
         """
         Helper function to get a specific column from the file
         """
         retval = []
-        for datafile in self.data:
-            retval = np.append(retval, get_column(get_table(datafile, table), column))
+        for datafile, event_map in self.data:
+            if event_map[name] is None:
+                tablename, columnname = event_map["energy"]
+                fileval = np.full(len(get_column(get_table(datafile, tablename), columnname)), 1)
+            else:
+                tablename, columnname = event_map[name]
+                fileval = get_column(get_table(datafile, tablename), columnname)
+
+            retval = np.append(retval, fileval)
+        if name == "pdgid":
+            retval = retval.astype(np.int32)
         return retval
 
     def get_weights(self, flux):
@@ -47,18 +62,24 @@ class Weighter:
           be useful for testing. If the value is 1 then the return value will be the well known quantity
           OneWeight
         """
+
         event_col = dict(
-            energy=self.get_column(*self.event_map["energy"]),
-            pdgid=self.get_column(*self.event_map["pdgid"]).astype(np.int32),
-            cos_zen=np.cos(self.get_column(*self.event_map["zenith"])),
+            energy=self.get_column("energy"),
+            pdgid=self.get_column("pdgid").astype(np.int32),
+            cos_zen=np.cos(self.get_column("zenith")),
         )
         epdf = self.surface.get_epdf(**event_col)
-
+        event_weight = self.get_column("event_weight")
+        
         # calculate the flux based on which type of flux it is
         if hasattr(flux, "getFlux"):
             # this is a nuflux model
             assert callable(flux.getFlux)
-            flux_val = 1e4 * flux.getFlux(event_col["pdgid"], event_col["energy"], event_col["cos_zen"])
+            flux_val = 1e4 * flux.getFlux(
+                self.get_column("pdgid"),
+                self.get_column("energy"),
+                np.cos(self.get_column("zenith")),
+            )
         elif callable(flux):
             # this is a cosmic ray flux model or just a function
             arguments = {k: event_col[k] for k in inspect.signature(flux).parameters.keys()}
@@ -72,12 +93,6 @@ class Weighter:
         else:
             raise ValueError("I do not understand what to do with flux {}".format(flux))
         assert flux_val.shape == epdf.shape
-
-        # Some generators don't have an event weight so just let them use None
-        if self.event_map["event_weight"] is None:
-            event_weight = np.ones_like(epdf)
-        else:
-            event_weight = self.get_column(*self.event_map["event_weight"])
 
         # Getting events with epdf=0 indicates some sort of mismatch between the
         # the surface and the dataset that can't be solved here so print a
@@ -93,11 +108,9 @@ class Weighter:
             )
         weights = np.zeros_like(epdf)
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
-
         return weights
 
     def effective_area(self, pdgid=None, energy_bins=None, cos_zenith_bins=None):
-
         """
         Calculate The effective area for a given energy and zenith bins.
 
@@ -125,9 +138,9 @@ class Weighter:
         assert len(energy_bins) >= 2
         assert len(cos_zenith_bins) >= 2
 
-        pdgid_col = self.get_column(*self.event_map["pdgid"])
-        energy = self.get_column(*self.event_map["energy"])
-        cos_zen = np.cos(self.get_column(*self.event_map["zenith"]))
+        pdgid_col = self.get_column("pdgid")
+        energy = self.get_column("energy")
+        cos_zen = np.cos(self.get_column("zenith"))
 
         if pdgid is None:
             mask = np.ones_like(pdgid_col, dtype=bool)
@@ -149,17 +162,8 @@ class Weighter:
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
         return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
 
-    def __iadd__(self, other):
-        if self.event_map != other.event_map:
-            raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
-        self.data = [*self.data, *other.data]
-        self.surface += other.surface
-        return self
-
     def __add__(self, other):
-        if self.event_map != other.event_map:
-            raise ValueError("Cannot add {} to {}".format(type(self), type(self)))
-        return Weighter([*self.data, *other.data], self.surface + other.surface, self.event_map)
+        return Weighter(self.data + other.data, self.surface + other.surface)
 
     def tostring(self, flux=None):
         """
@@ -169,7 +173,7 @@ class Weighter:
 
         """
         output = str(self.surface) + "\n"
-        output += pformat(self.event_map) + "\n"
+        output += pformat(self.colnames) + "\n"
         output += "Number of Events : {:8d}\n".format(len(self.get_weights(1)))
         output += "Effective Area   : {:8.6g} m²\n".format(self.effective_area()[0][0])
         if flux:

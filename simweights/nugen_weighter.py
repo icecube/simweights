@@ -111,4 +111,4 @@ def NuGenWeighter(infile, nfiles):
         assert has_column(weight_table, "TotalInteractionProbabilityWeight")
         event_map["event_weight"] = ("I3MCWeightDict", "TotalInteractionProbabilityWeight")
 
-    return Weighter([infile], surface, event_map)
+    return Weighter([(infile, event_map)], surface)
