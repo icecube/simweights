@@ -28,9 +28,18 @@ class Weighter:
         self.surface = surface
         self.colnames = list(colnames)
 
-    def get_column(self, name: str):
+    def get_column(self, table: str, column: str):
         """
         Helper function to get a specific column from the file
+        """
+        retval = []
+        for datafile, _ in self.data:
+            retval = np.append(retval, get_column(get_table(datafile, table), column))
+        return retval
+
+    def get_weight_column(self, name: str):
+        """
+        Helper function to get a column needed in the weight calculation
         """
         retval = []
         for datafile, event_map in self.data:
@@ -64,21 +73,21 @@ class Weighter:
         """
 
         event_col = dict(
-            energy=self.get_column("energy"),
-            pdgid=self.get_column("pdgid").astype(np.int32),
-            cos_zen=np.cos(self.get_column("zenith")),
+            energy=self.get_weight_column("energy"),
+            pdgid=self.get_weight_column("pdgid").astype(np.int32),
+            cos_zen=np.cos(self.get_weight_column("zenith")),
         )
         epdf = self.surface.get_epdf(**event_col)
-        event_weight = self.get_column("event_weight")
+        event_weight = self.get_weight_column("event_weight")
 
         # calculate the flux based on which type of flux it is
         if hasattr(flux, "getFlux"):
             # this is a nuflux model
             assert callable(flux.getFlux)
             flux_val = 1e4 * flux.getFlux(
-                self.get_column("pdgid"),
-                self.get_column("energy"),
-                np.cos(self.get_column("zenith")),
+                self.get_weight_column("pdgid"),
+                self.get_weight_column("energy"),
+                np.cos(self.get_weight_column("zenith")),
             )
         elif callable(flux):
             # this is a cosmic ray flux model or just a function
@@ -138,9 +147,9 @@ class Weighter:
         assert len(energy_bins) >= 2
         assert len(cos_zenith_bins) >= 2
 
-        pdgid_col = self.get_column("pdgid")
-        energy = self.get_column("energy")
-        cos_zen = np.cos(self.get_column("zenith"))
+        pdgid_col = self.get_weight_column("pdgid")
+        energy = self.get_weight_column("energy")
+        cos_zen = np.cos(self.get_weight_column("zenith"))
 
         if pdgid is None:
             mask = np.ones_like(pdgid_col, dtype=bool)

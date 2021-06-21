@@ -77,7 +77,7 @@ print("Livetime         : {:8.6g} s".format(weights_simweights.sum() / (weights_
 
 fig, ax = plt.subplots(figsize=(12, 6))
 bins = np.logspace(1, 6, 25)
-MCnuEnergy = wobj.get_column("energy")
+MCnuEnergy = wobj.get_weight_column("energy")
 plt.hist(MCnuEnergy, bins=bins, histtype="step", weights=weights_simweights, label="Primary Energy")
 plt.hist(MCmuonEnergy_nugen, bins=bins, histtype="step", weights=weights_simweights, label="Muon Energy")
 

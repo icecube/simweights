@@ -4,18 +4,36 @@
    :end-before: doc-break
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
 
    getting_started
-   primer
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+   
+   corsika_tutorial
+   nugen_tutorial
+
+.. toctree::
+   :maxdepth: 1
+   :caption: How-To Guides
+
+   without_tableio
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Explanations
+
    input
-   cmdline
+   primer
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference
+
    apireference  
+   cmdline
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+The layout and orginization of this documentation is based on  
+`The Documentation System <https://documentation.divio.com/>`_.

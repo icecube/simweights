@@ -79,33 +79,33 @@ class TestWeighter(unittest.TestCase):
         np.testing.assert_allclose(weights, flux * val / N)
 
         weights = weighter.get_weights(fluxfun1)
-        flux_vals = fluxfun1(weighter.get_column("energy"))
+        flux_vals = fluxfun1(weighter.get_weight_column("energy"))
         np.testing.assert_allclose(weights, flux_vals * val / N, 1e-2)
 
         weights = weighter.get_weights(fluxfun2)
-        flux_vals = fluxfun2(weighter.get_column("pdgid"), weighter.get_column("energy"))
+        flux_vals = fluxfun2(weighter.get_weight_column("pdgid"), weighter.get_weight_column("energy"))
         np.testing.assert_allclose(weights, flux_vals * val / N)
 
         weights = weighter.get_weights(fluxfun3)
         flux_vals = fluxfun3(
-            weighter.get_column("pdgid"),
-            weighter.get_column("energy"),
-            np.cos(weighter.get_column("zenith")),
+            weighter.get_weight_column("pdgid"),
+            weighter.get_weight_column("energy"),
+            np.cos(weighter.get_weight_column("zenith")),
         )
         np.testing.assert_allclose(weights, flux_vals * val / N)
 
         flux4 = fake_nuflux()
         weights = weighter.get_weights(flux4)
         flux_vals = 1e4 * flux4.getFlux(
-            weighter.get_column("pdgid"),
-            weighter.get_column("energy"),
-            np.cos(weighter.get_column("zenith")),
+            weighter.get_weight_column("pdgid"),
+            weighter.get_weight_column("energy"),
+            np.cos(weighter.get_weight_column("zenith")),
         )
         np.testing.assert_allclose(weights, flux_vals * val / N)
 
         flux = TIG1996()
         weights = weighter.get_weights(flux)
-        flux_vals = flux(weighter.get_column("energy"), weighter.get_column("pdgid"))
+        flux_vals = flux(weighter.get_weight_column("energy"), weighter.get_weight_column("pdgid"))
         np.testing.assert_allclose(weights, flux_vals * val / N)
 
         with self.assertRaises(ValueError):
