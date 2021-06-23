@@ -19,6 +19,9 @@
    :maxdepth: 1
    :caption: How-To Guides
 
+   combining_datasets
+   effective_area
+   livetime
    without_tableio
    
 .. toctree::
@@ -27,6 +30,7 @@
 
    input
    primer
+   icecube_weights
 
 .. toctree::
    :maxdepth: 1

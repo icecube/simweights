@@ -1,5 +1,5 @@
-Weighting Without Tableio
-=========================
+How to Weight Without Using TableIO
+===================================
 
 Although simweights was designed to be used with hdf5 files created byt tableio,
 it is possible to skip this step. The trick is to create python objects with the 

@@ -114,6 +114,32 @@ class TestWeighter(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.weighter1.get_weights(None)
 
+    def test_columns(self):
+
+        np.testing.assert_array_equal(
+            self.weighter1.get_column("I3Weight", "type"), self.weighter1.get_weight_column("pdgid")
+        )
+        np.testing.assert_array_equal(
+            self.weighter1.get_column("I3Weight", "energy"), self.weighter1.get_weight_column("energy")
+        )
+        np.testing.assert_array_equal(
+            self.weighter1.get_column("I3Weight", "zenith"), self.weighter1.get_weight_column("zenith")
+        )
+        np.testing.assert_array_equal(
+            self.weighter2.get_column("weight", "primary_type"), self.weighter2.get_weight_column("pdgid")
+        )
+        np.testing.assert_array_equal(
+            self.weighter2.get_column("weight", "primary_energy"),
+            self.weighter2.get_weight_column("energy"),
+        )
+        np.testing.assert_array_equal(
+            self.weighter2.get_column("weight", "primary_zenith"),
+            self.weighter2.get_weight_column("zenith"),
+        )
+        np.testing.assert_array_equal(
+            self.weighter2.get_column("weight", "ev"), self.weighter2.get_weight_column("event_weight")
+        )
+
     def test_weights(self):
         self.check_weight(self.weighter1, self.N1, self.p1.integral * self.c1.etendue)
         self.check_weight(self.weighter2, self.N1, self.p1.integral * self.c1.etendue)
@@ -132,10 +158,15 @@ class TestWeighter(unittest.TestCase):
         np.testing.assert_array_equal(weights, 0)
 
     def test_effective_area(self):
-        self.assertAlmostEqual(self.weighter1.effective_area(2212)[0][0], self.c1.etendue / 2 / np.pi)
-        self.assertAlmostEqual(self.weighter1.effective_area()[0][0], self.c1.etendue / 2 / np.pi)
+        self.assertAlmostEqual(
+            self.weighter1.effective_area([5e5, 5e6], [0, 1])[0][0], self.c1.etendue / 2 / np.pi
+        )
+        self.assertAlmostEqual(
+            self.weighter1.effective_area([5e5, 5e6], [0, 1], np.ones(self.N1, dtype=bool))[0][0],
+            self.c1.etendue / 2 / np.pi,
+        )
         np.testing.assert_allclose(
-            self.weighter1.effective_area(2212, np.linspace(5e5, 5e6, self.N1 + 1)),
+            self.weighter1.effective_area(np.linspace(5e5, 5e6, self.N1 + 1), [0, 1]),
             [np.full(self.N1, self.c1.etendue / 2 / np.pi)],
         )
 

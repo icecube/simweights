@@ -119,25 +119,32 @@ class Weighter:
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
         return weights
 
-    def effective_area(self, pdgid=None, energy_bins=None, cos_zenith_bins=None):
+    def effective_area(self, energy_bins, cos_zenith_bins, mask=None):
         """
-        Calculate The effective area for a given energy and zenith bins.
+        Calculate The effective area for the given energy and zenith bins.
+
+        This is accomplished by histogramming the generation surface the simulation sample
+        in energy and zenith bins and dividing by the size of the energy and solid angle of each bin.
+        If mask is passed as a parameter, only events which are included in the mask are used.
+
+        .. Note ::
+
+            If the sample contains more than one type of primary particle, then the result will be
+            averaged over the number of particles. This is usually what you want. However, it can
+            cause strange behavior if there is a small number of one type. In this case, the mask
+            should be used to select the particle types individually.
 
         Args:
-            pdgid (PGDCode): The particle to calculate Effective area for
-            energy_bins(array_like): an length N+1 array of energy bin edges
-            coz_zenith_bins(array_like): an length M+1 array of energy bin edges
+            energy_bins(array_like): A length N+1 array of energy bin edges
+            coz_zenith_bins(array_like): A length M+1 array of cos(zenith) bin edges
+            mask(array_like): boolean array where 1 indicates to use the event in the calculation.
+                Must have the same length as the simulation sample.
 
         Returns:
-            array_like: An NxM array of effective areas
+            array_like: An NxM array of effective areas. Where N is the number of energy bins and
+                M is the number of cos(zenith) bins.
 
         """
-
-        if energy_bins is None:
-            energy_bins = self.surface.get_energy_range(pdgid)
-
-        if cos_zenith_bins is None:
-            cos_zenith_bins = self.surface.get_cos_zenith_range(pdgid)
 
         energy_bins = np.array(energy_bins)
         cos_zenith_bins = np.array(cos_zenith_bins)
@@ -147,24 +154,24 @@ class Weighter:
         assert len(energy_bins) >= 2
         assert len(cos_zenith_bins) >= 2
 
-        pdgid_col = self.get_weight_column("pdgid")
         energy = self.get_weight_column("energy")
         cos_zen = np.cos(self.get_weight_column("zenith"))
 
-        if pdgid is None:
-            mask = np.ones_like(pdgid_col, dtype=bool)
-            nspecies = len(self.surface.get_pdgids())
-        else:
-            mask = pdgid == pdgid_col
-            nspecies = 1
-
         weights = self.get_weights(1)
+        if mask is None:
+            mask = np.full(weights.size, 1, dtype=bool)
+
+        assert mask.dtype == bool
+        assert mask.shape == weights.shape
+
         hist_val, czbin, enbin = np.histogram2d(
             cos_zen[mask],
             energy[mask],
             weights=weights[mask],
             bins=[cos_zenith_bins, energy_bins],
         )
+
+        nspecies = len(np.unique(self.get_weight_column("pdgid")[mask]))
 
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
@@ -184,7 +191,10 @@ class Weighter:
         output = str(self.surface) + "\n"
         output += pformat(self.colnames) + "\n"
         output += "Number of Events : {:8d}\n".format(len(self.get_weights(1)))
-        output += "Effective Area   : {:8.6g} m²\n".format(self.effective_area()[0][0])
+        eff_area = self.effective_area(
+            self.surface.get_energy_range(None), self.surface.get_cos_zenith_range(None)
+        )
+        output += "Effective Area   : {:8.6g} m²\n".format(eff_area[0][0])
         if flux:
             weights = self.get_weights(flux)
             output += "Using flux model : {}\n".format(flux.__class__.__name__)
