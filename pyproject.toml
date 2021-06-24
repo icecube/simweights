@@ -27,7 +27,7 @@ simweights = "simweights.cmdline:main"
 
 [tool.flit.metadata.requires-extra]
 test = ["pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint"]
-doc = ["sphinx"]
+docs = ["sphinx","sphinx-rtd-theme"]
 h5py = ["h5py"]
 tables = ["tables"]
 pandas = ["pandas"]
