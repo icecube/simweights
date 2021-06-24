@@ -59,17 +59,17 @@ class Weighter:
         """
         Calculate the weights for the sample for the given flux.
 
-        :param:`flux` can be any one of several types:
+        Args:
+          flux: can be any one of several types:
 
-        * An instance of :py:class:`nuflux.FluxFunction` from `nuflux <https://github.com/icecube/nuflux>`_
-        * An instance of :py:class:`simweights.CosmicRays`
-        * A function with 2 to 3 parameters. If the function takes two parameter it will be pdgid and
-          energy. if three it will be pdgid, energy, and cos_zenith.
-        * An iterable the same length os the datasample. If you have other means of calculating the flux
-          for each event than the above options this can be useful.
-        * A scalar number. calculate the unrealisitc scenario where all events have the same flux, this can
-          be useful for testing. If the value is 1 then the return value will be the well known quantity
-          OneWeight
+            * An instance of :py:class:`nuflux.FluxFunction` from
+              `nuflux <https://github.com/icecube/nuflux>`_
+            * A callable where the names of the arguments are match the weight objects weighting columns.
+            * An iterable the same length os the datasample. If you have other means of calculating
+              the flux for each event than the above options this can be useful.
+            * A scalar number. This calculates the unrealisitc scenario where all events have the same
+              flux, this can be useful for testing or calculating effective areas. If the value is 1 then
+              the return value will be the well known quantity OneWeight.
         """
 
         event_col = dict(
