@@ -2,9 +2,9 @@
 |tests| |docs| |codecov|
 
 
-.. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg
+.. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg?branch=main
   :target: https://github.com/icecube/simweights/actions
-.. |docs| image:: https://github.com/icecube/simweights/actions/workflows/build_docs.yml/badge.svg
+.. |docs| image:: https://github.com/icecube/simweights/actions/workflows/build_docs.yaml/badge.svg?branch=main
   :target: https://docs.icecube.aq/simweights/main/
 .. |codecov| image:: https://codecov.io/gh/icecube/simweights/branch/main/graph/badge.svg?token=LQ20TAMY9C
   :target: https://codecov.io/gh/icecube/simweights
