@@ -15,7 +15,7 @@ jobs:
           pip install .[docs] --use-feature=in-tree-build
       - name: Run Sphinx
         working-directory: ./docs
-        run: make html SPHINXOPTS="--keep-going"
+        run: make html SPHINXOPTS="-W --keep-going"
       - name: Upload docs to docs.icecube.aq
         working-directory: ./docs
         env:
