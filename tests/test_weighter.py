@@ -144,6 +144,12 @@ class TestWeighter(unittest.TestCase):
         self.check_weight(self.weighter1, self.N1, self.p1.integral * self.c1.etendue)
         self.check_weight(self.weighter2, self.N1, self.p1.integral * self.c1.etendue)
 
+    def test_empty(self):
+        fake_file = dict(I3Weight=dict(energy=[], type=[], zenith=[]))
+        weighter = Weighter([(fake_file, self.m1)], 0)
+        weights = weighter.get_weights(1)
+        self.assertEqual(weights.shape, (0,))
+
     def test_outside(self):
         data = dict(
             I3Weight=dict(

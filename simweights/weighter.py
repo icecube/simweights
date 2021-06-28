@@ -77,6 +77,11 @@ class Weighter:
             pdgid=self.get_weight_column("pdgid").astype(np.int32),
             cos_zen=np.cos(self.get_weight_column("zenith")),
         )
+
+        # do nothing if everything is empty
+        if event_col["pdgid"].shape == (0,):
+            return np.array([])
+
         epdf = self.surface.get_epdf(**event_col)
         event_weight = self.get_weight_column("event_weight")
 
