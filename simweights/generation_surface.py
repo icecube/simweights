@@ -231,9 +231,8 @@ class GenerationSurfaceCollection:
         # must handle the same set of particle types
         if set(self.spectra.keys()) != set(other.spectra.keys()):
             return False
-        for k in self.spectra:
-            spec1 = self.spectra[k]
-            spec2 = other.spectra[k]
+        for pdgid, spec1 in self.spectra.items():
+            spec2 = other.spectra[pdgid]
             # must have the same number of unique spectra
             if len(spec1) != len(spec2):
                 return False
