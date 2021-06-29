@@ -1,6 +1,8 @@
 from glob import glob
+
 import pylab as plt
 from icecube import dataio, simclasses
+
 import simweights
 
 filedir = "/data/sim/scratch/IceSim/dynstack/21682/0000000-0000999/"

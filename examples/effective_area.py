@@ -16,7 +16,7 @@ zenith_bins = [-1, -0.5, 0, 0.5, 1]
 # calculate the effective area in energy and zenith bins with all of the events in the sample
 effective_area = w.effective_area(energy_bins, zenith_bins)
 
-#make some labels for the different zenith bins
+# make some labels for the different zenith bins
 zenith_labels = [
     "120° < Zenith < 180°",
     "\u200790° < Zenith < 120°",
@@ -35,12 +35,12 @@ plt.ylabel("Effective Area [m$^2$]")
 plt.xlim(energy_bins[0], energy_bins[-1])
 plt.loglog()
 plt.tight_layout()
-plt.savefig('effective_area_zenith.png')
+plt.savefig("effective_area_zenith.png")
 
-plt.figure() 
+plt.figure()
 
 # start-example2
-# use a mask to select just the NuMus 
+# use a mask to select just the NuMus
 numu_mask = w.get_weight_column("pdgid") == simweights.PDGCode.NuMu
 ea_numu = w.effective_area(energy_bins, [-1, 1], numu_mask)
 plt.step(energy_bins, np.r_[0, ea_numu[0]], label=r"$\nu_{\mu}$")
@@ -52,7 +52,7 @@ plt.step(energy_bins, np.r_[0, ea_numubar[0]], label=r"$\bar{\nu}_{\mu}$")
 
 # not useing any mask will calculate the average
 ea_avg = w.effective_area(energy_bins, [-1, 1])
-plt.step(energy_bins, np.r_[0,ea_avg[0]], label="Average")
+plt.step(energy_bins, np.r_[0, ea_avg[0]], label="Average")
 # end-example2
 
 plt.legend(loc="best")
@@ -61,21 +61,21 @@ plt.ylabel("Effective Area [m$^2$]")
 plt.xlim(energy_bins[0], energy_bins[-1])
 plt.loglog()
 plt.tight_layout()
-plt.savefig('effective_area_type.png')
+plt.savefig("effective_area_type.png")
 
-plt.figure()  
+plt.figure()
 
 # start-example3
 # list of the filters we want to show
 filters = ["MuonFilter_13", "GRECOOnlineFilter_19", "HESEFilter_15"]
 
-#loop over the filters
+# loop over the filters
 for filter_name in filters:
-    #create a mask 
+    # create a mask
     mask = getattr(f.root.FilterMask.cols, filter_name)[:][:, 1].astype(bool)
     if np.any(mask):
         EA = w.effective_area(energy_bins, [-1, 1], mask)
-        plt.step(energy_bins, np.r_[0,EA[0]], label=filter_name)
+        plt.step(energy_bins, np.r_[0, EA[0]], label=filter_name)
 # end-example3
 
 plt.legend(loc="best")
@@ -84,6 +84,6 @@ plt.ylabel("Effective Area [m$^2$]")
 plt.xlim(energy_bins[0], energy_bins[-1])
 plt.loglog()
 plt.tight_layout()
-plt.savefig('effective_area_filters.png')
+plt.savefig("effective_area_filters.png")
 
 plt.show()
