@@ -3,9 +3,9 @@
 
 
 .. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg?branch=main
-  :target: https://github.com/icecube/simweights/actions
+  :target: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml
 .. |docs| image:: https://github.com/icecube/simweights/actions/workflows/build_docs.yaml/badge.svg?branch=main
-  :target: https://docs.icecube.aq/simweights/main/
+  :target: https://docs.icecube.aq/simweights/main
 .. |codecov| image:: https://codecov.io/gh/icecube/simweights/branch/main/graph/badge.svg?token=LQ20TAMY9C
   :target: https://codecov.io/gh/icecube/simweights
 
@@ -28,8 +28,8 @@ hdf5 file so there is no need for access to the simulation production database.
 Prerequisites
 =============
 
-| Required: numpy, scipy
-| Optional: h5py, pytables, pandas, nuflux
+| **Required**: ``numpy``, ``scipy``
+| **Optional**: ``h5py``, ``pytables``, ``pandas``, ``nuflux``
 
 Installation
 ============
@@ -57,42 +57,47 @@ For triggered CORSIKA or CORSIKA produced by ``corsika-reader`` with S-Frames fi
   flux_model = simweights.GaisserH4a()
   weight_obj = simweights.CorsikaWeighter(simfile)
   weights = weight_obj.get_weights(flux_model)
+  print('Rate',weights.sum(),'Hz')
 
-For traditional CORSIKA files made with ``corsika-reader`` you use the same function but you need to know 
-the number of ``.i3`` files that contributed to create this hdf5 file and pass it as the ``nfiles`` parameter.::
+The value returned by ``get_weights()`` is the rate of events in Hz
 
-  simfile = pandas.HDFStore('Level2_IC86.2016_corsika.020789.hdf5','r')
-  flux_model = simweights.GaisserH4a()
-  weight_obj = simweights.CorsikaWeighter(simfile,nfiles=10)
-  weights = weight_obj.get_weights(flux_model)
+For traditional CORSIKA files made with ``corsika-reader`` you will also use 
+:code:`simweights.CorsikaWeighter()`, but you need to know the number of ``.i3`` 
+files that contributed to create this hdf5 file and pass it as the ``nfiles`` parameter.
 
-For ``neutrino-generator`` you can use `NuGenWeighter()` which also requires you to know the number of files.
-Flux models from `nuflux <https://github.com/icecube/nuflux>`_ can be used. There is no need to convert the
-units, SimWeights will recognize nuflux objects and automatically convert the units.::
+For ``neutrino-generator`` you can use :code:`NuGenWeighter()` which also 
+requires you to know the number of files. 
+Flux models from `nuflux <https://github.com/icecube/nuflux>`_ can be used.::
 
   simfile = pandas.HDFStore('Level2_IC86.2016_NuMu.020878.000000.hdf5')
   flux_model = nuflux.makeFlux('CORSIKA_GaisserH3a_QGSJET-II')
-  weight_obj=simweights.NuGenWeighter(simfile,nfiles=10)
+  weight_obj=simweights.NuGenWeighter(simfile, nfiles=10)
   weights = weight_obj.get_weights(flux_model)
-
-The value returned by ``get_weights()`` is the rate of events in Hz such that the rate of a simulation
-sample can be calculated as::
-
   print('Rate',weights.sum(),'Hz')
 
 Also not that these examples use ``pandas``. SimWeights will work equally well with
 ``h5py`` or ``pytables``.
 
-.. Examples
+Documentation
+=============
 
-.. Documentation
+Full documentation is available on the 
+`IceCube Documentation Server <https://docs.icecube.aq/simweights/main>`_.
 
 Getting Help
 ============
 
-Please direct any questions to ``@kjm`` on the slack channel `#software <https://icecube-spno.slack.com/channels/software>`_.
+Please direct any questions to ``@kjm`` on the slack channel 
+`#software <https://icecube-spno.slack.com/channels/software>`_.
 
-.. Contributing
+Contributing
+============
+
+Any bugs or other issues can be filed at the 
+`Issue Tracker <https://github.com/icecube/simweights/issues>`_ on GitHub.
+
+Contribution to the source code can done via the 
+`Pull Request <https://github.com/icecube/simweights/pulls>`_ tab on GitHub.
 
 .. Contributors
 
