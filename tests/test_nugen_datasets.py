@@ -33,10 +33,10 @@ class TestNugenDatasets(unittest.TestCase):
             injection_area = wd["InjectionAreaCGS"]
         if "InjectionAreaNormCGS" in wd:
             injection_area = wd["InjectionAreaNormCGS"]
-        np.testing.assert_allclose(proj_area, injection_area / 1e4)
+        np.testing.assert_allclose(proj_area, injection_area)
 
         sw_etendue = 1 / cylinder.pdf(np.cos(wd["PrimaryNeutrinoZenith"]))
-        np.testing.assert_allclose(sw_etendue, solid_angle * injection_area / 1e4, 1e-5)
+        np.testing.assert_allclose(sw_etendue, solid_angle * injection_area, 1e-5)
 
         power_law = w.surface.spectra[pdgid][0].energy_dist
         energy_factor = 1 / power_law.pdf(wd["PrimaryNeutrinoEnergy"])
@@ -53,7 +53,6 @@ class TestNugenDatasets(unittest.TestCase):
             total_weight
             / power_law.pdf(wd["PrimaryNeutrinoEnergy"])
             / cylinder.pdf(np.cos(wd["PrimaryNeutrinoZenith"]))
-            / 1e-4
         )
         np.testing.assert_allclose(one_weight, wd["OneWeight"], 1e-5)
 
@@ -61,9 +60,7 @@ class TestNugenDatasets(unittest.TestCase):
             type_weight = wd["TypeWeight"]
         else:
             type_weight = 0.5
-        np.testing.assert_allclose(
-            w.get_weights(1), wd["OneWeight"] / (wd["NEvents"] * type_weight * 1e4), 1e-5
-        )
+        np.testing.assert_allclose(w.get_weights(1), wd["OneWeight"] / (wd["NEvents"] * type_weight), 1e-5)
 
         f.close()
 

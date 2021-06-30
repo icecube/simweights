@@ -89,7 +89,7 @@ class Weighter:
         if hasattr(flux, "getFlux"):
             # this is a nuflux model
             assert callable(flux.getFlux)
-            flux_val = 1e4 * flux.getFlux(
+            flux_val = flux.getFlux(
                 self.get_weight_column("pdgid"),
                 self.get_weight_column("energy"),
                 np.cos(self.get_weight_column("zenith")),
@@ -162,7 +162,7 @@ class Weighter:
         energy = self.get_weight_column("energy")
         cos_zen = np.cos(self.get_weight_column("zenith"))
 
-        weights = self.get_weights(1)
+        weights = self.get_weights(1e-4)
         if mask is None:
             mask = np.full(weights.size, 1, dtype=bool)
 

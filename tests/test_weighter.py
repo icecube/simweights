@@ -68,7 +68,7 @@ class TestWeighter(unittest.TestCase):
     def check_weight(self, weighter, N, val):
         flux = 6
         weights = weighter.get_weights(flux)
-        self.assertAlmostEqual(weights.sum(), flux * val, 1)
+        self.assertAlmostEqual(weights.sum(), flux * val, -2)
 
         flux = list(range(0, N))
         weights = weighter.get_weights(flux)
@@ -96,7 +96,7 @@ class TestWeighter(unittest.TestCase):
 
         flux4 = fake_nuflux()
         weights = weighter.get_weights(flux4)
-        flux_vals = 1e4 * flux4.getFlux(
+        flux_vals = flux4.getFlux(
             weighter.get_weight_column("pdgid"),
             weighter.get_weight_column("energy"),
             np.cos(weighter.get_weight_column("zenith")),
@@ -165,15 +165,16 @@ class TestWeighter(unittest.TestCase):
 
     def test_effective_area(self):
         self.assertAlmostEqual(
-            self.weighter1.effective_area([5e5, 5e6], [0, 1])[0][0], self.c1.etendue / 2 / np.pi
+            self.weighter1.effective_area([5e5, 5e6], [0, 1])[0][0], self.c1.etendue / 2e4 / np.pi, 6
         )
         self.assertAlmostEqual(
             self.weighter1.effective_area([5e5, 5e6], [0, 1], np.ones(self.N1, dtype=bool))[0][0],
-            self.c1.etendue / 2 / np.pi,
+            self.c1.etendue / 2e4 / np.pi,
+            6,
         )
         np.testing.assert_allclose(
             self.weighter1.effective_area(np.linspace(5e5, 5e6, self.N1 + 1), [0, 1]),
-            [np.full(self.N1, self.c1.etendue / 2 / np.pi)],
+            [np.full(self.N1, self.c1.etendue / 2e4 / np.pi)],
         )
 
     def test_weighter_addition(self):
@@ -181,7 +182,7 @@ class TestWeighter(unittest.TestCase):
         weighter_sum = self.weighter1 + self.weighter1
         w1 = self.weighter1.get_weights(1)
         ws = weighter_sum.get_weights(1)
-        self.assertAlmostEqual(w1.sum(), ws.sum())
+        self.assertAlmostEqual(w1.sum(), ws.sum(), -2)
         self.assertEqual(2 * len(w1), len(ws))
         self.assertIsNot(self.weighter1, weighter_sum)
         self.assertEqual(2 * len(self.weighter1.data), len(weighter_sum.data))
@@ -229,7 +230,7 @@ class TestWeighter(unittest.TestCase):
 
         honda = nuflux.makeFlux("honda2006")
         w = weighter1.get_weights(honda)
-        fluxval = 1e4 * honda.getFlux(14, data1["I3Weight"]["energy"], np.cos(data1["I3Weight"]["zenith"]))
+        fluxval = honda.getFlux(14, data1["I3Weight"]["energy"], np.cos(data1["I3Weight"]["zenith"]))
         oneweight = weighter1.get_weights(1)
         np.testing.assert_allclose(w, fluxval * oneweight)
         self.assertEqual(float(weighter1.tostring(honda).split("*")[0].strip()), N1)

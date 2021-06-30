@@ -24,7 +24,7 @@ class TestCosmicRayModels(unittest.TestCase):
             args = ()
         flux = getattr(fluxes, name)(*args)
         v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name].keys()]))
-        v2 = np.array(list(self.flux_values[name].values()))
+        v2 = np.array(list(self.flux_values[name].values())) / 1e4
 
         np.testing.assert_allclose(v1, v2, 1e-13)
 

@@ -28,7 +28,7 @@ class TestCosmicRayModels(unittest.TestCase):
         else:
             ptypes = f2.pdgids
         for j in range(len(ptypes)):
-            v1 = f1(E, ptypes[j])
+            v1 = f1(E, ptypes[j]) / 1e4
             v2 = f2(E, f2.pdgids[j])
             for i in range(len(E)):
                 self.assertAlmostEqual(v1[i], v2[i], 17)
@@ -47,7 +47,7 @@ class TestCosmicRayModels(unittest.TestCase):
         E = np.logspace(2, 10, N)
         self.assertEqual([CorsikaToPDG(p) for p in f1.ptypes], f2.pdgids)
         for p in f2.pdgids:
-            v1 = [f1(EE, PDGToCorsika(p)) for EE in E]
+            v1 = [f1(EE, PDGToCorsika(p)) / 1e4 for EE in E]
             v2 = f2(E, p)
             for i in range(N):
                 self.assertAlmostEqual(v1[i], v2[i], 17)

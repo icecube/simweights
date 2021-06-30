@@ -9,30 +9,36 @@ from simweights.spatial import CylinderBase
 
 class TestSpatial(unittest.TestCase):
     def check_diff_etendue(self, c, le, r):
-        self.assertAlmostEqual(c.projected_area(-1), np.pi * r ** 2)
-        self.assertAlmostEqual(c.projected_area(-0.5), np.pi * r ** 2 / 2 + 3 ** 0.5 * le * r)
-        self.assertAlmostEqual(c.projected_area(-1 / 2 ** 0.5), r / 2 ** 0.5 * (np.pi * r + 2 * le))
+
+        le *= 1e2
+        r *= 1e2
+
+        self.assertAlmostEqual(c.projected_area(-1), np.pi * r ** 2, 5)
+        self.assertAlmostEqual(c.projected_area(-0.5), np.pi * r ** 2 / 2 + 3 ** 0.5 * le * r, 5)
+        self.assertAlmostEqual(c.projected_area(-1 / 2 ** 0.5), r / 2 ** 0.5 * (np.pi * r + 2 * le), 5)
         self.assertAlmostEqual(c.projected_area(0), 2 * le * r)
-        self.assertAlmostEqual(c.projected_area(1 / 2 ** 0.5), r / 2 ** 0.5 * (np.pi * r + 2 * le))
-        self.assertAlmostEqual(c.projected_area(0.5), np.pi * r ** 2 / 2 + 3 ** 0.5 * le * r)
-        self.assertAlmostEqual(c.projected_area(1), np.pi * r ** 2)
+        self.assertAlmostEqual(c.projected_area(1 / 2 ** 0.5), r / 2 ** 0.5 * (np.pi * r + 2 * le), 5)
+        self.assertAlmostEqual(c.projected_area(0.5), np.pi * r ** 2 / 2 + 3 ** 0.5 * le * r, 5)
+        self.assertAlmostEqual(c.projected_area(1), np.pi * r ** 2, 5)
 
         with self.assertRaises(AssertionError):
             c.projected_area(-1.01)
         with self.assertRaises(AssertionError):
             c.projected_area(1.01)
 
-        self.assertAlmostEqual(c._diff_etendue(-1), -np.pi ** 2 * r * (r + 2 * le))
+        self.assertAlmostEqual(c._diff_etendue(-1), -np.pi ** 2 * r * (r + 2 * le), 4)
         self.assertAlmostEqual(
-            c._diff_etendue(-0.5), -np.pi ** 2 / 4 * r * (r + 2 / 3 * le * (3 ** 1.5 / np.pi + 8))
+            c._diff_etendue(-0.5), -np.pi ** 2 / 4 * r * (r + 2 / 3 * le * (3 ** 1.5 / np.pi + 8)), 4
         )
         self.assertAlmostEqual(
-            c._diff_etendue(-(0.5 ** 0.5)), -np.pi ** 2 / 2 * r * (r + le * (2 / np.pi + 3))
+            c._diff_etendue(-(0.5 ** 0.5)), -np.pi ** 2 / 2 * r * (r + le * (2 / np.pi + 3)), 4
         )
         self.assertAlmostEqual(c._diff_etendue(0), -np.pi ** 2 * le * r)
-        self.assertAlmostEqual(c._diff_etendue(0.5 ** 0.5), np.pi ** 2 / 2 * r * (r + le * (2 / np.pi - 1)))
         self.assertAlmostEqual(
-            c._diff_etendue(0.5), np.pi ** 2 / 4 * r * (r + 2 / 3 * le * (3 ** 1.5 / np.pi - 4))
+            c._diff_etendue(0.5 ** 0.5), np.pi ** 2 / 2 * r * (r + le * (2 / np.pi - 1)), 5
+        )
+        self.assertAlmostEqual(
+            c._diff_etendue(0.5), np.pi ** 2 / 4 * r * (r + 2 / 3 * le * (3 ** 1.5 / np.pi - 4)), 4
         )
         self.assertAlmostEqual(c._diff_etendue(1), (np.pi * r) ** 2)
 
@@ -42,7 +48,8 @@ class TestSpatial(unittest.TestCase):
             c._diff_etendue(np.nextafter(1, np.inf))
 
     def check_pdf_etendue(self, c, etendue):
-        self.assertAlmostEqual(c.etendue, etendue)
+        etendue *= 1e4
+        self.assertAlmostEqual(c.etendue, etendue, 4)
 
         x = np.linspace(c.cos_zen_min, c.cos_zen_max)
         np.testing.assert_allclose(c.pdf(x), 1 / etendue, 1e-15)
@@ -100,7 +107,9 @@ class TestSpatial(unittest.TestCase):
                 self.assertEqual(float(x[3]), 1)
 
     def check_uniform_pdf(self, c, solid_angle, area_int):
-        self.assertAlmostEqual(c.etendue, solid_angle * area_int)
+
+        area_int *= 1e4
+        self.assertAlmostEqual(c.etendue, solid_angle * area_int, 4)
 
         x = np.linspace(c.cos_zen_min, c.cos_zen_max, 10000)
         pdfs = c.pdf(x)
@@ -145,10 +154,10 @@ class TestSpatial(unittest.TestCase):
                 self.assertEqual(float(x[3]), 1)
 
     def check_circle(self, c, etendue):
-        self.assertAlmostEqual(c.etendue, etendue)
+        self.assertAlmostEqual(c.etendue, etendue, 4)
 
         x = np.linspace(c.cos_zen_min, c.cos_zen_max, 10000)
-        np.testing.assert_allclose(c.projected_area(x), np.pi * c.radius ** 2)
+        np.testing.assert_allclose(c.projected_area(x), np.pi * (1e2 * c.radius) ** 2)
         pdfs = c.pdf(x)
         np.testing.assert_allclose(pdfs, 1 / etendue, 1e-15)
         self.assertAlmostEqual((1 / pdfs).sum() / len(x) / c.etendue, 1)
@@ -163,13 +172,13 @@ class TestSpatial(unittest.TestCase):
         last_c1 = None
         for r in range(100, 1000, 300):
             c1 = CircleInjector(r, -1, 1)
-            self.check_circle(c1, 4 * np.pi ** 2 * r ** 2)
+            self.check_circle(c1, 4e4 * np.pi ** 2 * r ** 2)
 
             c2 = CircleInjector(r, -1, 0)
-            self.check_circle(c2, 2 * np.pi ** 2 * r ** 2)
+            self.check_circle(c2, 2e4 * np.pi ** 2 * r ** 2)
 
             c3 = CircleInjector(r, 0, 1)
-            self.check_circle(c3, 2 * np.pi ** 2 * r ** 2)
+            self.check_circle(c3, 2e4 * np.pi ** 2 * r ** 2)
 
             self.assertEqual(c1, c1)
             self.assertNotEqual(c1, c2)

@@ -10,9 +10,9 @@ hdffile = pd.HDFStore("Level2_IC86.2016_NuMu.021217.hdf5", "r")
 weighter = simweights.NuGenWeighter(hdffile, nfiles=10)
 
 # create an function to represent the Waxman and Bahcall limit
-# Note that the units are GeV^-1 * m^-2 * sr^-1 * s^-1 per particle type
+# Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
 def wblimit(energy):
-    return 1e-4 * energy ** -2
+    return 1e-8 * energy ** -2
 
 
 # get the weights by passing the flux to the weighter

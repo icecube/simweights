@@ -218,7 +218,7 @@ class TestGenerationSurface(unittest.TestCase):
         w = 1 / self.s0.get_epdf(2212, E, cz)
 
         area = (self.p1.b - self.p1.a) * (
-            2 * self.c1.radius * np.pi ** 2 * (self.c1.radius + self.c1.length)
+            2e4 * self.c1.radius * np.pi ** 2 * (self.c1.radius + self.c1.length)
         )
 
         self.assertAlmostEqual(area, self.s0.get_surface_area())
