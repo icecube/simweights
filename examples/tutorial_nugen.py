@@ -59,19 +59,21 @@ nfiles = len(filelist)
 wobj = simweights.NuGenWeighter({"I3MCWeightDict": I3MCWeightDict}, nfiles=nfiles)
 
 # check that what we got matches what is in OneWeight
-units = I3Units.cm2 / I3Units.m2
 np.testing.assert_allclose(
     wobj.get_weights(1),
-    np.array(I3MCWeightDict["OneWeight"]) / (0.5 * I3MCWeightDict["NEvents"][0] * nfiles) * units,
+    np.array(I3MCWeightDict["OneWeight"]) / (0.5 * I3MCWeightDict["NEvents"][0] * nfiles),
 )
 
 conventional = nuflux.makeFlux("honda2006")
 conventional.knee_reweighting_model = "gaisserH3a_elbert"
 weights_simweights = wobj.get_weights(conventional)
+
+erange = wobj.surface.get_energy_range(None)
+czrange = wobj.surface.get_cos_zenith_range(None)
 print(wobj.surface)
 print("Number of files  : {:8d}".format(nfiles))
 print("Number of Events : {:8d}".format(weights_simweights.size))
-print("Effective Area   : {:8.6g} m²".format(wobj.effective_area()[0][0]))
+print("Effective Area   : {:8.6g} m²".format(wobj.effective_area(erange, czrange)[0][0]))
 print("Event Rate       : {:8.6g} Hz".format(weights_simweights.sum()))
 print("Livetime         : {:8.6g} s".format(weights_simweights.sum() / (weights_simweights ** 2).sum()))
 

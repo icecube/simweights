@@ -63,9 +63,11 @@ livetime_GaisserH3a = weights_GaisserH3a / weightssqr_GaisserH3a
 weightssqr_Hoerandel = np.power(weights_Hoerandel, 2)
 livetime_Hoerandel = weights_GaisserH3a / weightssqr_Hoerandel
 
+erange = wobj.surface.get_energy_range(None)
+czrange = wobj.surface.get_cos_zenith_range(None)
 print("Number of files  : {}".format(len(corsika_filelist)))
 print("Number of events : {}".format(len(weights_GaisserH3a)))
-print("Effective Area   : {:10.2} m²".format(wobj.effective_area()[0][0]))
+print("Effective Area   : {:10.2} m²".format(wobj.effective_area(erange, czrange)[0][0]))
 
 print("           GaisserH3a Hoerandel")
 print("Rate     : {:10.4f} {:10.4f}".format(weights_GaisserH3a.sum(), weights_Hoerandel.sum()))
