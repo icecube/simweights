@@ -20,6 +20,7 @@
    :caption: How-To Guides
 
    combining_datasets
+   nugen_nuflux
    effective_area
    livetime
    without_tableio

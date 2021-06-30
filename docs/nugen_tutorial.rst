@@ -25,7 +25,7 @@ Now we can run a our script which calculates the weights and make a histogram.
 
 Note that we need to pass the number of files to :code:`NuGenWeighter` and 
 that the model is a function that returns a value in units of 
-:math:`\mathrm{GeV}^{-1}\cdot\mathrm{m}^{-2}\cdot\mathrm{sr}^{-1}\cdot{s}^{-1}`
+:math:`\mathrm{GeV}^{-1}\cdot\mathrm{cm}^{-2}\cdot\mathrm{sr}^{-1}\cdot{s}^{-1}`
 
 The output should look something like this:
 
