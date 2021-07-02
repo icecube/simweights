@@ -29,6 +29,7 @@
    :maxdepth: 1
    :caption: Explanations
 
+   units
    input
    primer
    icecube_weights
