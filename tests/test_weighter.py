@@ -150,6 +150,12 @@ class TestWeighter(unittest.TestCase):
         weights = weighter.get_weights(1)
         self.assertEqual(weights.shape, (0,))
 
+    def test_bad_column(self):
+        with self.assertRaises(ValueError):
+            self.weighter1.get_weights(lambda asdf: asdf ** -2)
+        with self.assertRaises(ValueError):
+            self.weighter2.get_weights(lambda x: x ** -2)
+
     def test_outside(self):
         data = dict(
             I3Weight=dict(

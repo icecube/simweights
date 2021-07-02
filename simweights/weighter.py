@@ -19,14 +19,20 @@ class Weighter:
 
     def __init__(self, data: list, surface):
 
-        colnames = set([])
+        colnames = None
         for _, event_map in data:
-            for colname in event_map.keys():
-                colnames.add(colname)
+            if colnames is None:
+                colnames = set(event_map.keys())
+            else:
+                colnames = colnames.intersection(set(event_map.keys()))
+
+        if "zenith" in colnames:
+            colnames.add("cos_zen")
 
         self.data = list(data)
         self.surface = surface
-        self.colnames = list(colnames)
+        self.colnames = sorted(colnames)
+        self.__cache = {}
 
     def get_column(self, table: str, column: str):
         """
@@ -41,18 +47,26 @@ class Weighter:
         """
         Helper function to get a column needed in the weight calculation
         """
-        retval = []
-        for datafile, event_map in self.data:
-            if event_map[name] is None:
-                tablename, columnname = event_map["energy"]
-                fileval = np.full(len(get_column(get_table(datafile, tablename), columnname)), 1)
-            else:
-                tablename, columnname = event_map[name]
-                fileval = get_column(get_table(datafile, tablename), columnname)
+        if name in self.__cache:
+            return self.__cache[name]
 
-            retval = np.append(retval, fileval)
-        if name == "pdgid":
-            retval = retval.astype(np.int32)
+        if name == "cos_zen":
+            retval = np.cos(self.get_weight_column("zenith"))
+
+        else:
+            retval = []
+            for datafile, event_map in self.data:
+                if event_map[name] is None:
+                    tablename, columnname = event_map["energy"]
+                    fileval = np.full(len(get_column(get_table(datafile, tablename), columnname)), 1)
+                else:
+                    tablename, columnname = event_map[name]
+                    fileval = get_column(get_table(datafile, tablename), columnname)
+                retval = np.append(retval, fileval)
+            if name == "pdgid":
+                retval = retval.astype(np.int32)
+
+        self.__cache[name] = retval
         return retval
 
     def get_weights(self, flux):
@@ -72,11 +86,7 @@ class Weighter:
               the return value will be the well known quantity OneWeight.
         """
 
-        event_col = dict(
-            energy=self.get_weight_column("energy"),
-            pdgid=self.get_weight_column("pdgid").astype(np.int32),
-            cos_zen=np.cos(self.get_weight_column("zenith")),
-        )
+        event_col = {k: self.get_weight_column(k) for k in ["energy", "pdgid", "cos_zen"]}
 
         # do nothing if everything is empty
         if event_col["pdgid"].shape == (0,):
@@ -92,11 +102,20 @@ class Weighter:
             flux_val = flux.getFlux(
                 self.get_weight_column("pdgid"),
                 self.get_weight_column("energy"),
-                np.cos(self.get_weight_column("zenith")),
+                self.get_weight_column("cos_zen"),
             )
         elif callable(flux):
             # this is a cosmic ray flux model or just a function
-            arguments = {k: event_col[k] for k in inspect.signature(flux).parameters.keys()}
+            keys = inspect.signature(flux).parameters.keys()
+            try:
+                arguments = {k: self.get_weight_column(k) for k in keys}
+            except KeyError as missing_params:
+                raise ValueError(
+                    "get_weights() was passed callable {!r} which has parameters {}. "
+                    "The weight columns which are available are {!r}".format(
+                        flux, list(keys), self.colnames
+                    )
+                ) from missing_params
             flux_val = flux(**arguments)
         elif hasattr(flux, "__len__"):
             # this is an array with a length equal to the number of events
@@ -125,12 +144,13 @@ class Weighter:
         return weights
 
     def effective_area(self, energy_bins, cos_zenith_bins, mask=None):
-        """
+        r"""
         Calculate The effective area for the given energy and zenith bins.
 
         This is accomplished by histogramming the generation surface the simulation sample
         in energy and zenith bins and dividing by the size of the energy and solid angle of each bin.
         If mask is passed as a parameter, only events which are included in the mask are used.
+        Effective areas are given units of :math:`\mathrm{m}^2`
 
         .. Note ::
 
