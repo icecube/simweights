@@ -1,6 +1,6 @@
-import nuflux
 import pandas as pd
 import pylab as plt
+import nuflux
 
 # start-box1
 import simweights
@@ -11,15 +11,15 @@ weighter = simweights.NuGenWeighter(hdffile, nfiles=10)
 bins = plt.geomspace(1e2, 1e8, 50)
 primary_energy = weighter.get_column("PolyplopiaPrimary", "energy")
 
-# create an function to represent the Waxman and Bahcall limit
+# create an function to represent the IceCube northern track limit
 # Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
-def wblimit(energy):
-    return 1e-8 * energy ** -2
-wblimit.name = "Waxman-Bahcall limit"
+def NorthernTrack(energy):
+    return 1.44e-18 / 2 * (energy/1e5)**-2.2
+NorthernTrack.name = "Northern Track 9.5 year"
 
-# create a bunch of models and put them in a list
+# Create models and put them in a list so we can iterate over them
 models = [
-    wblimit,
+    NorthernTrack,
     nuflux.makeFlux("CORSIKA_GaisserH3a_average"),
     nuflux.makeFlux("H3a_SIBYLL23C"),
     nuflux.makeFlux("honda2006"),
