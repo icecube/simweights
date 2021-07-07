@@ -7,7 +7,7 @@ just like a callable. SimWeights will detect that it is a nuflux model and do
 the correct thing. 
 
 This example creates a number of nuflux models and compares them with a custom
-flux model for Waxman and Bahacall limit. 
+flux model for the IceCube northern track result.
 
 .. literalinclude:: ../examples/nugen_nuflux.py
      :start-after: start-box1
