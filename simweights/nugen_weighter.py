@@ -63,11 +63,12 @@ def nugen_surface(table):
     """
     spatial = nugen_spatial(table)
     spectrum = nugen_spectrum(table)
-    pdgids = np.unique(get_column(table, "PrimaryNeutrinoType"))
+    pdgid = get_column(table, "PrimaryNeutrinoType")
+    unique_pdgids = np.unique(pdgid)
 
     surfaces = []
-    for pid in pdgids:
-        mask = pid == get_column(table, "PrimaryNeutrinoType")
+    for pid in unique_pdgids:
+        mask = pid == pdgid
 
         # neutrino-generator is usually produced with approximatly equal porportions of nu and nubar
         # newer version will explicitly put the ratio in `TypeWeight` but for older version we
