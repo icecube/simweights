@@ -29,10 +29,11 @@
    :maxdepth: 1
    :caption: Explanations
 
+   weights_in_simulation
+   weights_in_icecube
+   reading_files
+   reading_nugen
    units
-   input
-   primer
-   icecube_weights
 
 .. toctree::
    :maxdepth: 1
