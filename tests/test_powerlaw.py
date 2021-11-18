@@ -122,6 +122,14 @@ class TestPowerLaw(unittest.TestCase):
         self.check_sample(-2)
         self.check_sample(-2.5)
 
+    def test_raises(self):
+
+        p = PowerLaw(1, 1, 1000)
+        with self.assertRaises(NotImplementedError):
+            p == object()
+        with self.assertRaises(NotImplementedError):
+            p == np.array([])
+
 
 if __name__ == "__main__":
     unittest.main()

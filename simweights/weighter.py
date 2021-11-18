@@ -19,20 +19,14 @@ class Weighter:
 
     def __init__(self, data: list, surface):
 
-        colnames = None
+        colnames = set()
         for _, event_map in data:
-            if colnames is None:
-                colnames = set(event_map.keys())
-            else:
-                colnames = colnames.intersection(set(event_map.keys()))
-
-        if "zenith" in colnames:
-            colnames.add("cos_zen")
+            colnames = colnames.intersection(set(event_map.keys()))
 
         self.data = list(data)
         self.surface = surface
         self.colnames = sorted(colnames)
-        self.__cache = {}
+        self.__cache: dict = {}
 
     def get_column(self, table: str, column: str):
         """
@@ -111,10 +105,8 @@ class Weighter:
                 arguments = {k: self.get_weight_column(k) for k in keys}
             except KeyError as missing_params:
                 raise ValueError(
-                    "get_weights() was passed callable {!r} which has parameters {}. "
-                    "The weight columns which are available are {!r}".format(
-                        flux, list(keys), self.colnames
-                    )
+                    f"get_weights() was passed callable {repr(flux)} which has parameters {list(keys)}. "
+                    "The weight columns which are available are {repr(self.colnames)}"
                 ) from missing_params
             flux_val = flux(**arguments)
         elif hasattr(flux, "__len__"):
@@ -124,7 +116,7 @@ class Weighter:
             # this is a scalar
             flux_val = np.full(epdf.shape, flux)
         else:
-            raise ValueError("I do not understand what to do with flux {}".format(flux))
+            raise ValueError(f"I do not understand what to do with flux {flux}")
         assert flux_val.shape == epdf.shape
 
         # Getting events with epdf=0 indicates some sort of mismatch between the
@@ -134,10 +126,8 @@ class Weighter:
 
         if not np.all(mask):
             warnings.warn(
-                "simweights :: {} events out of {} were found to be outside the generation surface."
-                "This could indicate a problem with this dataset.".format(
-                    np.logical_not(mask).sum(), mask.size
-                )
+                "simweights :: {np.logical_not(mask).sum()} events out of {mask.size} were found to be "
+                "outside the generation surface. This could indicate a problem with this dataset."
             )
         weights = np.zeros_like(epdf)
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
@@ -215,16 +205,16 @@ class Weighter:
         """
         output = str(self.surface) + "\n"
         output += pformat(self.colnames) + "\n"
-        output += "Number of Events : {:8d}\n".format(len(self.get_weights(1)))
+        output += f"Number of Events : {len(self.get_weights(1)):8d}\n"
         eff_area = self.effective_area(
             self.surface.get_energy_range(None), self.surface.get_cos_zenith_range(None)
         )
-        output += "Effective Area   : {:8.6g} m²\n".format(eff_area[0][0])
+        output += f"Effective Area   : {eff_area[0][0]:8.6g} m²\n"
         if flux:
             weights = self.get_weights(flux)
-            output += "Using flux model : {}\n".format(flux.__class__.__name__)
-            output += "Event Rate       : {:8.6g} Hz\n".format(weights.sum())
-            output += "Livetime         : {:8.6g} s\n".format(weights.sum() / (weights ** 2).sum())
+            output += f"Using flux model : {flux.__class__.__name__}\n"
+            output += f"Event Rate       : {weights.sum():8.6g} Hz\n"
+            output += f"Livetime         : {weights.sum() / (weights ** 2).sum():8.6g} s\n"
         return output
 
     def __str__(self):

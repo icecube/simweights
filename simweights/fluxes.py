@@ -10,6 +10,8 @@ However they have been refactored to:
 * Follow :py:mod:`numpy` broadcasting rules
 
 """
+from typing import Callable, List
+
 from numpy import broadcast_arrays, exp, piecewise, sqrt
 
 from .pdgcode import PDGCode
@@ -28,8 +30,8 @@ class CosmicRayFlux:
     desired.
     """
 
-    pdgids = []
-    _funcs = []
+    pdgids = []  # type: List[PDGCode]
+    _funcs = []  # type: List[Callable[[float], float] | float]
 
     def _condition(self, energy, pdgid):
         # pylint: disable=unused-argument

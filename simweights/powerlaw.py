@@ -1,5 +1,5 @@
 import numpy as np
-from scipy._lib._util import check_random_state
+from scipy._lib._util import check_random_state  # type: ignore
 
 
 class PowerLaw:
@@ -38,20 +38,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x: float) -> float:
+    def _pdf(self, x):
         return x ** self.g / self.integral
 
-    def _cdf(self, x: float) -> float:
+    def _cdf(self, x):
         if self.G == 0:
             return np.log(x / self.a) / self.integral
         return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
-    def _ppf(self, q: float) -> float:
+    def _ppf(self, q):
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
         return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
-    def pdf(self, x: float) -> float:
+    def pdf(self, x):
         r"""
         Probability density function
 
@@ -64,7 +64,7 @@ class PowerLaw:
         x = np.asfarray(x)
         return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
-    def cdf(self, x: float) -> float:
+    def cdf(self, x):
         r"""
         Cumulative distribution function
 
@@ -76,7 +76,7 @@ class PowerLaw:
         """
         return np.piecewise(np.asfarray(x), [x < self.a, x > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q: float) -> float:
+    def ppf(self, q):
         """
         Percent point function (inverse of `cdf`) at `q`.
 
@@ -104,7 +104,9 @@ class PowerLaw:
         return self._ppf(random_state.uniform(0, 1, size))
 
     def __repr__(self):
-        return "{}({} ,{}, {})".format(self.__class__.__name__, self.g, self.a, self.b)
+        return f"{self.__class__.__name__}({self.g} ,{self.a}, {self.b})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, PowerLaw):
+            raise NotImplementedError
         return self.g == other.g and self.a == other.a and self.b == other.b

@@ -91,7 +91,7 @@ def check_run_counts(table, nfiles):  # pragma: no cover
     else:
         status = "Fail"
         ret = False
-    print("Claimed Runs = {}, Found Runs = {}, {}".format(nfiles, len(runs), status))
+    print(f"Claimed Runs = {nfiles}, Found Runs = {len(runs)}, {status}")
     return ret
 
 
@@ -101,7 +101,7 @@ def check_nfiles(runcol):  # pragma: no cover
     check that the number of jobs in the file is what the user claims they are
     Not Currently used
     """
-    from scipy import stats
+    from scipy import stats  # type: ignore
 
     unique_runs, run_counts = np.unique(runcol, return_counts=True)
     nfiles = unique_runs.size
@@ -117,8 +117,8 @@ def check_nfiles(runcol):  # pragma: no cover
     chi2, pval = stats.chisquare(hist_y, prob * hist_y.sum())
     pois = stats.poisson.pmf(0, rmean)
 
-    print("NFiles={}".format(nfiles))
+    print(f"NFiles={nfiles}")
     print("Warning : Guessing the numbers of nugen files based on the number of unique datasets!")
-    print("Number of events per file matches a poisson distribution with mean {}".format(rmean))
-    print("chi2 / ndof = {} / {} --> p = {}".format(chi2, hist_y.size - 1, pval))
-    print("the probability that a file would have zero events is {}".format(pois))
+    print(f"Number of events per file matches a poisson distribution with mean {rmean}")
+    print(f"chi2 / ndof = {chi2} / {hist_y.size-1} --> p = {pval}")
+    print(f"the probability that a file would have zero events is {pois}")
