@@ -78,17 +78,17 @@ def CorsikaWeighter(infile, nfiles=None):
     if has_table(infile, "I3CorsikaWeight"):
         if nfiles is not None:
             raise RuntimeError(
-                "This file, `{}`, was identified as a triggered CORSIKA file based on the existance of "
-                "the `I3CorsikaWeight` object. However the parameter nfiles was passed to CorsikaWeighter."
-                "This is unnsecessary.".format(getattr(infile, "filename", "<NONE>"))
+                f"This file, `{getattr(infile, 'filename', '<NONE>')}`, was identified as a triggered "
+                "CORSIKA file based on the existence of the `I3CorsikaWeight` object. However the "
+                "parameter nfiles was passed to CorsikaWeighter. This is unnecessary."
             )
 
         info_obj = "I3PrimaryInjectorInfo"
         if not has_table(infile, info_obj):
             raise RuntimeError(
-                "This file, `{}`, was identified as a triggered CORSIKA file based on the existance of "
-                "the `I3CorsikaWeight` object. However it seems to be missing the S-Frames table "
-                "`I3PrimaryInjectorInfo`.".format(getattr(infile, "filename", "<NONE>"))
+                f"This file, `{getattr(infile, 'filename', '<NONE>')}`, was identified as a triggered "
+                "CORSIKA file based on the existence of the `I3CorsikaWeight` object. However it seems to "
+                "be missing the S-Frames table `I3PrimaryInjectorInfo`."
             )
         event_map = dict(
             pdgid=("I3CorsikaWeight", "type"),
@@ -103,8 +103,8 @@ def CorsikaWeighter(infile, nfiles=None):
         info_obj = "I3CorsikaInfo"
         if not has_table(infile, info_obj):
             raise RuntimeError(
-                "File `{}` is was not passed an parameter for nfiles and no I3CorsikaInfo table was "
-                " found.".format(getattr(infile, "filename", "<NONE>"))
+                f"File `{getattr(infile, 'filename', '<NONE>')}` is was not passed an parameter for nfiles "
+                "and no I3CorsikaInfo table was found."
             )
         event_map = dict(
             pdgid=("PolyplopiaPrimary", "type"),

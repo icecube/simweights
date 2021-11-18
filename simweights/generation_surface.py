@@ -83,7 +83,7 @@ class GenerationSurface:
                 new_surface.nevents = self.nevents + other.nevents
                 return new_surface
             return GenerationSurfaceCollection(self, other)
-        raise TypeError("Can't add %s to %s" % (type(other).__name__, type(self).__name__))
+        raise TypeError(f"Can't add {type(other).__name__} to {type(self).__name__}")
 
     def __radd__(self, other):
         return self + other
@@ -101,8 +101,9 @@ class GenerationSurface:
         return self.__mul__(factor)
 
     def __repr__(self):
-        return "{:f} * {}({}, {}, {})".format(
-            self.nevents, self.__class__.__name__, self.particle_name, self.energy_dist, self.spatial_dist
+        return (
+            f"{self.nevents:f} * {self.__class__.__name__}"
+            f"({self.particle_name}, {self.energy_dist}, {self.spatial_dist})"
         )
 
 
@@ -143,7 +144,7 @@ class GenerationSurfaceCollection:
                 for ospec in ospectra:
                     output._insert(ospec)
         else:
-            raise TypeError("Cannot add {} to {}".format(type(self), type(self)))
+            raise TypeError(f"Cannot add {type(self)} to {type(other)}")
         return output
 
     def __radd__(self, other):
@@ -255,10 +256,8 @@ class GenerationSurfaceCollection:
         for specs in self.spectra.values():
             collections = []
             for subspec in specs:
-                collections.append(
-                    "N={} {} {}".format(subspec.nevents, subspec.energy_dist, subspec.spatial_dist)
-                )
+                collections.append(f"N={subspec.nevents} {subspec.energy_dist} {subspec.spatial_dist}")
             outstrs.append(
-                "     {:11} : ".format(specs[0].particle_name) + "\n                   ".join(collections)
+                f"     {specs[0].particle_name:11} : " + "\n                   ".join(collections)
             )
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
