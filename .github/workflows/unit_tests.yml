@@ -16,7 +16,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Homebrew Deps
         run: brew install hdf5 c-blosc
-        if: ${{ contains( matrix.os, 'macos-latest') && matrix.python-version >= 3.9 }}
+        if: ${{ contains( matrix.os, 'macos') }}
+      - name: Install apt Deps
+        run: sudo apt-get install libhdf5-serial-dev
+        if: ${{ contains( matrix.os, 'ubuntu') }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
