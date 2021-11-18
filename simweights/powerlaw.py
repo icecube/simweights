@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy._lib._util import check_random_state  # type: ignore
 
 
@@ -39,20 +38,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x) -> ArrayLike:
+    def _pdf(self, x):
         return x ** self.g / self.integral
 
-    def _cdf(self, x) -> ArrayLike:
+    def _cdf(self, x):
         if self.G == 0:
             return np.log(x / self.a) / self.integral
         return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
-    def _ppf(self, q) -> ArrayLike:
+    def _ppf(self, q):
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
         return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
-    def pdf(self, x) -> ArrayLike:
+    def pdf(self, x):
         r"""
         Probability density function
 
@@ -65,7 +64,7 @@ class PowerLaw:
         x = np.asfarray(x)
         return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
-    def cdf(self, x) -> ArrayLike:
+    def cdf(self, x):
         r"""
         Cumulative distribution function
 
@@ -77,7 +76,7 @@ class PowerLaw:
         """
         return np.piecewise(np.asfarray(x), [x < self.a, x > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q) -> ArrayLike:
+    def ppf(self, q):
         """
         Percent point function (inverse of `cdf`) at `q`.
 
@@ -89,7 +88,7 @@ class PowerLaw:
         """
         return np.piecewise(np.asfarray(q), [(q >= 0) & (q <= 1)], [self._ppf, np.nan])
 
-    def rvs(self, size: ArrayLike = None, random_state=None) -> ArrayLike:
+    def rvs(self, size=None, random_state=None):
         """
         Random variates
 

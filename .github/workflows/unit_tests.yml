@@ -27,7 +27,7 @@ jobs:
           python -m flit install --symlink
       - name: Tests
         run: |
-          pytest --isort --black --flake8 --pylint --pylint-ignore=tests --cov=simweights
+          pytest
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v1
         with:

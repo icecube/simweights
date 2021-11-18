@@ -3,7 +3,6 @@ import warnings
 from pprint import pformat
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from .utils import get_column, get_table
 
@@ -20,20 +19,20 @@ class Weighter:
 
     def __init__(self, data: list, surface):
 
-        colnames: set[str] = set()
+        colnames = set()
         for _, event_map in data:
             colnames = colnames.intersection(set(event_map.keys()))
 
         self.data = list(data)
         self.surface = surface
         self.colnames = sorted(colnames)
-        self.__cache: dict[str, ArrayLike] = {}
+        self.__cache: dict = {}
 
     def get_column(self, table: str, column: str):
         """
         Helper function to get a specific column from the file
         """
-        retval: ArrayLike = []
+        retval = []
         for datafile, _ in self.data:
             retval = np.append(retval, get_column(get_table(datafile, table), column))
         return retval
