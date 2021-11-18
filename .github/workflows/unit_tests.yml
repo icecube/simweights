@@ -14,9 +14,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Blosc
-        run: brew install c-blosc
-        if: ${{ contains( matrix.os, 'macos-latest') }}
+      - name: Install Homebrew Deps
+        run: brew install hdf5 c-blosc
+        if: ${{ contains( matrix.os, 'macos-latest') && matrix.python-version >= 3.9 }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

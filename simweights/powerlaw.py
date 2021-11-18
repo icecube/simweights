@@ -1,5 +1,6 @@
 import numpy as np
-from scipy._lib._util import check_random_state
+from numpy.typing import ArrayLike
+from scipy._lib._util import check_random_state  # type: ignore
 
 
 class PowerLaw:
@@ -38,20 +39,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x: float) -> float:
+    def _pdf(self, x) -> ArrayLike:
         return x ** self.g / self.integral
 
-    def _cdf(self, x: float) -> float:
+    def _cdf(self, x) -> ArrayLike:
         if self.G == 0:
             return np.log(x / self.a) / self.integral
         return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
-    def _ppf(self, q: float) -> float:
+    def _ppf(self, q) -> ArrayLike:
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
         return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
-    def pdf(self, x: float) -> float:
+    def pdf(self, x) -> ArrayLike:
         r"""
         Probability density function
 
@@ -64,7 +65,7 @@ class PowerLaw:
         x = np.asfarray(x)
         return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
-    def cdf(self, x: float) -> float:
+    def cdf(self, x) -> ArrayLike:
         r"""
         Cumulative distribution function
 
@@ -76,7 +77,7 @@ class PowerLaw:
         """
         return np.piecewise(np.asfarray(x), [x < self.a, x > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q: float) -> float:
+    def ppf(self, q) -> ArrayLike:
         """
         Percent point function (inverse of `cdf`) at `q`.
 
@@ -88,7 +89,7 @@ class PowerLaw:
         """
         return np.piecewise(np.asfarray(q), [(q >= 0) & (q <= 1)], [self._ppf, np.nan])
 
-    def rvs(self, size=None, random_state=None):
+    def rvs(self, size: ArrayLike = None, random_state=None) -> ArrayLike:
         """
         Random variates
 
@@ -104,7 +105,9 @@ class PowerLaw:
         return self._ppf(random_state.uniform(0, 1, size))
 
     def __repr__(self):
-        return "{}({} ,{}, {})".format(self.__class__.__name__, self.g, self.a, self.b)
+        return f"{self.__class__.__name__}({self.g} ,{self.a}, {self.b})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, PowerLaw):
+            raise NotImplementedError
         return self.g == other.g and self.a == other.a and self.b == other.b

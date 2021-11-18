@@ -9,7 +9,7 @@ from .weighter import Weighter
 
 def nugen_spatial(table):
     """
-    Inspect the `I3MCWeightDict` table object of a nugen file to generate an object to represent
+    Inspect the ``I3MCWeightDict`` table object of a nugen file to generate an object to represent
     the spatial distribution. It will either return a CircleInjector or UniformSolidAngleCylinder
     depending on how the dataset was generated
     """

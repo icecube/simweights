@@ -9,7 +9,7 @@ if [ -z "${ICECUBE_PASSWORD}" ]; then
     exit 0
 fi
 
-if [ "${GIT_BRANCH}" -neq "main" ]; then
+if [ "${GIT_BRANCH}" != "main" ]; then
     echo not on main branch, skipping upload
     exit 0
 fi

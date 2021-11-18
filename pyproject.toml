@@ -39,6 +39,9 @@ omit = ["simweights/cmdline.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["simweights","tests"]
+addopts = "--isort --black --flake8 --pylint --pylint-ignore=tests --cov=simweights"
+flake8-max-line-length = 108
+flake8-ignore = "E203, W503"
 
 [tool.isort]
 multi_line_output = 3
