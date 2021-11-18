@@ -13,7 +13,6 @@ However they have been refactored to:
 from typing import Callable, List
 
 from numpy import broadcast_arrays, exp, piecewise, sqrt
-from numpy.typing import ArrayLike
 
 from .pdgcode import PDGCode
 
@@ -34,11 +33,11 @@ class CosmicRayFlux:
     pdgids = []  # type: List[PDGCode]
     _funcs = []  # type: List[Callable[[float], float] | float]
 
-    def _condition(self, energy: ArrayLike, pdgid: ArrayLike):
+    def _condition(self, energy, pdgid):
         # pylint: disable=unused-argument
         return [pdgid == p for p in self.pdgids]
 
-    def __call__(self, energy: ArrayLike, pdgid: ArrayLike):
+    def __call__(self, energy, pdgid):
         energy, pdgid = broadcast_arrays(energy, pdgid)
         pcond = self._condition(energy, pdgid)
         return piecewise(energy, pcond, self._funcs)

@@ -15,10 +15,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Homebrew Deps
-        run: brew install hdf5 c-blosc
+        run: |
+          brew install hdf5 c-blosc
+          HDF5_DIR="$(brew --prefix)/opt/hdf5" pip3 install tables
         if: ${{ contains( matrix.os, 'macos') }}
       - name: Install apt Deps
-        run: sudo apt-get install libhdf5-serial-dev
+        run: sudo apt-get install libhdf5-dev
         if: ${{ contains( matrix.os, 'ubuntu') }}
       - name: Install dependencies
         run: |
