@@ -14,22 +14,22 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Ubuntu Deps
+      - name: Apt-Get Install Deps
         if: ${{ contains( matrix.os, 'ubuntu') && contains( matrix.python-version, '3.10') }}
         run: sudo apt-get install libblosc-dev libhdf5-dev
-      - name: Install Homebrew Deps
+      - name: HomeBrew Install Deps
         if: ${{ contains( matrix.os, 'macos') && ( contains( matrix.python-version, '3.9') || contains( matrix.python-version, '3.10') ) }}
         run: brew install c-blosc hdf5
       - name: Upgrade Pip
         run: python3 -m pip install --upgrade pip
-      - name: Install PyTables from main
+      - name: Install PyTables from GitHub
         if: ${{ contains( matrix.python-version, '3.10') }} 
         run: |
           python3 -m pip install cython
           python3 -m pip install git+https://github.com/PyTables/PyTables
       - name: Install SimWeights
         run: pip install .[test] --use-feature=in-tree-build
-      - name: Tests
+      - name: Run Tests
         run: pytest
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v1
