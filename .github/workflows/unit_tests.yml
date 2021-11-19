@@ -28,9 +28,7 @@ jobs:
           python3 -m pip install cython
           python3 -m pip install git+https://github.com/PyTables/PyTables
       - name: Install dependencies
-        run: |
-          python3 -m pip install flit
-          python3 -m flit install --symlink
+        run: pip install .[test] --use-feature=in-tree-build
       - name: Tests
         run: pytest
       - name: Upload Coverage to Codecov
