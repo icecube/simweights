@@ -15,12 +15,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Ubuntu Deps
-        if: ${{ contains( matrix.os, 'ubuntu') }}      
+        if: ${{ contains( matrix.os, 'ubuntu') && contains( matrix.python-version, '3.10'}}
         run: sudo apt-get install libblosc-dev liblzo2-dev libhdf5-dev
       - name: Install Homebrew Deps
-        if: ${{ contains( matrix.os, 'macos') }}      
-        run: brew install c-blosc lzo hdf5
-      - name: Install Pip
+        if: ${{ contains( matrix.os, 'macos') && ( contains( matrix.python-version, '3.9') || contains( matrix.python-version, '3.10') ) }}
+        run: brew install c-blosc hdf5
+      - name: Upgrading Pip
         run: python3 -m pip install --upgrade pip
       - name: Install PyTables from main
         if: ${{ contains( matrix.python-version, '3.10') }} 
