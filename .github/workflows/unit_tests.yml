@@ -19,12 +19,16 @@ jobs:
         run: sudo apt-get install libblosc-dev liblzo2-dev libhdf5-dev
       - name: Install Homebrew Deps
         if: ${{ contains( matrix.os, 'macos') }}      
-        run: brew install lzo hdf5
-      - name: Install dependencies
+        run: brew install c-blosc lzo hdf5
+      - name: Install Pip
+        run: python3 -m pip install --upgrade pip
+      - name: Install PyTables from main
+        if: ${{ contains( matrix.python-version, '3.10') }} 
         run: |
-          python3 -m pip install --upgrade pip
           python3 -m pip install cython
           python3 -m pip install git+https://github.com/PyTables/PyTables
+      - name: Install dependencies
+        run: |
           python3 -m pip install flit
           python3 -m flit install --symlink
       - name: Tests
