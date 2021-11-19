@@ -18,6 +18,7 @@ classifiers = [
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Physics',
     ]
@@ -26,11 +27,8 @@ classifiers = [
 simweights = "simweights.cmdline:main"
 
 [tool.flit.metadata.requires-extra]
-test = ["pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint"]
+test = ["h5py", "tables", "pandas", "pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
-h5py = ["h5py"]
-tables = ["tables"]
-pandas = ["pandas"]
 
 [tool.coverage.run]
 source = ["simweights"]
