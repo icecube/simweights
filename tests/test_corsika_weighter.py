@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import unittest
 
-import h5py
 import numpy as np
 from scipy.interpolate import interp1d
 
@@ -68,14 +67,6 @@ def make_corsika_data(pdgid, nevents, c, p):
     np.random.shuffle(primary["zenith"])
     primary["energy"] = p.ppf(np.linspace(0, 1, nevents))
     return dict(CorsikaWeightMap=weight, PolyplopiaPrimary=primary)
-
-
-def make_hdf5_file(fname, v):
-    d = make_corsika_data(*v)
-    f = h5py.File(fname, "w")
-    f.create_dataset("CorsikaWeightMap", data=d["CorsikaWeightMap"])
-    f.create_dataset("PolyplopiaPrimary", data=d["PolyplopiaPrimary"])
-    f.close()
 
 
 class TestCorsikaWeighter(unittest.TestCase):
