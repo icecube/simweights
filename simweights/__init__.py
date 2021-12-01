@@ -17,6 +17,7 @@ __all__ = [
     "UniformSolidAngleCylinder",
     "TIG1996",
     "FixedFractionFlux",
+    "GenieWeighter",
     "GaisserH3a",
     "GaisserH4a",
     "GaisserH4a_IT",
@@ -50,6 +51,7 @@ from .fluxes import (
     Honda2004,
 )
 from .generation_surface import GenerationSurface, GenerationSurfaceCollection
+from .genie_weighter import GenieWeighter
 from .nugen_weighter import NuGenWeighter
 from .pdgcode import PDGCode
 from .powerlaw import PowerLaw
