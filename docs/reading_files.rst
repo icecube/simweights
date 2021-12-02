@@ -61,8 +61,8 @@ The number of files must be passed to :py:func:`simweights.CorsikaWeighter` and
 :py:func:`simweights.NuGenWeighter` as the ``nfiles`` parameter which will be multiplied by ``NEvents``
 to get the total number of events in the dataset. 
 
-For simulation with S-Frames: Triggered CORSIKA and corsika-reader after S-Frames were added, there is
-no need for ``nfiles`` as it can be deduced from the number of S-Frames.
+For simulation with S-Frames: Triggered CORSIKA, corsika-reader after S-Frames were added, and genie-reader
+there is no need for ``nfiles`` as it can be deduced from the number of S-Frames.
 In this case SimWeights will determine the generation surface from S-Frames, but it still relies on
 objects in the Q-Frame for the sampled quantities. 
 The table below shows the what tables simweights looks for for each type of simulation.
@@ -77,4 +77,6 @@ The table below shows the what tables simweights looks for for each type of simu
 | CORSIKA without S-Frames | none                      | ``CorsikaWeightMap``, ``PolyplopiaPrimary`` |
 +--------------------------+---------------------------+---------------------------------------------+
 | neutrino-generator       | none                      | ``I3MCWeightDict``                          |
++--------------------------+---------------------------+---------------------------------------------+
+| genie-reader             | ``I3GenieInfo``           | ``I3GenieResult``                           |
 +--------------------------+---------------------------+---------------------------------------------+

@@ -21,7 +21,8 @@ SimWeights was designed with goal of calculating weights for IceCube simulation 
 is easy to combine combine datasets with different generation parameters into a single sample.
 It was also designed to be a stand alone project which does not depend on IceTray in any way so that it can
 be installed easily on laptops. SimWeights gathers all the information it needs form information in the
-hdf5 file so there is no need for access to the simulation production database.
+hdf5 file so there is no need for access to the simulation production database. SimWeights works with
+files produced with corsika-reader, neutrino-generator, and genie-reader.
 
 .. doc-break
 
@@ -71,12 +72,20 @@ Flux models from `nuflux <https://github.com/icecube/nuflux>`_ can be used.::
 
   simfile = pandas.HDFStore('Level2_IC86.2016_NuMu.020878.000000.hdf5')
   flux_model = nuflux.makeFlux('CORSIKA_GaisserH3a_QGSJET-II')
-  weight_obj=simweights.NuGenWeighter(simfile, nfiles=10)
+  weight_obj = simweights.NuGenWeighter(simfile, nfiles=10)
   weights = weight_obj.get_weights(flux_model)
-  print('Rate',weights.sum(),'Hz')
+  print('Rate', weights.sum(), 'Hz')
 
-Also not that these examples use ``pandas``. SimWeights will work equally well with
-``h5py`` or ``pytables``.
+Simulation created with ``genie-reader`` can be weighted with :code:`GenieWeighter()`:::
+
+  simfile = pandas.HDFStore('genie_reader_NuE_C_corr.hdf5')
+  flux_model = nuflux.makeFlux('IPhonda2014_spl_solmax')
+  weight_obj = simweights.GenieWeighter(simfile)
+  weights = weight_obj.get_weights(flux_model)
+  print('Rate', weights.sum(), 'Hz')
+
+Also note that these examples use ``pandas``. SimWeights will work equally well with
+``pandas``, ``h5py``, or ``pytables``.
 
 Documentation
 =============

@@ -33,10 +33,7 @@ def GenieWeighter(infile):
     """
     Weighter for GENIE simulation
 
-    Does not use S-Frames and stores the surface information in an I3MapStringDouble so that the user
-    does not know how many jobs contributed to the current sample, so it needs to know the number of
-    files. Nugen calculates the event weight in a column called ``TotalWeight`` which takes into account
-    the netutrino cross-section, detector density, and distance traveled through the generation volume.
+    Reads ``I3GenieInfo`` from S-Frames and ``I3GenieResult`` from Q-Frames.
     """
 
     weight_table = get_table(infile, "I3GenieInfo")
