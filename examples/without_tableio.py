@@ -57,7 +57,7 @@ fileobj = dict(I3PrimaryInjectorInfo=I3PrimaryInjectorInfo, I3CorsikaWeight=I3Co
 # create the weighter object
 weighter = simweights.CorsikaWeighter(fileobj)
 
-# create an object to reperesnt our cosmic-ray primary flux model
+# create an object to represent our cosmic-ray primary flux model
 flux = simweights.GaisserH4a()
 
 # get the weights by passing the flux to the weighter

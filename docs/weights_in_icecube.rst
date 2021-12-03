@@ -98,7 +98,7 @@ therefore it can be factored out of the summation. Further note that the pdf for
 evaluated on every event regardless of which dataset it came from. Also, recall that pdfs are defined to be
 zero outside of the region on which the dataset generated events.
 
-The quantity that is commonly refered to as the weight in IceCube, :math:`w_i`, is thus defined as 
+The quantity that is commonly referred to as the weight in IceCube, :math:`w_i`, is thus defined as
 
 .. math::
     

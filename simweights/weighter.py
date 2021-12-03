@@ -14,7 +14,7 @@ class Weighter:
     Weighters will take a file object as input and calculate the weights of the events in the file
     for a given flux. As well as helper functions for all columns in the file. Weighters will keep
     track of the generation surface for the Monte Carlo in question. Weighters can be
-    added together to form samples with differnt simulation parameters
+    added together to form samples with different simulation parameters
     """
 
     def __init__(self, data: list, surface):
@@ -75,7 +75,7 @@ class Weighter:
             * A callable where the names of the arguments are match the weight objects weighting columns.
             * An iterable the same length os the datasample. If you have other means of calculating
               the flux for each event than the above options this can be useful.
-            * A scalar number. This calculates the unrealisitc scenario where all events have the same
+            * A scalar number. This calculates the unrealistic scenario where all events have the same
               flux, this can be useful for testing or calculating effective areas. If the value is 1 then
               the return value will be the well known quantity OneWeight.
         """
@@ -126,7 +126,7 @@ class Weighter:
 
         if not np.all(mask):
             warnings.warn(
-                "simweights :: {np.logical_not(mask).sum()} events out of {mask.size} were found to be "
+                f"simweights :: {np.logical_not(mask).sum()} events out of {mask.size} were found to be "
                 "outside the generation surface. This could indicate a problem with this dataset."
             )
         weights = np.zeros_like(epdf)

@@ -13,7 +13,7 @@ class TestNugenDatasets(unittest.TestCase):
     def setUpClass(cls):
         datadir = os.environ.get("SIMWEIGHTS_DATA", None)
         if not datadir:
-            cls.skipTest(None, "enviornment varible SIMWEIGHTS_DATA not set")
+            cls.skipTest(None, "environment variable SIMWEIGHTS_DATA not set")
         cls.datadir = datadir + "/"
 
     def cmp_dataset(self, fname):

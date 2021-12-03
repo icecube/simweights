@@ -38,7 +38,7 @@ class TestCosmicRayModels(unittest.TestCase):
     def test_fixed_fractional_flux(self):
         """
         The old FixedFractionalFlux needed some hand holding
-        so do it in a sperate test
+        so do it in a separate test
         """
         f = {2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4}
         f1 = oldfluxes.FixedFractionFlux({PDGToCorsika(p): x for p, x in f.items()})

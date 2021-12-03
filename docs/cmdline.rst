@@ -3,7 +3,7 @@
 Command line Utility
 ====================
 
-Simweights comes with a simple command line utility to quickly print basic info about how it will weight a 
+SimWeights comes with a simple command line utility to quickly print basic info about how it will weight a
 simulation file. It prints the Generation Surface of the file, a dictionary of the names of the columns it
 will use to weight events, the number of events in the file, and the effective area. If a flux model is
 provided at the command line it will also print the event rate and livetime. An example for a CORSIKA file

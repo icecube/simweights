@@ -34,7 +34,7 @@ class TestWeighter(unittest.TestCase):
         cls.data1 = dict(
             I3Weight=dict(
                 type=np.full(cls.N1, 2212),
-                energy=np.linspace(5e5, 5e6, cls.N1),  # np.full(N,1e6),
+                energy=np.linspace(5e5, 5e6, cls.N1),
                 zenith=np.full(cls.N1, np.pi / 4),
             )
         )

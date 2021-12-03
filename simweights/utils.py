@@ -42,7 +42,7 @@ def constcol(table, colname, mask=None):
     Helper function which makes sure that all of the entries in a column are exactly the same, and returns
     that value.
 
-    This is nescessary because CORSIKA and NuGen store generation surface parameters in every frame and we
+    This is necessary because CORSIKA and NuGen store generation surface parameters in every frame and we
     want to verify that they are all the same.
     """
     col = get_column(table, colname)

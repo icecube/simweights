@@ -5,7 +5,7 @@ SimWeights objects have a method :py:func:`simweights.Weighter.effective_area` f
 areas. Some example usage is shown below.
 
 The first example will calculate effective area in 4 different zenith bins and 25 energy bins
-and plot each zenith bin seperatly.
+and plot each zenith bin separately.
 
 .. literalinclude :: ../examples/effective_area.py
     :start-after: start-example1

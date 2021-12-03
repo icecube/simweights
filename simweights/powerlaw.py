@@ -9,7 +9,7 @@ class PowerLaw:
     However, it has several differences needed for weighting Monte Carlo simulation:
 
     - The support is defined from a to b rather than from 0 to 1.
-    - Negitive values of the power-law index are allowed.
+    - Negative values of the power-law index are allowed.
     - No shape or location parameters are supported.
 
     The probability density function for a `PowerLaw` is defined as:

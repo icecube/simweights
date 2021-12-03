@@ -9,7 +9,7 @@ hdffile = pd.HDFStore("Level2_IC86.2016_corsika.021682.hdf5", "r")
 # instantiate the weighter object by passing the pandas file to it
 weighter = simweights.CorsikaWeighter(hdffile)
 
-# create an object to reperesnt our cosmic-ray primary flux model
+# create an object to represent our cosmic-ray primary flux model
 flux = simweights.GaisserH4a()
 
 # get the weights by passing the flux to the weighter

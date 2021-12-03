@@ -9,7 +9,7 @@ the sum of the weights.
     L_{eff} = \frac{\sum{w_i^2}}{\sum{w_i}}
 
 
-As shown in the example below it can be calculated for any sample or for any subsample by using historgrams.
+As shown in the example below it can be calculated for any sample or for any subsample by using histograms.
 
 .. literalinclude:: ../examples/livetime.py
 

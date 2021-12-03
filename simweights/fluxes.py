@@ -1,5 +1,5 @@
 """
-A collection of cosmic ray flux paramerizations.
+A collection of cosmic ray flux parametrizations.
 
 This files contains the same Cosmic Ray flux models as :file:`weighting/python/fluxes.py`.
 However they have been refactored to:
@@ -21,12 +21,12 @@ from .pdgcode import PDGCode
 
 class CosmicRayFlux:
     """
-    Base class for cosmic ray fluxes that uses :py:func:`numpy.piecewise` for effient
+    Base class for cosmic ray fluxes that uses :py:func:`numpy.piecewise` for efficient
     mathematical evaluation
 
     Derived must set `pdgids` to enumerate the particle types in this model.
     :py:func:`_funcs` must be set to a list of functions to be called for each particle
-    type. :py:func:`_condition()` can be overidden if additional piecewise conditions are
+    type. :py:func:`_condition()` can be overridden if additional piecewise conditions are
     desired.
     """
 

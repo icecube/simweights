@@ -18,7 +18,7 @@ def nugen_spatial(table):
     min_cos = np.cos(constcol(table, "MaxZenith"))
 
     # Before V04-01-00, nugen injection primaries on the surface of a circle perpendicular to the momentum
-    # vector of the primary, this can be determied by checking `InjectionSurfaceR`. It will
+    # vector of the primary, this can be determined by checking `InjectionSurfaceR`. It will
     # be > 0 for circle injection and -1 for surface injection. In new versions >V6-00-00 it is not even
     # present indicating surface mode
     if has_column(table, "InjectionSurfaceR"):
@@ -51,7 +51,7 @@ def nugen_spectrum(table):
     min_energy = 10 ** constcol(table, "MinEnergyLog")
     max_energy = 10 ** constcol(table, "MaxEnergyLog")
     # the energy spectrum is always powerlaw however nugen uses positive value of `PowerLawIndex`
-    # for negitive slopes ie +2 means E**-2 injection spectrum
+    # for negative slopes ie +2 means E**-2 injection spectrum
     power_law_index = -constcol(table, "PowerLawIndex")
     assert power_law_index <= 0
     return PowerLaw(power_law_index, min_energy, max_energy)
@@ -70,7 +70,7 @@ def nugen_surface(table):
     for pid in unique_pdgids:
         mask = pid == pdgid
 
-        # neutrino-generator is usually produced with approximatly equal porportions of nu and nubar
+        # neutrino-generator is usually produced with approximately equal proportions of nu and nubar
         # newer version will explicitly put the ratio in `TypeWeight` but for older version we
         # assume it is 0.5
         if has_column(table, "TypeWeight"):
@@ -91,8 +91,8 @@ def NuGenWeighter(infile, nfiles):
 
     Does not use S-Frames and stores the surface information in an I3MapStringDouble so that the user
     does not know how many jobs contributed to the current sample, so it needs to know the number of
-    files. Nugen calculates the event weight in a column called ``TotalWeight`` which takes into account
-    the netutrino cross-section, detector density, and distance traveled through the generation volume.
+    files. NuGen calculates the event weight in a column called ``TotalWeight`` which takes into account
+    the neutrino cross-section, detector density, and distance traveled through the generation volume.
     """
 
     weight_table = get_table(infile, "I3MCWeightDict")
