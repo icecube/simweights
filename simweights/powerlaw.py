@@ -1,8 +1,8 @@
-from typing import Optional, Union
+from typing import Any, Union
 
 import numpy as np
 from numpy.random.mtrand import RandomState
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 from scipy._lib._util import check_random_state  # type: ignore
 
 
@@ -42,20 +42,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x: NDArray) -> NDArray:
+    def _pdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return x ** self.g / self.integral
 
-    def _cdf(self, x: NDArray) -> NDArray:
+    def _cdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
             return np.log(x / self.a) / self.integral
         return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
-    def _ppf(self, q: NDArray) -> NDArray:
+    def _ppf(self, q: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
         return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
-    def pdf(self, x: NDArray) -> NDArray:
+    def pdf(self, x: ArrayLike) -> NDArray[np.float64]:
         r"""
         Probability density function
 
@@ -65,10 +65,10 @@ class PowerLaw:
         Returns:
             array_like: Probability density function evaluated at `x`
         """
-        x = np.asfarray(x)
-        return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
+        xa = np.asfarray(x)
+        return np.piecewise(xa, [(xa >= self.a) & (xa <= self.b)], [self._pdf])
 
-    def cdf(self, x: NDArray) -> NDArray:
+    def cdf(self, x: ArrayLike) -> NDArray[np.float64]:
         r"""
         Cumulative distribution function
 
@@ -78,9 +78,10 @@ class PowerLaw:
         Returns:
             array_like: Cumulative distribution function evaluated at `x`
         """
-        return np.piecewise(np.asfarray(x), [x < self.a, x > self.b], [0, 1, self._cdf])
+        qa = np.asfarray(x)
+        return np.piecewise(qa, [qa < self.a, qa > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q: NDArray) -> NDArray:
+    def ppf(self, q: ArrayLike) -> NDArray[np.float64]:
         """
         Percent point function (inverse of `cdf`) at `q`.
 
@@ -90,11 +91,12 @@ class PowerLaw:
         Returns:
             array_like: quantile corresponding to the lower tail probability `q`.
         """
-        return np.piecewise(np.asfarray(q), [(q >= 0) & (q <= 1)], [self._ppf, np.nan])
+        qa = np.asfarray(q)
+        return np.piecewise(qa, [(qa >= 0) & (qa <= 1)], [self._ppf, np.nan])
 
     def rvs(
-        self, size: Optional[NDArray] = None, random_state: Union[None, int, RandomState] = None
-    ) -> NDArray:
+        self, size: Any = None, random_state: Union[None, int, RandomState] = None
+    ) -> NDArray[np.float64]:
         """
         Random variates
 
@@ -106,13 +108,13 @@ class PowerLaw:
                ``RandomState`` instance is used, seeded with random_state. If `random_state` is already a
                ``RandomState`` or ``Generator`` instance, then that object is used. Default is None.
         """
-        randomstate: RandomState = check_random_state(random_state)
-        return self._ppf(randomstate.uniform(0, 1, size))
+        rand_state: RandomState = check_random_state(random_state)
+        return self._ppf(np.asfarray(rand_state.uniform(0, 1, size)))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.g} ,{self.a}, {self.b})"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PowerLaw):
-            raise NotImplementedError
+            raise ValueError(f"{self} cannot be compared to {other}")
         return self.g == other.g and self.a == other.a and self.b == other.b

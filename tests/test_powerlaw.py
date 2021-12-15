@@ -125,9 +125,9 @@ class TestPowerLaw(unittest.TestCase):
     def test_raises(self):
 
         p = PowerLaw(1, 1, 1000)
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(ValueError):
             p == object()
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(ValueError):
             p == np.array([])
 
 

@@ -6,7 +6,7 @@ from pprint import pformat
 from typing import Any, Callable, Iterable, Optional, Set, Union
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 from .generation_surface import GenerationSurface, GenerationSurfaceCollection
 from .utils import get_column, get_table
@@ -38,7 +38,7 @@ class Weighter:
         self.colnames = sorted(colnames)
         self.__cache: dict = {}
 
-    def get_column(self, table: str, column: str) -> NDArray:
+    def get_column(self, table: str, column: str) -> NDArray[np.float64]:
         """
         Helper function to get a specific column from the file
         """
@@ -48,7 +48,7 @@ class Weighter:
         print("RETVAL", retval)
         return retval
 
-    def get_weight_column(self, name: str) -> NDArray:
+    def get_weight_column(self, name: str) -> NDArray[np.float64]:
         """
         Helper function to get a column needed in the weight calculation
         """
@@ -74,7 +74,7 @@ class Weighter:
         self.__cache[name] = retval
         return retval
 
-    def get_weights(self, flux: Any) -> NDArray:
+    def get_weights(self, flux: Any) -> NDArray[np.float64]:
         """
         Calculate the weights for the sample for the given flux.
 
@@ -145,8 +145,8 @@ class Weighter:
         return weights
 
     def effective_area(
-        self, energy_bins: NDArray, cos_zenith_bins: NDArray, mask: Optional[NDArray[np.bool_]] = None
-    ) -> NDArray:
+        self, energy_bins: ArrayLike, cos_zenith_bins: ArrayLike, mask: Optional[ArrayLike] = None
+    ) -> NDArray[np.float64]:
         r"""
         Calculate The effective area for the given energy and zenith bins.
 
@@ -187,26 +187,27 @@ class Weighter:
 
         weights = self.get_weights(1e-4)
         if mask is None:
-            mask = np.full(weights.size, 1, dtype=bool)
+            maska = np.full(weights.size, 1, dtype=bool)
+        else:
+            maska = np.asarray(mask, dtype=bool)
 
-        assert mask.dtype == bool
-        assert mask.shape == weights.shape
+        assert maska.shape == weights.shape
 
         hist_val, czbin, enbin = np.histogram2d(
-            cos_zen[mask],
-            energy[mask],
-            weights=weights[mask],
+            cos_zen[maska],
+            energy[maska],
+            weights=weights[maska],
             bins=[cos_zenith_bins, energy_bins],
         )
 
-        nspecies = len(np.unique(self.get_weight_column("pdgid")[mask]))
+        nspecies = len(np.unique(self.get_weight_column("pdgid")[maska]))
 
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
         return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
 
-    def __add__(self, other):
+    def __add__(self, other: Any) -> Weighter:
         return Weighter(self.data + other.data, self.surface + other.surface)
 
     def tostring(self, flux: Union[None, object, Callable, NDArray] = None) -> str:

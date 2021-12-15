@@ -56,7 +56,7 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertNotEqual(self.s0, self.s4)
 
     def test_get_pdgids(self):
-        self.assertEqual(self.s0.get_pdgids(), [2212])
+        self.assertEqual(self.s0.get_pdgids(), [PDGCode(2212)])
         self.assertEqual(self.s1.get_pdgids(), [2212])
         self.assertEqual(self.s2.get_pdgids(), [2212])
         self.assertEqual(self.s3.get_pdgids(), [2212])
@@ -98,9 +98,9 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(self.gsc4.get_cos_zenith_range(None), (-1, 1))
         self.assertEqual(self.gsc4.get_cos_zenith_range(None), (-1, 1))
         with self.assertRaises(AssertionError):
-            self.gsc1.get_cos_zenith_range(2213)
+            self.gsc1.get_cos_zenith_range(22)
         with self.assertRaises(AssertionError):
-            self.gsc2.get_cos_zenith_range(2213)
+            self.gsc2.get_cos_zenith_range(22)
 
     def test_addition(self):
         n0 = self.s0.nevents
@@ -212,7 +212,7 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertEqual(eval(repr(self.s4)), self.s4)
 
     def test_powerlaw(self):
-        N = self.s0.nevents
+        N = int(self.s0.nevents)
         E = np.geomspace(self.p1.a, self.p1.b - 1 / N, N)
         cz = np.linspace(self.c1.cos_zen_min, self.c1.cos_zen_max, N)
         w = 1 / self.s0.get_epdf(2212, E, cz)
@@ -231,7 +231,7 @@ class TestGenerationSurface(unittest.TestCase):
         self.assertIsNot(self.s0.energy_dist, self.p1)
 
     def test_two_surfaces(self):
-        N = self.s0.nevents
+        N = int(self.s0.nevents)
         cz = np.linspace(self.c1.cos_zen_min, self.c1.cos_zen_max, N)
         q = np.linspace(1 / 2 / N, 1 - 1 / 2 / N, N)
         E1 = 10 * np.exp(q * np.log(100 / 10))
