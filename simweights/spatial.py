@@ -1,3 +1,5 @@
+from typing import Any, Union
+
 import numpy as np
 
 
@@ -6,7 +8,7 @@ class CylinderBase:
     Abstract base class for cylinder pdf classes
     """
 
-    def __init__(self, length, radius, cos_zen_min, cos_zen_max):
+    def __init__(self, length: float, radius: float, cos_zen_min: float, cos_zen_max: float):
         if cos_zen_min < -1 or cos_zen_max > 1:
             raise ValueError(
                 self.__class__.__name__ + ": both cos_zen_min and cos_zen_max must be between -1 and +1"
@@ -21,7 +23,7 @@ class CylinderBase:
         self._cap = 1e4 * np.pi * self.radius ** 2
         self.etendue = self._diff_etendue(self.cos_zen_max) - self._diff_etendue(self.cos_zen_min)
 
-    def projected_area(self, cos_zen):
+    def projected_area(self, cos_zen: float) -> float:
         """
         Returns the cross sectional area of a cylinder in cm^2 as seen from the angle described by cos_zen
         """
@@ -29,7 +31,7 @@ class CylinderBase:
         assert np.all(cos_zen <= +1)
         return self._cap * np.abs(cos_zen) + self._side * np.sqrt(1 - cos_zen ** 2)
 
-    def _diff_etendue(self, cos_zen):
+    def _diff_etendue(self, cos_zen: float) -> float:
         assert np.all(cos_zen >= -1)
         assert np.all(cos_zen <= +1)
         return np.pi * (
@@ -37,7 +39,7 @@ class CylinderBase:
             + self._side * (cos_zen * np.sqrt(1 - cos_zen ** 2) - np.arccos(cos_zen))
         )
 
-    def pdf(self, cos_zen):
+    def pdf(self, cos_zen: float) -> float:
         """
         Returns:
           the probability density function for the given zenith angle.
@@ -50,7 +52,7 @@ class CylinderBase:
             f"({self.length}, {self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return (
             type(self) is type(other)
             and self.length == other.length
@@ -74,10 +76,10 @@ class UniformSolidAngleCylinder(CylinderBase):
 
     """
 
-    def _pdf(self, cos_zen):
+    def _pdf(self, cos_zen: float) -> float:
         return 1 / (2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self.projected_area(cos_zen))
 
-    def pdf(self, cos_zen):
+    def pdf(self, cos_zen: float) -> float:
         cos_zen = np.asfarray(cos_zen)
         return np.piecewise(
             cos_zen, [(cos_zen >= self.cos_zen_min) & (cos_zen <= self.cos_zen_max)], [self._pdf]
@@ -102,11 +104,11 @@ class NaturalRateCylinder(CylinderBase):
       I \propto r^2\cdot\pi\cdot\sin\theta\cdot(\cos\theta+2/\pi\cdot l/r\cdot\sin\theta)
     """
 
-    def __init__(self, length, radius, cos_zen_min, cos_zen_max):
+    def __init__(self, length: float, radius: float, cos_zen_min: float, cos_zen_max: float):
         super().__init__(length, radius, cos_zen_min, cos_zen_max)
         self._normalization = 1 / self.etendue
 
-    def pdf(self, cos_zen):
+    def pdf(self, cos_zen: float) -> float:
         cos_zen = np.asfarray(cos_zen)
         return np.piecewise(
             cos_zen, [(cos_zen >= self.cos_zen_min) & (cos_zen <= self.cos_zen_max)], [self._normalization]
@@ -120,7 +122,7 @@ class CircleInjector:
     The etendue is just the area of the circle times the solid angle.
     """
 
-    def __init__(self, radius, cos_zen_min, cos_zen_max):
+    def __init__(self, radius: float, cos_zen_min: float, cos_zen_max: float):
         self.radius = radius
         self.cos_zen_min = cos_zen_min
         self.cos_zen_max = cos_zen_max
@@ -128,14 +130,14 @@ class CircleInjector:
         self.etendue = 2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
         self._normalization = 1 / self.etendue
 
-    def projected_area(self, cos_zen):
+    def projected_area(self, cos_zen: float) -> float:
         """
         Returns the cross sectional area of the injection area in cm^2
         """
         # pylint: disable=unused-argument
         return self._cap
 
-    def pdf(self, cos_zen):
+    def pdf(self, cos_zen: float) -> float:
         """
         Returns:
           the probability density function for the given zenith angle.
@@ -148,10 +150,13 @@ class CircleInjector:
     def __repr__(self):
         return f"CircleInjector({self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return (
             type(self) is type(other)
             and self.radius == other.radius
             and self.cos_zen_min == other.cos_zen_min
             and self.cos_zen_max == other.cos_zen_max
         )
+
+
+SpatialDist = Union[CylinderBase, CircleInjector]

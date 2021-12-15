@@ -1,7 +1,10 @@
+from typing import Any
+
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
 
-def has_table(file_obj, name: str):
+def has_table(file_obj: Any, name: str) -> bool:
     """
     Helper function for determining if a file has a table, works with h5py, pytables, and pandas
     """
@@ -10,7 +13,7 @@ def has_table(file_obj, name: str):
     return name in file_obj.keys()
 
 
-def get_table(file_obj, name: str):
+def get_table(file_obj: Any, name: str) -> Any:
     """
     Helper function for getting a certian table from a file, works with h5py, pytables, and pandas
     """
@@ -19,7 +22,7 @@ def get_table(file_obj, name: str):
     return file_obj[name]
 
 
-def has_column(table, name: str):
+def has_column(table: Any, name: str) -> bool:
     """
     Helper function for determining if a table has a column, works with h5py, pytables, and pandas
     """
@@ -28,7 +31,7 @@ def has_column(table, name: str):
     return name in table
 
 
-def get_column(table, name: str):
+def get_column(table: Any, name: str) -> NDArray:
     """
     Helper function getting a column from a table, works with h5py, pytables, and pandas
     """
@@ -37,7 +40,7 @@ def get_column(table, name: str):
     return np.array(table[name])
 
 
-def constcol(table, colname, mask=None):
+def constcol(table: Any, colname: str, mask: NDArray[np.bool_] = None) -> float:
     """
     Helper function which makes sure that all of the entries in a column are exactly the same, and returns
     that value.
@@ -54,7 +57,7 @@ def constcol(table, colname, mask=None):
     return val
 
 
-def corsika_to_pdg(cid):
+def corsika_to_pdg(cid: ArrayLike) -> NDArray:
     """
     Convert CORSIKA particle code to particle data group (PDG) Monte Carlo
     numbering scheme.
@@ -78,7 +81,7 @@ def corsika_to_pdg(cid):
     )
 
 
-def check_run_counts(table, nfiles):  # pragma: no cover
+def check_run_counts(table: Any, nfiles: int) -> bool:  # pragma: no cover
     """
     check that the number of jobs in the file is what the user claims they are
     Not Currently used
@@ -95,7 +98,7 @@ def check_run_counts(table, nfiles):  # pragma: no cover
     return ret
 
 
-def check_nfiles(runcol):  # pragma: no cover
+def check_nfiles(runcol: NDArray):  # pragma: no cover
     # pylint: disable=import-outside-toplevel
     """
     check that the number of jobs in the file is what the user claims they are

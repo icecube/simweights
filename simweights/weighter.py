@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import inspect
 import warnings
 from pprint import pformat
+from typing import Any, Callable, Iterable, Optional, Set, Union
 
 import numpy as np
+from numpy.typing import NDArray
 
+from .generation_surface import GenerationSurface, GenerationSurfaceCollection
 from .utils import get_column, get_table
 
 
@@ -17,27 +22,33 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self, data: list, surface):
-
-        colnames = set()
+    def __init__(
+        self, data: Iterable[tuple], surface: Union[GenerationSurface, GenerationSurfaceCollection]
+    ):
+        colnames: Set[str] = set()
         for _, event_map in data:
-            colnames = colnames.intersection(set(event_map.keys()))
+            keys = set(event_map.keys())
+            if colnames:
+                colnames = colnames.intersection(keys)
+            else:
+                colnames = keys
 
         self.data = list(data)
         self.surface = surface
         self.colnames = sorted(colnames)
         self.__cache: dict = {}
 
-    def get_column(self, table: str, column: str):
+    def get_column(self, table: str, column: str) -> NDArray:
         """
         Helper function to get a specific column from the file
         """
-        retval = []
+        retval: NDArray = np.array([])
         for datafile, _ in self.data:
             retval = np.append(retval, get_column(get_table(datafile, table), column))
+        print("RETVAL", retval)
         return retval
 
-    def get_weight_column(self, name: str):
+    def get_weight_column(self, name: str) -> NDArray:
         """
         Helper function to get a column needed in the weight calculation
         """
@@ -48,7 +59,7 @@ class Weighter:
             retval = np.cos(self.get_weight_column("zenith"))
 
         else:
-            retval = []
+            retval = np.array([])
             for datafile, event_map in self.data:
                 if event_map[name] is None:
                     tablename, columnname = event_map["energy"]
@@ -63,7 +74,7 @@ class Weighter:
         self.__cache[name] = retval
         return retval
 
-    def get_weights(self, flux):
+    def get_weights(self, flux: Any) -> NDArray:
         """
         Calculate the weights for the sample for the given flux.
 
@@ -133,7 +144,9 @@ class Weighter:
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
         return weights
 
-    def effective_area(self, energy_bins, cos_zenith_bins, mask=None):
+    def effective_area(
+        self, energy_bins: NDArray, cos_zenith_bins: NDArray, mask: Optional[NDArray[np.bool_]] = None
+    ) -> NDArray:
         r"""
         Calculate The effective area for the given energy and zenith bins.
 
@@ -196,7 +209,7 @@ class Weighter:
     def __add__(self, other):
         return Weighter(self.data + other.data, self.surface + other.surface)
 
-    def tostring(self, flux=None):
+    def tostring(self, flux: Union[None, object, Callable, NDArray] = None) -> str:
         """
         Creates a string with important information about this weighting object:
         generation surface, event map, number of events, and effective area.
@@ -217,5 +230,5 @@ class Weighter:
             output += f"Livetime         : {weights.sum() / (weights ** 2).sum():8.6g} s\n"
         return output
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.tostring()

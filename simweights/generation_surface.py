@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 from copy import deepcopy
 
 import numpy as np
+
+from simweights.powerlaw import PowerLaw
+from simweights.spatial import SpatialDist
 
 from .pdgcode import PDGCode
 
@@ -14,7 +19,7 @@ class GenerationSurface:
     solid angle stored in the surface.
     """
 
-    def __init__(self, pdgid, energy_dist, spatial_dist):
+    def __init__(self, pdgid: PDGCode, energy_dist: PowerLaw, spatial_dist: SpatialDist):
         self.pdgid = pdgid
         try:
             self.particle_name = PDGCode(pdgid).name

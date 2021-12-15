@@ -27,7 +27,7 @@ classifiers = [
 simweights = "simweights.cmdline:main"
 
 [tool.flit.metadata.requires-extra]
-test = ["h5py", "tables", "pandas", "pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint"]
+test = ["h5py", "tables", "pandas", "pytest-mypy", "pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
 
 [tool.coverage.run]
@@ -37,7 +37,7 @@ omit = ["simweights/cmdline.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["simweights","tests"]
-addopts = "--isort --black --flake8 --pylint --pylint-ignore=tests --cov=simweights"
+addopts = "--mypy --isort --black --flake8 --pylint --pylint-ignore=tests --cov=simweights --mypy --mypy-ignore-missing-imports"
 flake8-max-line-length = 108
 flake8-ignore = "E203, W503"
 
@@ -58,3 +58,6 @@ disable = "C0330, C0326, C0114"
 
 [tool.pylint.format]
 max-line-length = "108"
+
+[mypy]
+plugins = "numpy.typing.mypy_plugin"

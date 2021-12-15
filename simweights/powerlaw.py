@@ -1,4 +1,8 @@
+from typing import Optional, Union
+
 import numpy as np
+from numpy.random.mtrand import RandomState
+from numpy.typing import NDArray
 from scipy._lib._util import check_random_state  # type: ignore
 
 
@@ -38,20 +42,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x):
+    def _pdf(self, x: NDArray) -> NDArray:
         return x ** self.g / self.integral
 
-    def _cdf(self, x):
+    def _cdf(self, x: NDArray) -> NDArray:
         if self.G == 0:
             return np.log(x / self.a) / self.integral
         return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
-    def _ppf(self, q):
+    def _ppf(self, q: NDArray) -> NDArray:
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
         return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
-    def pdf(self, x):
+    def pdf(self, x: NDArray) -> NDArray:
         r"""
         Probability density function
 
@@ -64,7 +68,7 @@ class PowerLaw:
         x = np.asfarray(x)
         return np.piecewise(x, [(x >= self.a) & (x <= self.b)], [self._pdf])
 
-    def cdf(self, x):
+    def cdf(self, x: NDArray) -> NDArray:
         r"""
         Cumulative distribution function
 
@@ -76,7 +80,7 @@ class PowerLaw:
         """
         return np.piecewise(np.asfarray(x), [x < self.a, x > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q):
+    def ppf(self, q: NDArray) -> NDArray:
         """
         Percent point function (inverse of `cdf`) at `q`.
 
@@ -88,7 +92,9 @@ class PowerLaw:
         """
         return np.piecewise(np.asfarray(q), [(q >= 0) & (q <= 1)], [self._ppf, np.nan])
 
-    def rvs(self, size=None, random_state=None):
+    def rvs(
+        self, size: Optional[NDArray] = None, random_state: Union[None, int, RandomState] = None
+    ) -> NDArray:
         """
         Random variates
 
@@ -100,8 +106,8 @@ class PowerLaw:
                ``RandomState`` instance is used, seeded with random_state. If `random_state` is already a
                ``RandomState`` or ``Generator`` instance, then that object is used. Default is None.
         """
-        random_state = check_random_state(random_state)
-        return self._ppf(random_state.uniform(0, 1, size))
+        randomstate: RandomState = check_random_state(random_state)
+        return self._ppf(randomstate.uniform(0, 1, size))
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.g} ,{self.a}, {self.b})"

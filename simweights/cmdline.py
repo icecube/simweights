@@ -6,7 +6,7 @@ import pandas as pd
 import simweights
 
 
-def find_weighter(fileobj, nfiles):
+def find_weighter(fileobj: pd.HDFStore, nfiles: int):
     """
     Try to automatically determine which type of file this is and return the correct weighter
     """
