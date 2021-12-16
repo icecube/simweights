@@ -1,13 +1,15 @@
+from typing import Any
+
 import numpy as np
 
-from .generation_surface import NullSurface, generation_surface
+from .generation_surface import GenerationSurfaceCollection, NullSurface, generation_surface
 from .powerlaw import PowerLaw
-from .spatial import CircleInjector, UniformSolidAngleCylinder
+from .spatial import CircleInjector, SpatialDist, UniformSolidAngleCylinder
 from .utils import constcol, get_column, get_table, has_column
 from .weighter import Weighter
 
 
-def nugen_spatial(table):
+def nugen_spatial(table: Any) -> SpatialDist:
     """
     Inspect the ``I3MCWeightDict`` table object of a nugen file to generate an object to represent
     the spatial distribution. It will either return a CircleInjector or UniformSolidAngleCylinder
@@ -43,7 +45,7 @@ def nugen_spatial(table):
     return UniformSolidAngleCylinder(cylinder_height, cylinder_radius, min_cos, max_cos)
 
 
-def nugen_spectrum(table):
+def nugen_spectrum(table: Any) -> PowerLaw:
     """
     Inspect the `I3MCWeightDict` table object of a nugen file to generate a PowerLaw object to represent
     the energy spectrum
@@ -57,7 +59,7 @@ def nugen_spectrum(table):
     return PowerLaw(power_law_index, min_energy, max_energy)
 
 
-def nugen_surface(table):
+def nugen_surface(table: Any) -> GenerationSurfaceCollection:
     """
     Inspect the `I3MCWeightDict` table object of a nugen file to generate a surface object
     """
@@ -80,11 +82,11 @@ def nugen_surface(table):
 
         primary_type = constcol(table, "PrimaryNeutrinoType", mask)
         n_events = type_weight * constcol(table, "NEvents", mask)
-        surfaces.append(n_events * generation_surface(primary_type, spectrum, spatial))
+        surfaces.append(n_events * generation_surface(int(primary_type), spectrum, spatial))
     return sum(surfaces, NullSurface)
 
 
-def NuGenWeighter(infile, nfiles):
+def NuGenWeighter(infile: Any, nfiles: int) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for neutrino-generator (NuGen) simulation

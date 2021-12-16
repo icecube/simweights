@@ -16,13 +16,17 @@ def find_weighter(fileobj: pd.HDFStore, nfiles: int):
         pass
     try:
         return simweights.CorsikaWeighter(fileobj, nfiles=nfiles)
-    except RuntimeError:
+    except AttributeError:
         pass
     try:
         return simweights.NuGenWeighter(fileobj, nfiles=nfiles)
-    except RuntimeError:
+    except AttributeError:
         pass
-    raise RuntimeError("could not find a suitable weighter for file object " + str(fileobj))
+    try:
+        return simweights.GenieWeighter(fileobj)
+    except AttributeError:
+        pass
+    raise RuntimeError(f"Could not find a suitable weighter for file object `{fileobj.filename}`")
 
 
 def main():
@@ -38,22 +42,23 @@ def main():
     parser.add_argument("-w", "--weighter", default="TriggeredCorsikaWeighter")
     args = parser.parse_args()
 
-    fileobj = pd.HDFStore(args.filename, "r")
-    try:
-        wobj = find_weighter(fileobj, args.nfiles)
-    except RuntimeError as error:
-        sys.stderr.write(str(error))
-        return -1
-
-    if args.flux:
+    with pd.HDFStore(args.filename, "r") as fileobj:
         try:
-            flux_model = getattr(simweights, args.flux)()
-        except AttributeError:
+            wobj = find_weighter(fileobj, args.nfiles)
+        except RuntimeError as error:
+            sys.stderr.write(str(error) + "\n")
+            return -1
+
+        if args.flux:
+            try:
+                flux_model = getattr(simweights, args.flux)()
+            except AttributeError:
+                flux_model = None
+            if flux_model is None:
+                sys.stderr.write(f"Warning: Cannot find flux model {args.flux}\n")
+
+        else:
             flux_model = None
 
-    else:
-        flux_model = None
-
-    print(wobj.tostring(flux_model))
-    fileobj.close()
+        print(wobj.tostring(flux_model))
     return 0

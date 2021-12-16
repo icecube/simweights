@@ -1,13 +1,15 @@
+from typing import Any, Iterable, Mapping
+
 import numpy as np
 
-from .generation_surface import NullSurface, generation_surface
+from .generation_surface import GenerationSurfaceCollection, NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import CircleInjector
 from .utils import get_table
 from .weighter import Weighter
 
 
-def genie_surface(table):
+def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurfaceCollection:
     """
     Inspect the rows of a GENIE S-Frame table object to generate a surface object.
     """
@@ -23,12 +25,12 @@ def genie_surface(table):
         surfaces.append(
             row["n_flux_events"]
             / row["global_probability_scale"]
-            * generation_surface(row["primary_type"], spectrum, spatial)
+            * generation_surface(int(row["primary_type"]), spectrum, spatial)
         )
     return sum(surfaces, NullSurface)
 
 
-def GenieWeighter(infile):
+def GenieWeighter(infile: Any) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for GENIE simulation

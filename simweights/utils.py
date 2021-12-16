@@ -31,7 +31,7 @@ def has_column(table: Any, name: str) -> bool:
     return name in table
 
 
-def get_column(table: Any, name: str) -> NDArray:
+def get_column(table: Any, name: str) -> NDArray[np.floating]:
     """
     Helper function getting a column from a table, works with h5py, pytables, and pandas
     """

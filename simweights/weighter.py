@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from pprint import pformat
-from typing import Any, Callable, Iterable, Optional, Set, Union
+from typing import Any, Callable, Iterable, Mapping, Optional, Set, Union
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -22,7 +21,7 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self, data: Iterable[tuple], surface: GenerationSurfaceCollection):
+    def __init__(self, data: Iterable[tuple[Any, Mapping]], surface: GenerationSurfaceCollection):
         colnames: Set[str] = set()
         for _, event_map in data:
             keys = set(event_map.keys())
@@ -205,10 +204,10 @@ class Weighter:
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
         return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
 
-    def __add__(self, other: Any) -> Weighter:
+    def __add__(self, other: Weighter) -> Weighter:
         return Weighter(self.data + other.data, self.surface + other.surface)
 
-    def tostring(self, flux: Union[None, object, Callable, NDArray] = None) -> str:
+    def tostring(self, flux: Union[None, object, Callable, ArrayLike] = None) -> str:
         """
         Creates a string with important information about this weighting object:
         generation surface, event map, number of events, and effective area.
@@ -216,7 +215,7 @@ class Weighter:
 
         """
         output = str(self.surface) + "\n"
-        output += pformat(self.colnames) + "\n"
+        output += f"Weight Columns   : {', '.join(self.colnames)}\n"
         output += f"Number of Events : {len(self.get_weights(1)):8d}\n"
         eff_area = self.effective_area(
             self.surface.get_energy_range(None), self.surface.get_cos_zenith_range(None)

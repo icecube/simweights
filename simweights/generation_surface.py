@@ -27,7 +27,7 @@ class GenerationSurfaceCollection:
         """
         :param spectra: a collection of GenerationProbabilities.
         """
-        self.spectra: Dict = {}
+        self.spectra: Dict[int, List[SurfaceTuple]] = {}
         for spec in spectra:
             self._insert(spec)
 
@@ -160,10 +160,15 @@ class GenerationSurfaceCollection:
     def __str__(self) -> str:
         outstrs = []
         for pdgid, specs in self.spectra.items():
+            try:
+                ptype = PDGCode(pdgid).name
+            except ValueError:
+                ptype = str(pdgid)
+
             collections = []
             for subspec in specs:
                 collections.append(f"N={subspec.nevents} {subspec.energy_dist} {subspec.spatial_dist}")
-            outstrs.append(f"     {pdgid:11} : " + "\n                   ".join(collections))
+            outstrs.append(f"     {ptype:>11} : " + "\n                   ".join(collections))
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
 
 

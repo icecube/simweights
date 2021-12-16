@@ -1,15 +1,18 @@
 import warnings
+from typing import Any, Iterable, Mapping, Optional, Tuple
 
 import numpy as np
 
-from .generation_surface import NullSurface, generation_surface
+from .generation_surface import GenerationSurfaceCollection, NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import NaturalRateCylinder
 from .utils import constcol, get_column, get_table, has_table
 from .weighter import Weighter
 
 
-def sframe_corsika_surface(table, oversampling):
+def sframe_corsika_surface(
+    table: Iterable[Mapping[str, float]], oversampling: bool
+) -> GenerationSurfaceCollection:
     """
     Inspect the rows of a CORSIKA S-Frame table object to generate a surface object. This function works
     on files generated with either triggered CORSIKA or corsika-reader because `I3PrimaryInjectorInfo` and
@@ -30,12 +33,14 @@ def sframe_corsika_surface(table, oversampling):
         else:
             oversampling_val = 1
         surfaces.append(
-            row["n_events"] * oversampling_val * generation_surface(row["primary_type"], spectrum, spatial)
+            row["n_events"]
+            * oversampling_val
+            * generation_surface(int(row["primary_type"]), spectrum, spatial)
         )
     return sum(surfaces, NullSurface)
 
 
-def weight_map_corsika_surface(table):
+def weight_map_corsika_surface(table: Any) -> GenerationSurfaceCollection:
     """
     Inspect the `CorsikaWeightMap` table object of a corsika file to generate a surface object
 
@@ -65,7 +70,7 @@ def weight_map_corsika_surface(table):
     return sum(surface, NullSurface)
 
 
-def CorsikaWeighter(infile, nfiles=None):
+def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader
@@ -74,6 +79,8 @@ def CorsikaWeighter(infile, nfiles=None):
     the user does not know how many jobs contributed to the current sample, so it needs to know the number
     of files.
     """
+
+    event_map: Mapping[str, Optional[Tuple[str, str]]] = {}
 
     if has_table(infile, "I3CorsikaWeight"):
         if nfiles is not None:
