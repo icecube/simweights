@@ -28,9 +28,10 @@ __all__ = [
     "Hoerandel5",
     "Hoerandel_IT",
     "Honda2004",
+    "NullSurface",
     "PDGCode",
     "corsika_to_pdg",
-    "GenerationSurface",
+    "generation_surface",
     "GenerationSurfaceCollection",
     "NuGenWeighter",
     "PowerLaw",
@@ -51,7 +52,7 @@ from .fluxes import (
     Hoerandel_IT,
     Honda2004,
 )
-from .generation_surface import GenerationSurface, GenerationSurfaceCollection
+from .generation_surface import GenerationSurfaceCollection, NullSurface, generation_surface
 from .genie_weighter import GenieWeighter
 from .nugen_weighter import NuGenWeighter
 from .pdgcode import PDGCode

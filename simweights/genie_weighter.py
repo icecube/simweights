@@ -1,6 +1,6 @@
 import numpy as np
 
-from .generation_surface import GenerationSurface
+from .generation_surface import NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import CircleInjector
 from .utils import get_table
@@ -23,9 +23,9 @@ def genie_surface(table):
         surfaces.append(
             row["n_flux_events"]
             / row["global_probability_scale"]
-            * GenerationSurface(row["primary_type"], spectrum, spatial)
+            * generation_surface(row["primary_type"], spectrum, spatial)
         )
-    return sum(surfaces)
+    return sum(surfaces, NullSurface)
 
 
 def GenieWeighter(infile):

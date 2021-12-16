@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import namedtuple
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -11,115 +12,18 @@ from simweights.spatial import SpatialDist
 
 from .pdgcode import PDGCode
 
-
-class GenerationSurface:
-    """
-    This is a booking class which represents the surface in which Monte Carlo simulation is generated on.
-
-    In IceCube the surface is an combines an energy, an area, and a solid angle as well as the number of
-    events generated. This uses composision to store the energy spectrum in energy_dist and the area and
-    solid angle stored in the surface.
-    """
-
-    def __init__(self, pdgid: Union[int, PDGCode], energy_dist: PowerLaw, spatial_dist: SpatialDist):
-        self.pdgid = pdgid
-        try:
-            self.particle_name = PDGCode(pdgid).name
-        except ValueError:
-            self.particle_name = str(pdgid)
-        self.nevents = 1.0
-        self.energy_dist = deepcopy(energy_dist)
-        self.spatial_dist = deepcopy(spatial_dist)
-
-    def get_epdf(self, pdgid: ArrayLike, energy: ArrayLike, cos_zen: ArrayLike) -> NDArray[np.float64]:
-        """
-        Get the extended pdf of an event.
-
-        The pdf is the probability that an event with these parameters is generated. The pdf is multiplied
-        by the number of events.
-        """
-        assert np.all(pdgid == self.pdgid)
-        return self.nevents * self.energy_dist.pdf(energy) * self.spatial_dist.pdf(cos_zen)
-
-    def get_surface_area(self) -> float:
-        """
-        Get the surface area in E * sr * m^2
-        """
-        return self.energy_dist.span * self.spatial_dist.etendue
-
-    def is_compatible(self, other: Any) -> bool:
-        """
-        Returns if other class can be combined with the this class
-        """
-        return (
-            isinstance(other, type(self))
-            and self.pdgid == other.pdgid
-            and self.energy_dist == other.energy_dist
-            and self.spatial_dist == other.spatial_dist
-        )
-
-    def get_pdgids(self) -> List[Union[int, PDGCode]]:
-        """
-        Return a list of pdgids that this surface represents
-        """
-        return [self.pdgid]
-
-    def get_energy_range(self, pdgid: Optional[PDGCode]) -> Tuple[float, float]:
-        """
-        Return the energy range for given particle type over all surfaces
-        """
-        assert (pdgid is None) or (pdgid == self.pdgid)
-        return self.energy_dist.a, self.energy_dist.b
-
-    def get_cos_zenith_range(self, pdgid: Optional[PDGCode]) -> Tuple[float, float]:
-        """
-        Return the cos_zenith range for given particle type over all surfaces
-        """
-        assert (pdgid is None) or pdgid == self.pdgid
-        return self.spatial_dist.cos_zen_min, self.spatial_dist.cos_zen_max
-
-    def __eq__(self, other: Any) -> bool:
-        return self.is_compatible(other) and self.nevents == other.nevents
-
-    def __add__(self, other: Any) -> SurfaceType:
-        if np.isscalar(other) and other == 0:
-            return self
-        if isinstance(other, GenerationSurface):
-            if self.is_compatible(other):
-                new_surface = deepcopy(self)
-                new_surface.nevents = self.nevents + other.nevents
-                return new_surface
-            return GenerationSurfaceCollection(self, other)
-        raise TypeError(f"Can't add {type(other).__name__} to {type(self).__name__}")
-
-    def __radd__(self, other: Any) -> bool:
-        return self + other
-
-    def __imul__(self, factor: float) -> SurfaceType:
-        self.nevents *= factor
-        return self
-
-    def __mul__(self, factor: float) -> SurfaceType:
-        new_surface = deepcopy(self)
-        new_surface.__imul__(factor)
-        return new_surface
-
-    def __rmul__(self, factor: float) -> SurfaceType:
-        return self.__mul__(factor)
-
-    def __repr__(self) -> str:
-        return (
-            f"{self.nevents:f} * {self.__class__.__name__}"
-            f"({self.particle_name}, {self.energy_dist}, {self.spatial_dist})"
-        )
+SurfaceTuple = namedtuple("SurfaceTuple", ["pdgid", "nevents", "energy_dist", "spatial_dist"])
 
 
 class GenerationSurfaceCollection:
     """
-    A collection of generation spectra, possibly for different particle types.
+    This class represents a surface on which Monte Carlo simulation was generated on.
+
+    The number of events thrown, the spatial distribution, and the energy distribution are stored in this
+    class. Each particle type is stored separately.
     """
 
-    def __init__(self, *spectra):
+    def __init__(self, *spectra: SurfaceTuple):
         """
         :param spectra: a collection of GenerationProbabilities.
         """
@@ -127,41 +31,35 @@ class GenerationSurfaceCollection:
         for spec in spectra:
             self._insert(spec)
 
-    def _insert(self, surface: GenerationSurface) -> None:
-        assert isinstance(surface, GenerationSurface)
+    def _insert(self, surface: SurfaceTuple) -> None:
         key = int(surface.pdgid)
         if key not in self.spectra:
             self.spectra[key] = []
 
         for i, spec in enumerate(self.spectra[key]):
-            if surface.is_compatible(spec):
-                self.spectra[key][i] = spec + surface
+            if surface.energy_dist == spec.energy_dist and surface.spatial_dist == spec.spatial_dist:
+                self.spectra[key][i] = spec._replace(nevents=surface.nevents + spec.nevents)
                 break
         else:
             self.spectra[key].append(deepcopy(surface))
 
-    def __add__(self, other: SurfaceType) -> GenerationSurfaceCollection:
-        if np.isscalar(other) and other == 0:
-            return self
+    def __add__(self, other: GenerationSurfaceCollection) -> GenerationSurfaceCollection:
         output = deepcopy(self)
-        if isinstance(other, GenerationSurface):
-            output._insert(other)
-        elif isinstance(other, GenerationSurfaceCollection):
-            for _, ospectra in other.spectra.items():
-                for ospec in ospectra:
-                    output._insert(ospec)
-        else:
+        if not isinstance(other, GenerationSurfaceCollection):
             raise TypeError(f"Cannot add {type(self)} to {type(other)}")
+        for _, ospectra in other.spectra.items():
+            for ospec in ospectra:
+                output._insert(ospec)
         return output
 
-    def __radd__(self, other: SurfaceType) -> GenerationSurfaceCollection:
+    def __radd__(self, other: GenerationSurfaceCollection) -> GenerationSurfaceCollection:
         return self + other
 
     def __mul__(self, factor: float) -> GenerationSurfaceCollection:
         new_surface = deepcopy(self)
         for subsurf in new_surface.spectra.values():
             for i, _ in enumerate(subsurf):
-                subsurf[i] *= factor
+                subsurf[i] = subsurf[i]._replace(nevents=factor * subsurf[i].nevents)
         return new_surface
 
     def __rmul__(self, factor: float) -> GenerationSurfaceCollection:
@@ -184,7 +82,8 @@ class GenerationSurfaceCollection:
                 masked_energy = energy[mask]
                 masked_cos_zen = cos_zen[mask]
                 count[mask] += sum(
-                    p.get_epdf(ptype, masked_energy, masked_cos_zen) for p in self.spectra[ptype]
+                    p.nevents * p.energy_dist.pdf(masked_energy) * p.spatial_dist.pdf(masked_cos_zen)
+                    for p in self.spectra[ptype]
                 )
         return count
 
@@ -260,14 +159,21 @@ class GenerationSurfaceCollection:
 
     def __str__(self) -> str:
         outstrs = []
-        for specs in self.spectra.values():
+        for pdgid, specs in self.spectra.items():
             collections = []
             for subspec in specs:
                 collections.append(f"N={subspec.nevents} {subspec.energy_dist} {subspec.spatial_dist}")
-            outstrs.append(
-                f"     {specs[0].particle_name:11} : " + "\n                   ".join(collections)
-            )
+            outstrs.append(f"     {pdgid:11} : " + "\n                   ".join(collections))
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
 
 
-SurfaceType = Union[GenerationSurface, GenerationSurfaceCollection, float]
+def generation_surface(pdgid: Union[int, PDGCode], energy_dist: PowerLaw, spatial_dist: SpatialDist):
+    """
+    Convenience function to generate a GenerationSurfaceCollection for a single particle type
+    """
+    return GenerationSurfaceCollection(
+        SurfaceTuple(pdgid=pdgid, nevents=1.0, energy_dist=energy_dist, spatial_dist=spatial_dist)
+    )
+
+
+NullSurface = GenerationSurfaceCollection()

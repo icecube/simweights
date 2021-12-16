@@ -23,7 +23,7 @@ class TestNugenDatasets(unittest.TestCase):
 
         solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
 
-        cylinder = w.surface.spatial_dist
+        cylinder = w.surface.spectra[12][0].spatial_dist
         proj_area = cylinder.projected_area(0)
         injection_area = np.pi * (wd["InjectionSurfaceR"] * 1e2) ** 2
         np.testing.assert_allclose(proj_area, injection_area)
@@ -31,7 +31,7 @@ class TestNugenDatasets(unittest.TestCase):
         sw_etendue = 1 / cylinder.pdf(0)
         np.testing.assert_allclose(sw_etendue, solid_angle * injection_area, 1e-5)
 
-        power_law = w.surface.energy_dist
+        power_law = w.surface.spectra[12][0].energy_dist
         energy_factor = 1 / power_law.pdf(wd["PrimaryNeutrinoEnergy"])
         total_weight = wd["TotalInteractionProbabilityWeight"]
 

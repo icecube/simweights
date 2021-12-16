@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from .generation_surface import GenerationSurface
+from .generation_surface import NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import NaturalRateCylinder
 from .utils import constcol, get_column, get_table, has_table
@@ -30,9 +30,9 @@ def sframe_corsika_surface(table, oversampling):
         else:
             oversampling_val = 1
         surfaces.append(
-            row["n_events"] * oversampling_val * GenerationSurface(row["primary_type"], spectrum, spatial)
+            row["n_events"] * oversampling_val * generation_surface(row["primary_type"], spectrum, spatial)
         )
-    return sum(surfaces)
+    return sum(surfaces, NullSurface)
 
 
 def weight_map_corsika_surface(table):
@@ -61,8 +61,8 @@ def weight_map_corsika_surface(table):
             constcol(table, "EnergyPrimaryMax", mask),
         )
         nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
-        surface.append(nevents * GenerationSurface(pdgid, spectrum, spatial))
-    return sum(surface)
+        surface.append(nevents * generation_surface(pdgid, spectrum, spatial))
+    return sum(surface, NullSurface)
 
 
 def CorsikaWeighter(infile, nfiles=None):

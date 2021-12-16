@@ -5,7 +5,7 @@ from copy import copy
 
 import numpy as np
 
-from simweights import TIG1996, GenerationSurface, NaturalRateCylinder, PowerLaw
+from simweights import TIG1996, NaturalRateCylinder, PowerLaw, generation_surface
 from simweights.weighter import Weighter
 
 
@@ -40,7 +40,7 @@ class TestWeighter(unittest.TestCase):
         )
         cls.c1 = NaturalRateCylinder(100, 200, 0, 1)
         cls.p1 = PowerLaw(0, 5e5, 5e6)
-        cls.s1 = cls.N1 * GenerationSurface(2212, cls.p1, cls.c1)
+        cls.s1 = cls.N1 * generation_surface(2212, cls.p1, cls.c1)
         cls.m1 = dict(
             pdgid=("I3Weight", "type"),
             energy=("I3Weight", "energy"),
@@ -231,7 +231,7 @@ class TestWeighter(unittest.TestCase):
                 zenith=np.full(N1, np.pi / 4),
             )
         )
-        s1 = N1 * GenerationSurface(14, self.p1, self.c1)
+        s1 = N1 * generation_surface(14, self.p1, self.c1)
         weighter1 = Weighter([(data1, self.m1)], s1)
 
         honda = nuflux.makeFlux("honda2006")
@@ -242,10 +242,11 @@ class TestWeighter(unittest.TestCase):
         self.assertEqual(float(weighter1.tostring(honda).split("*")[0].strip()), N1)
 
     def test_string(self):
-        self.assertEqual(float(str(self.weighter1).split("*")[0].strip()), self.N1)
-        self.assertEqual(float(self.weighter1.tostring(fluxfun1).split("*")[0].strip()), self.N1)
-        self.assertEqual(float(str(self.weighter1).split("*")[0].strip()), self.N1)
-        self.assertEqual(float(self.weighter1.tostring(fluxfun2).split("*")[0].strip()), self.N1)
+        string1 = str(self.weighter1)
+        self.assertIn(str(self.s1), string1)
+        string2 = self.weighter1.tostring(fluxfun1)
+        self.assertIn(str(self.s1), string2)
+        self.assertIn(f"{self.weighter1.get_weights(fluxfun1).sum():8.6g}", string2)
 
 
 if __name__ == "__main__":

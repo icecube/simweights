@@ -8,7 +8,7 @@ from typing import Any, Callable, Iterable, Optional, Set, Union
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .generation_surface import GenerationSurface, GenerationSurfaceCollection
+from .generation_surface import GenerationSurfaceCollection
 from .utils import get_column, get_table
 
 
@@ -22,9 +22,7 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(
-        self, data: Iterable[tuple], surface: Union[GenerationSurface, GenerationSurfaceCollection]
-    ):
+    def __init__(self, data: Iterable[tuple], surface: GenerationSurfaceCollection):
         colnames: Set[str] = set()
         for _, event_map in data:
             keys = set(event_map.keys())
