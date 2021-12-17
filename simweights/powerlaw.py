@@ -1,7 +1,7 @@
 from typing import Any, Union
 
 import numpy as np
-from numpy.random.mtrand import RandomState
+from numpy.random import RandomState
 from numpy.typing import ArrayLike, NDArray
 from scipy._lib._util import check_random_state  # type: ignore
 
@@ -42,20 +42,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _pdf(self, x: NDArray[np.floating]) -> NDArray[np.floating]:
         return x ** self.g / self.integral
 
-    def _cdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _cdf(self, x: NDArray[np.floating]) -> NDArray[np.floating]:
         if self.G == 0:
             return np.log(x / self.a) / self.integral
         return (x ** self.G - self.a ** self.G) / self.G / self.integral
 
-    def _ppf(self, q: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _ppf(self, q: NDArray[np.floating]) -> NDArray[np.floating]:
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
         return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
 
-    def pdf(self, x: ArrayLike) -> NDArray[np.float64]:
+    def pdf(self, x: ArrayLike) -> NDArray[np.floating]:
         r"""
         Probability density function
 
@@ -68,7 +68,7 @@ class PowerLaw:
         xa = np.asfarray(x)
         return np.piecewise(xa, [(xa >= self.a) & (xa <= self.b)], [self._pdf])
 
-    def cdf(self, x: ArrayLike) -> NDArray[np.float64]:
+    def cdf(self, x: ArrayLike) -> NDArray[np.floating]:
         r"""
         Cumulative distribution function
 
@@ -81,7 +81,7 @@ class PowerLaw:
         qa = np.asfarray(x)
         return np.piecewise(qa, [qa < self.a, qa > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q: ArrayLike) -> NDArray[np.float64]:
+    def ppf(self, q: ArrayLike) -> NDArray[np.floating]:
         """
         Percent point function (inverse of `cdf`) at `q`.
 
@@ -96,7 +96,7 @@ class PowerLaw:
 
     def rvs(
         self, size: Any = None, random_state: Union[None, int, RandomState] = None
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.floating]:
         """
         Random variates
 

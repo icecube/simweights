@@ -7,7 +7,7 @@ from typing import Any, Callable, Iterable, Mapping, Optional, Set, Union
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .generation_surface import GenerationSurfaceCollection
+from .generation_surface import GenerationSurface
 from .utils import get_column, get_table
 
 
@@ -21,7 +21,7 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self, data: Iterable[tuple[Any, Mapping]], surface: GenerationSurfaceCollection):
+    def __init__(self, data: Iterable[tuple[Any, Mapping]], surface: GenerationSurface):
         colnames: Set[str] = set()
         for _, event_map in data:
             keys = set(event_map.keys())
@@ -35,7 +35,7 @@ class Weighter:
         self.colnames = sorted(colnames)
         self.__cache: dict = {}
 
-    def get_column(self, table: str, column: str) -> NDArray[np.float64]:
+    def get_column(self, table: str, column: str) -> NDArray[np.floating]:
         """
         Helper function to get a specific column from the file
         """
@@ -45,7 +45,7 @@ class Weighter:
         print("RETVAL", retval)
         return retval
 
-    def get_weight_column(self, name: str) -> NDArray[np.float64]:
+    def get_weight_column(self, name: str) -> NDArray[np.floating]:
         """
         Helper function to get a column needed in the weight calculation
         """
@@ -71,7 +71,7 @@ class Weighter:
         self.__cache[name] = retval
         return retval
 
-    def get_weights(self, flux: Any) -> NDArray[np.float64]:
+    def get_weights(self, flux: Any) -> NDArray[np.floating]:
         """
         Calculate the weights for the sample for the given flux.
 
@@ -143,7 +143,7 @@ class Weighter:
 
     def effective_area(
         self, energy_bins: ArrayLike, cos_zenith_bins: ArrayLike, mask: Optional[ArrayLike] = None
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.floating]:
         r"""
         Calculate The effective area for the given energy and zenith bins.
 

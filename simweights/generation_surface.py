@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import namedtuple
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -15,7 +15,7 @@ from .pdgcode import PDGCode
 SurfaceTuple = namedtuple("SurfaceTuple", ["pdgid", "nevents", "energy_dist", "spatial_dist"])
 
 
-class GenerationSurfaceCollection:
+class GenerationSurface:
     """
     This class represents a surface on which Monte Carlo simulation was generated on.
 
@@ -43,29 +43,29 @@ class GenerationSurfaceCollection:
         else:
             self.spectra[key].append(deepcopy(surface))
 
-    def __add__(self, other: GenerationSurfaceCollection) -> GenerationSurfaceCollection:
+    def __add__(self, other: GenerationSurface) -> GenerationSurface:
         output = deepcopy(self)
-        if not isinstance(other, GenerationSurfaceCollection):
+        if not isinstance(other, GenerationSurface):
             raise TypeError(f"Cannot add {type(self)} to {type(other)}")
         for _, ospectra in other.spectra.items():
             for ospec in ospectra:
                 output._insert(ospec)
         return output
 
-    def __radd__(self, other: GenerationSurfaceCollection) -> GenerationSurfaceCollection:
+    def __radd__(self, other: GenerationSurface) -> GenerationSurface:
         return self + other
 
-    def __mul__(self, factor: float) -> GenerationSurfaceCollection:
+    def __mul__(self, factor: float) -> GenerationSurface:
         new_surface = deepcopy(self)
         for subsurf in new_surface.spectra.values():
             for i, _ in enumerate(subsurf):
                 subsurf[i] = subsurf[i]._replace(nevents=factor * subsurf[i].nevents)
         return new_surface
 
-    def __rmul__(self, factor: float) -> GenerationSurfaceCollection:
+    def __rmul__(self, factor: float) -> GenerationSurface:
         return self.__mul__(factor)
 
-    def get_epdf(self, pdgid: ArrayLike, energy: ArrayLike, cos_zen: ArrayLike) -> NDArray[np.float64]:
+    def get_epdf(self, pdgid: ArrayLike, energy: ArrayLike, cos_zen: ArrayLike) -> NDArray[np.floating]:
         """
         Get the extended pdf of an event.
 
@@ -134,8 +134,10 @@ class GenerationSurfaceCollection:
         assert np.isfinite(czmax)
         return czmin, czmax
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         # must handle the same set of particle types
+        if not isinstance(other, GenerationSurface):
+            return False
         if set(self.spectra.keys()) != set(other.spectra.keys()):
             return False
         for pdgid, spec1 in self.spectra.items():
@@ -174,11 +176,11 @@ class GenerationSurfaceCollection:
 
 def generation_surface(pdgid: Union[int, PDGCode], energy_dist: PowerLaw, spatial_dist: SpatialDist):
     """
-    Convenience function to generate a GenerationSurfaceCollection for a single particle type
+    Convenience function to generate a GenerationSurface for a single particle type
     """
-    return GenerationSurfaceCollection(
+    return GenerationSurface(
         SurfaceTuple(pdgid=pdgid, nevents=1.0, energy_dist=energy_dist, spatial_dist=spatial_dist)
     )
 
 
-NullSurface = GenerationSurfaceCollection()
+NullSurface = GenerationSurface()

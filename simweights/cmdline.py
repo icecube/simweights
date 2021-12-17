@@ -1,12 +1,12 @@
 import argparse
 import sys
 
-import pandas as pd
+import pandas as pd  # type: ignore
 
 import simweights
 
 
-def find_weighter(fileobj: pd.HDFStore, nfiles: int):
+def find_weighter(fileobj: pd.HDFStore, nfiles: int) -> simweights.Weighter:
     """
     Try to automatically determine which type of file this is and return the correct weighter
     """

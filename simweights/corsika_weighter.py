@@ -3,16 +3,14 @@ from typing import Any, Iterable, Mapping, Optional, Tuple
 
 import numpy as np
 
-from .generation_surface import GenerationSurfaceCollection, NullSurface, generation_surface
+from .generation_surface import GenerationSurface, NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import NaturalRateCylinder
 from .utils import constcol, get_column, get_table, has_table
 from .weighter import Weighter
 
 
-def sframe_corsika_surface(
-    table: Iterable[Mapping[str, float]], oversampling: bool
-) -> GenerationSurfaceCollection:
+def sframe_corsika_surface(table: Iterable[Mapping[str, float]], oversampling: bool) -> GenerationSurface:
     """
     Inspect the rows of a CORSIKA S-Frame table object to generate a surface object. This function works
     on files generated with either triggered CORSIKA or corsika-reader because `I3PrimaryInjectorInfo` and
@@ -40,7 +38,7 @@ def sframe_corsika_surface(
     return sum(surfaces, NullSurface)
 
 
-def weight_map_corsika_surface(table: Any) -> GenerationSurfaceCollection:
+def weight_map_corsika_surface(table: Any) -> GenerationSurface:
     """
     Inspect the `CorsikaWeightMap` table object of a corsika file to generate a surface object
 

@@ -37,7 +37,7 @@ def get_column(table: Any, name: str) -> NDArray[np.floating]:
     """
     if hasattr(table, "cols"):
         return getattr(table.cols, name)[:]
-    return np.array(table[name])
+    return np.asfarray(table[name])
 
 
 def constcol(table: Any, colname: str, mask: NDArray[np.bool_] = None) -> float:
@@ -57,7 +57,7 @@ def constcol(table: Any, colname: str, mask: NDArray[np.bool_] = None) -> float:
     return val
 
 
-def corsika_to_pdg(cid: ArrayLike) -> NDArray:
+def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.floating]:
     """
     Convert CORSIKA particle code to particle data group (PDG) Monte Carlo
     numbering scheme.
@@ -73,7 +73,7 @@ def corsika_to_pdg(cid: ArrayLike) -> NDArray:
     Returns:
         array_like: PDG codes
     """
-    cid = np.asarray(cid)
+    cid = np.asarray(cid, dtype=int)
     return np.piecewise(
         cid,
         [cid == 14, (cid >= 100) & (cid <= 9999)],
@@ -98,7 +98,7 @@ def check_run_counts(table: Any, nfiles: int) -> bool:  # pragma: no cover
     return ret
 
 
-def check_nfiles(runcol: NDArray):  # pragma: no cover
+def check_nfiles(runcol: NDArray[np.integer]):  # pragma: no cover
     # pylint: disable=import-outside-toplevel
     """
     check that the number of jobs in the file is what the user claims they are

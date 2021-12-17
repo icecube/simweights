@@ -12,7 +12,7 @@ However they have been refactored to:
 """
 from typing import Callable, List, Mapping, Union
 
-from numpy import bool_, broadcast_arrays, exp, float_, int_, piecewise, sqrt
+from numpy import bool_, broadcast_arrays, exp, floating, integer, piecewise, sqrt
 from numpy.typing import ArrayLike, NDArray
 
 from .pdgcode import PDGCode
@@ -32,13 +32,13 @@ class CosmicRayFlux:
     """
 
     pdgids: List[PDGCode] = []
-    _funcs: List[Union[Callable[[float], float], float]] = []
+    _funcs: List[Union[float, Callable[[float], float]]] = []
 
-    def _condition(self, energy: NDArray[float_], pdgid: NDArray[int_]) -> List[NDArray[bool_]]:
+    def _condition(self, energy: NDArray[floating], pdgid: NDArray[integer]) -> List[NDArray[bool_]]:
         # pylint: disable=unused-argument
         return [pdgid == p for p in self.pdgids]
 
-    def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float_]:
+    def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[floating]:
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
         pcond = self._condition(energy_arr, pdgid_arr)
         return piecewise(energy, pcond, self._funcs)
@@ -273,7 +273,7 @@ class Honda2004(CosmicRayFlux):
         lambda E: (0.000445 / 56.26) * (E / 56.26 + 3.07 * exp(-0.41 * sqrt(E / 56.26))) ** (-2.68),
     ]
 
-    def _condition(self, energy: NDArray[float_], pdgid: NDArray[int_]) -> List[NDArray[bool_]]:
+    def _condition(self, energy: NDArray[floating], pdgid: NDArray[integer]) -> List[NDArray[bool_]]:
         return [
             (pdgid == 2212) * (energy < 100),
             (pdgid == 2212) * (energy >= 100),
@@ -293,7 +293,7 @@ class TIG1996(CosmicRayFlux):
     pdgids = [PDGCode.PPlus]
     _funcs = [lambda E: 1.70 * E ** -2.7, lambda E: 1.74e2 * E ** -3.0, 0]
 
-    def _condition(self, energy: NDArray[float_], pdgid: NDArray[int_]) -> List[NDArray[bool_]]:
+    def _condition(self, energy: NDArray[floating], pdgid: NDArray[integer]) -> List[NDArray[bool_]]:
         return [(pdgid == 2212) * (energy < 5e6), (pdgid == 2212) * (energy >= 5e6)]
 
 
@@ -350,7 +350,7 @@ class FixedFractionFlux(CosmicRayFlux):
         if normalized:
             assert sum(self.fracs) == 1.0
 
-    def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float_]:
+    def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[floating]:
         """
         :param E: particle energy in GeV
         :param pdgid: particle type code

@@ -5,7 +5,7 @@ from copy import deepcopy
 import numpy as np
 
 from simweights import (
-    GenerationSurfaceCollection,
+    GenerationSurface,
     NaturalRateCylinder,
     NullSurface,
     PDGCode,
@@ -105,7 +105,7 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(sb, self.s0)
 
         s = self.s0 + self.s1
-        self.assertEqual(type(s), GenerationSurfaceCollection)
+        self.assertEqual(type(s), GenerationSurface)
         self.assertEqual(s.spectra[2212][0].nevents, 30000)
         self.assertNotEqual(s, self.s0)
         self.assertNotEqual(s, self.s1)
@@ -116,7 +116,7 @@ class Testgeneration_surface(unittest.TestCase):
         )
 
         ss = self.s0 + self.s2
-        self.assertEqual(type(ss), GenerationSurfaceCollection)
+        self.assertEqual(type(ss), GenerationSurface)
         self.assertEqual(len(ss.spectra), 1)
         self.assertEqual(len(ss.spectra[2212]), 2)
         self.assertEqual(ss.spectra[2212][0], self.s0.spectra[2212][0])
@@ -126,7 +126,7 @@ class Testgeneration_surface(unittest.TestCase):
         )
 
         s3 = self.s0 + self.s3
-        self.assertEqual(type(s3), GenerationSurfaceCollection)
+        self.assertEqual(type(s3), GenerationSurface)
         self.assertEqual(len(s3.spectra), 1)
         self.assertEqual(len(s3.spectra[2212]), 2)
         self.assertEqual(s3.spectra[2212][0], self.s0.spectra[2212][0])
@@ -136,7 +136,7 @@ class Testgeneration_surface(unittest.TestCase):
         )
 
         s4 = self.s0 + self.s4
-        self.assertEqual(type(s4), GenerationSurfaceCollection)
+        self.assertEqual(type(s4), GenerationSurface)
         self.assertEqual(len(s4.spectra), 2)
         self.assertEqual(len(s4.spectra[2212]), 1)
         self.assertEqual(len(s4.spectra[2213]), 1)
@@ -259,20 +259,20 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(sb, self.gsc1)
 
         s0 = self.gsc1 + self.s0
-        self.assertEqual(type(s0), GenerationSurfaceCollection)
+        self.assertEqual(type(s0), GenerationSurface)
         self.assertEqual(len(s0.spectra), 1)
         self.assertEqual(len(s0.spectra[2212]), 1)
         self.assertEqual(s0.spectra[2212][0].nevents, 40000)
 
         s2 = self.gsc2 + self.s0
-        self.assertEqual(type(s2), GenerationSurfaceCollection)
+        self.assertEqual(type(s2), GenerationSurface)
         self.assertEqual(len(s2.spectra), 1)
         self.assertEqual(len(s2.spectra[2212]), 2)
         self.assertEqual(s2.spectra[2212][0].nevents, 20000)
         self.assertEqual(s2.spectra[2212][1].nevents, 10000)
 
         s4 = self.gsc4 + self.s0
-        self.assertEqual(type(s4), GenerationSurfaceCollection)
+        self.assertEqual(type(s4), GenerationSurface)
         self.assertEqual(len(s4.spectra), 2)
         self.assertEqual(len(s4.spectra[2212]), 1)
         self.assertEqual(len(s4.spectra[2213]), 1)
@@ -280,14 +280,14 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(s4.spectra[2213][0].nevents, 10000)
 
         s5 = self.gsc1 + self.gsc2
-        self.assertEqual(type(s5), GenerationSurfaceCollection)
+        self.assertEqual(type(s5), GenerationSurface)
         self.assertEqual(len(s5.spectra), 1)
         self.assertEqual(len(s5.spectra[2212]), 2)
         self.assertEqual(s5.spectra[2212][0].nevents, 40000)
         self.assertEqual(s5.spectra[2212][1].nevents, 10000)
 
         s6 = self.gsc2 + self.gsc4
-        self.assertEqual(type(s6), GenerationSurfaceCollection)
+        self.assertEqual(type(s6), GenerationSurface)
         self.assertEqual(len(s6.spectra), 2)
         self.assertEqual(len(s6.spectra[2212]), 2)
         self.assertEqual(len(s6.spectra[2213]), 1)
@@ -332,6 +332,9 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(s1.spectra[2212][1], self.s3.spectra[2212][0]._replace(nevents=4.5 * self.N1))
 
     def test_equal_gsc(self):
+        self.assertNotEqual(None, self.gsc1)
+        self.assertNotEqual([], self.gsc1)
+        self.assertNotEqual(self.c1, self.gsc1)
         self.assertEqual(self.gsc1, self.gsc1)
         self.assertEqual(self.gsc2, self.gsc2)
         self.assertEqual(self.gsc3, self.gsc3)
@@ -356,7 +359,7 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(self.gsc4, eval(repr(self.gsc4)))
 
         s = str(self.gsc2 + self.gsc3 + self.gsc4).split("\n")
-        self.assertEqual(s[0], "< GenerationSurfaceCollection")
+        self.assertEqual(s[0], "< GenerationSurface")
         self.assertEqual(eval("".join(s[1].split()[-4:])), self.c1)
         self.assertEqual(eval("".join(s[1].split()[-7:-4])), self.p1)
         self.assertEqual(eval("".join(s[2].split()[-4:])), self.c1)

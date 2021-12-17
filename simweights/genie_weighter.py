@@ -2,14 +2,14 @@ from typing import Any, Iterable, Mapping
 
 import numpy as np
 
-from .generation_surface import GenerationSurfaceCollection, NullSurface, generation_surface
+from .generation_surface import GenerationSurface, NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import CircleInjector
 from .utils import get_table
 from .weighter import Weighter
 
 
-def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurfaceCollection:
+def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
     """
     Inspect the rows of a GENIE S-Frame table object to generate a surface object.
     """

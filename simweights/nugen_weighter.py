@@ -2,7 +2,7 @@ from typing import Any
 
 import numpy as np
 
-from .generation_surface import GenerationSurfaceCollection, NullSurface, generation_surface
+from .generation_surface import GenerationSurface, NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import CircleInjector, SpatialDist, UniformSolidAngleCylinder
 from .utils import constcol, get_column, get_table, has_column
@@ -59,7 +59,7 @@ def nugen_spectrum(table: Any) -> PowerLaw:
     return PowerLaw(power_law_index, min_energy, max_energy)
 
 
-def nugen_surface(table: Any) -> GenerationSurfaceCollection:
+def nugen_surface(table: Any) -> GenerationSurface:
     """
     Inspect the `I3MCWeightDict` table object of a nugen file to generate a surface object
     """
