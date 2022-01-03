@@ -12,7 +12,7 @@ However they have been refactored to:
 """
 from typing import Callable, List, Mapping, Union
 
-from numpy import bool_, broadcast_arrays, exp, floating, integer, piecewise, sqrt
+from numpy import asfarray, bool_, broadcast_arrays, exp, floating, integer, piecewise, sqrt
 from numpy.typing import ArrayLike, NDArray
 
 from .pdgcode import PDGCode
@@ -357,6 +357,7 @@ class FixedFractionFlux(CosmicRayFlux):
         :type pdgid: int
         """
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
+        energy_arr = asfarray(energy_arr)
         fluxsum = sum(self.flux(energy_arr, p) for p in self.pdgids)
         cond = self._condition(energy_arr, pdgid_arr)
         return fluxsum * piecewise(energy, cond, self.fracs)

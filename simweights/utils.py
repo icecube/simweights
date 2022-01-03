@@ -113,7 +113,7 @@ def check_nfiles(runcol: NDArray[np.integer]):  # pragma: no cover
     rmin = run_counts.min()
     rmax = run_counts.max()
 
-    hist_y, hist_x = np.histogram(run_counts, range=[rmin, rmax + 1], bins=rmax - rmin + 1)
+    hist_y, hist_x = np.histogram(run_counts, range=(rmin, rmax + 1), bins=rmax - rmin + 1)
     hist_x = hist_x[:-1]
     prob = stats.poisson.pmf(hist_x, rmean)
     # pp = stats.poisson.logpmf(hist_y, p)

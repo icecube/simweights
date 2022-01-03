@@ -1,3 +1,4 @@
+import numbers
 import warnings
 from typing import Any, Iterable, Mapping, Optional, Tuple
 
@@ -121,8 +122,10 @@ def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
 
     else:
 
-        if not np.isscalar(nfiles):
-            raise TypeError("CorsikaWeighter: Nfiles must be an integer. Got " + str(nfiles))
+        if not isinstance(nfiles, numbers.Number):
+            raise TypeError(
+                "CorsikaWeighter: argument nfiles must be a floating point number. Got " + str(nfiles)
+            )
 
         if has_table(infile, "I3CorsikaInfo"):
             warnings.warn(
