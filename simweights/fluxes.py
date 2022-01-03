@@ -357,10 +357,9 @@ class FixedFractionFlux(CosmicRayFlux):
         :type pdgid: int
         """
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
-        energy_arr = asfarray(energy_arr)
         fluxsum = sum(self.flux(energy_arr, p) for p in self.pdgids)
         cond = self._condition(energy_arr, pdgid_arr)
-        return fluxsum * piecewise(energy, cond, self.fracs)
+        return asfarray(fluxsum * piecewise(energy, cond, self.fracs))
 
 
 class _references:
