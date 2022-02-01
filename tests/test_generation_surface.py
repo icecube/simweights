@@ -197,7 +197,7 @@ class Testgeneration_surface(unittest.TestCase):
         w = 1 / self.s0.get_epdf(2212, E, cz)
 
         area = (self.p1.b - self.p1.a) * (
-            2e4 * self.c1.radius * np.pi ** 2 * (self.c1.radius + self.c1.length)
+            2e4 * self.c1.radius * np.pi**2 * (self.c1.radius + self.c1.length)
         )
 
         self.assertAlmostEqual(
@@ -215,7 +215,7 @@ class Testgeneration_surface(unittest.TestCase):
         cz = np.linspace(self.c1.cos_zen_min, self.c1.cos_zen_max, N)
         q = np.linspace(1 / 2 / N, 1 - 1 / 2 / N, N)
         E1 = 10 * np.exp(q * np.log(100 / 10))
-        E2 = (q * (500 ** -1 - 50 ** -1) + 50 ** -1) ** -1
+        E2 = (q * (500**-1 - 50**-1) + 50**-1) ** -1
 
         surf = self.s0 + self.s2
         E = np.r_[E1, E2]

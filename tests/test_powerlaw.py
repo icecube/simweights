@@ -47,7 +47,7 @@ class TestPowerLaw(unittest.TestCase):
 
     def check_vals(self, p):
         x = np.linspace(p.a, p.b, 51)
-        v1 = p.pdf(x) * x ** -p.g
+        v1 = p.pdf(x) * x**-p.g
         np.testing.assert_allclose(v1, v1[0])
 
         c0 = [quad(p.pdf, p.a, xx)[0] for xx in x]

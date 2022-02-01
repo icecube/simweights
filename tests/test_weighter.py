@@ -10,20 +10,20 @@ from simweights.weighter import Weighter
 
 
 def fluxfun1(energy):
-    return energy ** 2
+    return energy**2
 
 
 def fluxfun2(pdgid, energy):
-    return energy ** 2
+    return energy**2
 
 
 def fluxfun3(pdgid, energy, cos_zen):
-    return cos_zen * energy ** 2
+    return cos_zen * energy**2
 
 
 class fake_nuflux:
     def getFlux(self, particle_type, energy, cos_zenith):
-        return energy ** -3 / cos_zenith
+        return energy**-3 / cos_zenith
 
 
 class TestWeighter(unittest.TestCase):
@@ -152,9 +152,9 @@ class TestWeighter(unittest.TestCase):
 
     def test_bad_column(self):
         with self.assertRaises(ValueError):
-            self.weighter1.get_weights(lambda asdf: asdf ** -2)
+            self.weighter1.get_weights(lambda asdf: asdf**-2)
         with self.assertRaises(ValueError):
-            self.weighter2.get_weights(lambda x: x ** -2)
+            self.weighter2.get_weights(lambda x: x**-2)
 
     def test_outside(self):
         data = dict(

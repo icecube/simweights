@@ -38,22 +38,22 @@ class PowerLaw:
         if self.G == 0:
             self.integral = np.log(self.b / self.a)
         else:
-            self.integral = (self.b ** self.G - self.a ** self.G) / self.G
+            self.integral = (self.b**self.G - self.a**self.G) / self.G
 
         self.span = b - a
 
     def _pdf(self, x: NDArray[np.floating]) -> NDArray[np.floating]:
-        return x ** self.g / self.integral
+        return x**self.g / self.integral
 
     def _cdf(self, x: NDArray[np.floating]) -> NDArray[np.floating]:
         if self.G == 0:
             return np.log(x / self.a) / self.integral
-        return (x ** self.G - self.a ** self.G) / self.G / self.integral
+        return (x**self.G - self.a**self.G) / self.G / self.integral
 
     def _ppf(self, q: NDArray[np.floating]) -> NDArray[np.floating]:
         if self.G == 0:
             return self.a * np.exp(q * self.integral)
-        return (q * self.G * self.integral + self.a ** self.G) ** (1 / self.G)
+        return (q * self.G * self.integral + self.a**self.G) ** (1 / self.G)
 
     def pdf(self, x: ArrayLike) -> NDArray[np.floating]:
         r"""

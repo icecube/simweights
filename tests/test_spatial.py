@@ -13,32 +13,32 @@ class TestSpatial(unittest.TestCase):
         le *= 1e2
         r *= 1e2
 
-        self.assertAlmostEqual(c.projected_area(-1), np.pi * r ** 2, 5)
-        self.assertAlmostEqual(c.projected_area(-0.5), np.pi * r ** 2 / 2 + 3 ** 0.5 * le * r, 5)
-        self.assertAlmostEqual(c.projected_area(-1 / 2 ** 0.5), r / 2 ** 0.5 * (np.pi * r + 2 * le), 5)
+        self.assertAlmostEqual(c.projected_area(-1), np.pi * r**2, 5)
+        self.assertAlmostEqual(c.projected_area(-0.5), np.pi * r**2 / 2 + 3**0.5 * le * r, 5)
+        self.assertAlmostEqual(c.projected_area(-1 / 2**0.5), r / 2**0.5 * (np.pi * r + 2 * le), 5)
         self.assertAlmostEqual(c.projected_area(0), 2 * le * r)
-        self.assertAlmostEqual(c.projected_area(1 / 2 ** 0.5), r / 2 ** 0.5 * (np.pi * r + 2 * le), 5)
-        self.assertAlmostEqual(c.projected_area(0.5), np.pi * r ** 2 / 2 + 3 ** 0.5 * le * r, 5)
-        self.assertAlmostEqual(c.projected_area(1), np.pi * r ** 2, 5)
+        self.assertAlmostEqual(c.projected_area(1 / 2**0.5), r / 2**0.5 * (np.pi * r + 2 * le), 5)
+        self.assertAlmostEqual(c.projected_area(0.5), np.pi * r**2 / 2 + 3**0.5 * le * r, 5)
+        self.assertAlmostEqual(c.projected_area(1), np.pi * r**2, 5)
 
         with self.assertRaises(AssertionError):
             c.projected_area(-1.01)
         with self.assertRaises(AssertionError):
             c.projected_area(1.01)
 
-        self.assertAlmostEqual(c._diff_etendue(-1), -np.pi ** 2 * r * (r + 2 * le), 4)
+        self.assertAlmostEqual(c._diff_etendue(-1), -np.pi**2 * r * (r + 2 * le), 4)
         self.assertAlmostEqual(
-            c._diff_etendue(-0.5), -np.pi ** 2 / 4 * r * (r + 2 / 3 * le * (3 ** 1.5 / np.pi + 8)), 4
+            c._diff_etendue(-0.5), -np.pi**2 / 4 * r * (r + 2 / 3 * le * (3**1.5 / np.pi + 8)), 4
         )
         self.assertAlmostEqual(
-            c._diff_etendue(-(0.5 ** 0.5)), -np.pi ** 2 / 2 * r * (r + le * (2 / np.pi + 3)), 4
+            c._diff_etendue(-(0.5**0.5)), -np.pi**2 / 2 * r * (r + le * (2 / np.pi + 3)), 4
         )
-        self.assertAlmostEqual(c._diff_etendue(0), -np.pi ** 2 * le * r)
+        self.assertAlmostEqual(c._diff_etendue(0), -np.pi**2 * le * r)
         self.assertAlmostEqual(
-            c._diff_etendue(0.5 ** 0.5), np.pi ** 2 / 2 * r * (r + le * (2 / np.pi - 1)), 5
+            c._diff_etendue(0.5**0.5), np.pi**2 / 2 * r * (r + le * (2 / np.pi - 1)), 5
         )
         self.assertAlmostEqual(
-            c._diff_etendue(0.5), np.pi ** 2 / 4 * r * (r + 2 / 3 * le * (3 ** 1.5 / np.pi - 4)), 4
+            c._diff_etendue(0.5), np.pi**2 / 4 * r * (r + 2 / 3 * le * (3**1.5 / np.pi - 4)), 4
         )
         self.assertAlmostEqual(c._diff_etendue(1), (np.pi * r) ** 2)
 
@@ -81,13 +81,13 @@ class TestSpatial(unittest.TestCase):
             for r in range(100, 1000, 300):
                 c1 = NaturalRateCylinder(le, r, -1, 1)
                 self.check_diff_etendue(c1, le, r)
-                self.check_pdf_etendue(c1, 2 * np.pi ** 2 * r * (r + le))
+                self.check_pdf_etendue(c1, 2 * np.pi**2 * r * (r + le))
 
                 c2 = NaturalRateCylinder(le, r, -1, 0)
-                self.check_pdf_etendue(c2, np.pi ** 2 * r * (r + le))
+                self.check_pdf_etendue(c2, np.pi**2 * r * (r + le))
 
                 c3 = NaturalRateCylinder(le, r, 0, 1)
-                self.check_pdf_etendue(c3, np.pi ** 2 * r * (r + le))
+                self.check_pdf_etendue(c3, np.pi**2 * r * (r + le))
 
                 self.assertEqual(c1, c1)
                 self.assertNotEqual(c1, c2)
@@ -172,13 +172,13 @@ class TestSpatial(unittest.TestCase):
         last_c1 = None
         for r in range(100, 1000, 300):
             c1 = CircleInjector(r, -1, 1)
-            self.check_circle(c1, 4e4 * np.pi ** 2 * r ** 2)
+            self.check_circle(c1, 4e4 * np.pi**2 * r**2)
 
             c2 = CircleInjector(r, -1, 0)
-            self.check_circle(c2, 2e4 * np.pi ** 2 * r ** 2)
+            self.check_circle(c2, 2e4 * np.pi**2 * r**2)
 
             c3 = CircleInjector(r, 0, 1)
-            self.check_circle(c3, 2e4 * np.pi ** 2 * r ** 2)
+            self.check_circle(c3, 2e4 * np.pi**2 * r**2)
 
             self.assertEqual(c1, c1)
             self.assertNotEqual(c1, c2)

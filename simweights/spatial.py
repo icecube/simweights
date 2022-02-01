@@ -21,7 +21,7 @@ class CylinderBase:
         self.cos_zen_min = cos_zen_min
         self.cos_zen_max = cos_zen_max
         self._side = 2e4 * self.radius * self.length
-        self._cap = 1e4 * np.pi * self.radius ** 2
+        self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = float(self._diff_etendue(self.cos_zen_max) - self._diff_etendue(self.cos_zen_min))
 
     def projected_area(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
@@ -31,14 +31,14 @@ class CylinderBase:
         cosz = np.asfarray(cos_zen)
         assert np.all(cosz >= -1)
         assert np.all(cosz <= +1)
-        return self._cap * np.abs(cosz) + self._side * np.sqrt(1 - cosz ** 2)
+        return self._cap * np.abs(cosz) + self._side * np.sqrt(1 - cosz**2)
 
     def _diff_etendue(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
         cosz = np.asfarray(cos_zen)
         assert np.all(cosz >= -1)
         assert np.all(cosz <= +1)
         return np.pi * (
-            self._cap * cosz * np.abs(cosz) + self._side * (cosz * np.sqrt(1 - cosz ** 2) - np.arccos(cosz))
+            self._cap * cosz * np.abs(cosz) + self._side * (cosz * np.sqrt(1 - cosz**2) - np.arccos(cosz))
         )
 
     def pdf(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
@@ -126,7 +126,7 @@ class CircleInjector:
         self.radius = radius
         self.cos_zen_min = cos_zen_min
         self.cos_zen_max = cos_zen_max
-        self._cap = 1e4 * np.pi * self.radius ** 2
+        self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = 2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
         self._normalization = 1 / self.etendue
 
