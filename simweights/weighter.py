@@ -42,7 +42,6 @@ class Weighter:
         retval: NDArray = np.array([])
         for datafile, _ in self.data:
             retval = np.append(retval, get_column(get_table(datafile, table), column))
-        print("RETVAL", retval)
         return retval
 
     def get_weight_column(self, name: str) -> NDArray[np.floating]:
