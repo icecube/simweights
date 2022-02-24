@@ -19,7 +19,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install flit
           python -m flit install --symlink --deps=production --extras=test
+      - name: Download Test Data
+        run: |
+          mkdir simweights_testdata
+          wget --user=icecube --password=${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/user/kmeagher/simweights_testdata.tar.gz
+          tar xzvf simweights_testdata.tar.gz -C simweights_testdata
       - name: Run Tests
+        env:
+          SIMWEIGHTS_TESTDATA: ./simweights_testdata
         run: pytest
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v1

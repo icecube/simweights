@@ -12,9 +12,9 @@ class TestCorsikaDatasets(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.flux = GaisserH4a()
-        datadir = os.environ.get("SIMWEIGHTS_DATA", None)
+        datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
         if not datadir:
-            cls.skipTest(None, "environment variable SIMWEIGHTS_DATA not set")
+            cls.skipTest(None, "environment variable SIMWEIGHTS_TESTDATA not set")
         cls.datadir = datadir + "/"
 
     def cmp_dataset(self, fname, rate):
