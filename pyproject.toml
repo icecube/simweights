@@ -2,15 +2,17 @@
 requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "simweights"
-author = "Kevin Meagher"
-author-email = "kmeagher@icecube.wisc.edu"
-home-page = "https://github.com/icecube/simweights"
-requires = ["numpy", "scipy"]
+[project]
+name = "simweights"
+readme = "README.rst"
+requires-python = "~=3.7"
+license = {file = "LICENCE"}
+authors = [{name = "Kevin Meagher"}]
+keywords = ["python", "science", "astronomy", "astrophysics", "IceCube", "neutrino", "simulation"]
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: POSIX :: Linux',
     'Programming Language :: Python',
@@ -21,13 +23,20 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Physics',
     ]
+dependencies = ["numpy", "scipy"]
+dynamic = ["version", "description"]
 
-[tool.flit.scripts]
-simweights = "simweights.cmdline:main"
+[project.urls]
+Source = "https://github.com/icecube/simweights"
+Documentation = "https://docs.icecube.aq/simweights/main"
+Collaboration = "https://icecube.wisc.edu"
 
-[tool.flit.metadata.requires-extra]
+[project.optional-dependencies]
 test = ["h5py", "tables", "pandas", "pytest-mypy", "pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
+
+[project.scripts]
+simweights = "simweights.cmdline:main"
 
 [tool.coverage.run]
 source = ["simweights"]

@@ -1,5 +1,5 @@
 
-|tests| |docs| |codecov|
+|tests| |docs| |codecov| |LICENSE|
 
 
 .. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg?branch=main
@@ -8,6 +8,8 @@
   :target: https://docs.icecube.aq/simweights/main
 .. |codecov| image:: https://codecov.io/gh/icecube/simweights/branch/main/graph/badge.svg?token=LQ20TAMY9C
   :target: https://codecov.io/gh/icecube/simweights
+.. |LICENSE| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+  :target: https://www.gnu.org/licenses/gpl-3.0
 
 .. badge-break
 
@@ -125,4 +127,9 @@ Contribution to the source code can done via the
 
 .. Contributors
 
-.. License
+License
+=======
+
+Code in this repository is Copyright (c) 2022, The IceCube Collaboration (https://icecube.wisc.edu)
+
+Code in this repository is listened under the GNU General Public License v3.0 or later(GPL-3.0-or-later). A copy is included in the LICENSE file.
