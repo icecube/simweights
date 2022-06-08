@@ -100,18 +100,23 @@ def NuGenWeighter(infile: Any, nfiles: int) -> Weighter:
     weight_table = get_table(infile, "I3MCWeightDict")
     surface = nfiles * nugen_surface(weight_table)
 
-    event_map = dict(
-        energy=("I3MCWeightDict", "PrimaryNeutrinoEnergy"),
-        pdgid=("I3MCWeightDict", "PrimaryNeutrinoType"),
-        zenith=("I3MCWeightDict", "PrimaryNeutrinoZenith"),
+    weighter = Weighter([infile], surface)
+    weighter.add_weight_column("energy", weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoEnergy"))
+    weighter.add_weight_column(
+        "pdgid", weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoType").astype(np.int32)
     )
+    weighter.add_weight_column(
+        "cos_zen", np.cos(weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoZenith"))
+    )
+
     # the event weight is stored in `TotalWeight` in newer simulation and
     # `TotalInteractionProbabilityWeight` in older simulation, so we are gonna need to let the weighter
     # know that
     if has_column(weight_table, "TotalWeight"):
-        event_map["event_weight"] = ("I3MCWeightDict", "TotalWeight")
+        weightname = "TotalWeight"
     else:
         assert has_column(weight_table, "TotalInteractionProbabilityWeight")
-        event_map["event_weight"] = ("I3MCWeightDict", "TotalInteractionProbabilityWeight")
+        weightname = "TotalInteractionProbabilityWeight"
+    weighter.add_weight_column("event_weight", weighter.get_column("I3MCWeightDict", weightname))
 
-    return Weighter([(infile, event_map)], surface)
+    return weighter

@@ -45,9 +45,12 @@ class TestWeighter(unittest.TestCase):
             pdgid=("I3Weight", "type"),
             energy=("I3Weight", "energy"),
             zenith=("I3Weight", "zenith"),
-            event_weight=None,
         )
-        cls.weighter1 = Weighter([(cls.data1, cls.m1)], cls.s1)
+        cls.weighter1 = Weighter([cls.data1], cls.s1)
+        for x, y in cls.m1.items():
+            cls.weighter1.add_weight_column(x, cls.data1[y[0]][y[1]])
+        cls.weighter1.add_weight_column("event_weight", np.full(cls.N1, 1))
+        cls.weighter1.add_weight_column("cos_zen", np.cos(cls.data1["I3Weight"]["zenith"]))
 
         cls.data2 = dict(
             weight=dict(
@@ -63,7 +66,10 @@ class TestWeighter(unittest.TestCase):
             zenith=("weight", "primary_zenith"),
             event_weight=("weight", "ev"),
         )
-        cls.weighter2 = Weighter([(cls.data2, cls.m2)], cls.s1)
+        cls.weighter2 = Weighter([cls.data2], cls.s1)
+        for x, y in cls.m2.items():
+            cls.weighter2.add_weight_column(x, cls.data2[y[0]][y[1]])
+        cls.weighter2.add_weight_column("cos_zen", np.cos(cls.data2["weight"]["primary_zenith"]))
 
     def check_weight(self, weighter, N, val):
         flux = 6
@@ -146,9 +152,16 @@ class TestWeighter(unittest.TestCase):
 
     def test_empty(self):
         fake_file = dict(I3Weight=dict(energy=[], type=[], zenith=[]))
-        weighter = Weighter([(fake_file, self.m1)], 0)
+        weighter = Weighter([fake_file], 0)
+        weighter.add_weight_column("energy", np.array([]))
+        weighter.add_weight_column("pdgid", np.array([]))
+        weighter.add_weight_column("cos_zen", np.array([]))
         weights = weighter.get_weights(1)
         self.assertEqual(weights.shape, (0,))
+
+    def test_wrong_size_column(self):
+        with self.assertRaises(ValueError):
+            self.weighter1.add_weight_column("asdf", np.full(555, 1))
 
     def test_bad_column(self):
         with self.assertRaises(ValueError):
@@ -164,7 +177,11 @@ class TestWeighter(unittest.TestCase):
                 zenith=-np.full(self.N1, 3 * np.pi / 4),
             )
         )
-        weighter = Weighter([(data, self.m1)], self.s1)
+        weighter = Weighter([data], self.s1)
+        weighter.add_weight_column("pdgid", data["I3Weight"]["type"])
+        weighter.add_weight_column("energy", data["I3Weight"]["energy"])
+        weighter.add_weight_column("cos_zen", np.cos(data["I3Weight"]["zenith"]))
+        weighter.add_weight_column("event_weight", np.full(self.N1, 1))
         with self.assertWarns(UserWarning):
             weights = weighter.get_weights(1)
         np.testing.assert_array_equal(weights, 0)
@@ -226,20 +243,23 @@ class TestWeighter(unittest.TestCase):
         N1 = 15
         data1 = dict(
             I3Weight=dict(
-                type=np.full(N1, 14),
+                type=np.full(N1, 14, dtype=np.int32),
                 energy=np.linspace(5e5, 5e6, N1),
                 zenith=np.full(N1, np.pi / 4),
             )
         )
         s1 = N1 * generation_surface(14, self.p1, self.c1)
-        weighter1 = Weighter([(data1, self.m1)], s1)
+        weighter1 = Weighter([data1], s1)
+        weighter1.add_weight_column("pdgid", data1["I3Weight"]["type"])
+        weighter1.add_weight_column("energy", data1["I3Weight"]["energy"])
+        weighter1.add_weight_column("cos_zen", np.cos(data1["I3Weight"]["zenith"]))
+        weighter1.add_weight_column("event_weight", np.full(N1, 1))
 
         honda = nuflux.makeFlux("honda2006")
         w = weighter1.get_weights(honda)
         fluxval = honda.getFlux(14, data1["I3Weight"]["energy"], np.cos(data1["I3Weight"]["zenith"]))
         oneweight = weighter1.get_weights(1)
         np.testing.assert_allclose(w, fluxval * oneweight)
-        self.assertEqual(float(weighter1.tostring(honda).split("*")[0].strip()), N1)
 
     def test_string(self):
         string1 = str(self.weighter1)

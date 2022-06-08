@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import Any, Callable, Iterable, Mapping, Optional, Set, Union
+from typing import Any, Callable, Dict, Iterable, Optional, Union
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -21,54 +21,42 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self, data: Iterable[tuple[Any, Mapping]], surface: GenerationSurface):
-        colnames: Set[str] = set()
-        for _, event_map in data:
-            keys = set(event_map.keys())
-            if colnames:
-                colnames = colnames.intersection(keys)
-            else:
-                colnames = keys
-
+    def __init__(self, data: Iterable, surface: GenerationSurface):
         self.data = list(data)
         self.surface = surface
-        self.colnames = sorted(colnames)
-        self.__cache: dict = {}
+        self.weight_cols: Dict[str, NDArray] = {}
+        self.colnames = sorted(self.weight_cols.keys())
+        self.size: Optional[int] = None
 
     def get_column(self, table: str, column: str) -> NDArray[np.floating]:
         """
         Helper function to get a specific column from the file
         """
         retval: NDArray = np.array([])
-        for datafile, _ in self.data:
+        for datafile in self.data:
             retval = np.append(retval, get_column(get_table(datafile, table), column))
         return retval
+
+    def add_weight_column(self, name: str, column: ArrayLike) -> None:
+        """
+        Add a new column to be passed as parameters to flux models
+        """
+
+        col = np.array(column)
+        if self.size:
+            if self.size != col.size:
+                raise ValueError(f"{self.size}  != {col.size}")
+        else:
+            self.size = col.size
+
+        self.weight_cols[name] = col
+        self.colnames = sorted(self.weight_cols.keys())
 
     def get_weight_column(self, name: str) -> NDArray[np.floating]:
         """
         Helper function to get a column needed in the weight calculation
         """
-        if name in self.__cache:
-            return self.__cache[name]
-
-        if name == "cos_zen":
-            retval = np.cos(self.get_weight_column("zenith"))
-
-        else:
-            retval = np.array([])
-            for datafile, event_map in self.data:
-                if event_map[name] is None:
-                    tablename, columnname = event_map["energy"]
-                    fileval = np.full(len(get_column(get_table(datafile, tablename), columnname)), 1)
-                else:
-                    tablename, columnname = event_map[name]
-                    fileval = get_column(get_table(datafile, tablename), columnname)
-                retval = np.append(retval, fileval)
-            if name == "pdgid":
-                retval = retval.astype(np.int32)
-
-        self.__cache[name] = retval
-        return retval
+        return self.weight_cols[name]
 
     def get_weights(self, flux: Any) -> NDArray[np.floating]:
         """
@@ -79,12 +67,12 @@ class Weighter:
 
             * An instance of :py:class:`nuflux.FluxFunction` from
               `nuflux <https://github.com/icecube/nuflux>`_
-            * A callable where the names of the arguments are match the weight objects weighting columns.
-            * An iterable the same length os the datasample. If you have other means of calculating
+            * A callable where the names of the arguments match the weight objects weighting columns.
+            * An iterable with the same length as the data sample. If you have other means of calculating
               the flux for each event than the above options this can be useful.
             * A scalar number. This calculates the unrealistic scenario where all events have the same
-              flux, this can be useful for testing or calculating effective areas. If the value is 1 then
-              the return value will be the well known quantity OneWeight.
+              flux, this can be useful for testing or calculating effective areas. For neutrinos, If the
+              value is 1 then the return value will be the well known quantity OneWeight.
         """
 
         event_col = {k: self.get_weight_column(k) for k in ["energy", "pdgid", "cos_zen"]}
@@ -179,7 +167,7 @@ class Weighter:
         assert len(cos_zenith_bins) >= 2
 
         energy = self.get_weight_column("energy")
-        cos_zen = np.cos(self.get_weight_column("zenith"))
+        cos_zen = self.get_weight_column("cos_zen")
 
         weights = self.get_weights(1e-4)
         if mask is None:
@@ -204,7 +192,13 @@ class Weighter:
         return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
 
     def __add__(self, other: Weighter) -> Weighter:
-        return Weighter(self.data + other.data, self.surface + other.surface)
+
+        weighter = Weighter(self.data + other.data, self.surface + other.surface)
+
+        for colname, column in self.weight_cols.items():
+            if colname in other.weight_cols:
+                weighter.add_weight_column(colname, np.append(column, other.weight_cols[colname]))
+        return weighter
 
     def tostring(self, flux: Union[None, object, Callable, ArrayLike] = None) -> str:
         """

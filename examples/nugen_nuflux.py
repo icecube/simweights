@@ -14,7 +14,9 @@ primary_energy = weighter.get_column("PolyplopiaPrimary", "energy")
 # create an function to represent the IceCube northern track limit
 # Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
 def NorthernTrack(energy):
-    return 1.44e-18 / 2 * (energy/1e5)**-2.2
+    return 1.44e-18 / 2 * (energy / 1e5) ** -2.2
+
+
 NorthernTrack.name = "Northern Track 9.5 year"
 
 # Create models and put them in a list so we can iterate over them
@@ -35,8 +37,7 @@ for flux_model in models:
     print("{:26} {:8.2f} mHz".format(flux_model.name, 1e6 * weights.sum()))
 
     # histogram the primary energy with the weights
-    plt.hist(primary_energy, weights=weights, bins=bins, 
-        histtype="step", label=flux_model.name)
+    plt.hist(primary_energy, weights=weights, bins=bins, histtype="step", label=flux_model.name)
 # end-box1
 
 # make the plot look good

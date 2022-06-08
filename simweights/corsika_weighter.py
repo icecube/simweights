@@ -1,6 +1,6 @@
 import numbers
 import warnings
-from typing import Any, Iterable, Mapping, Optional, Tuple
+from typing import Any, Iterable, Mapping, Optional
 
 import numpy as np
 
@@ -79,8 +79,6 @@ def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
     of files.
     """
 
-    event_map: Mapping[str, Optional[Tuple[str, str]]] = {}
-
     if has_table(infile, "I3CorsikaWeight"):
         if nfiles is not None:
             raise RuntimeError(
@@ -96,32 +94,21 @@ def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
                 "CORSIKA file based on the existence of the `I3CorsikaWeight` object. However it seems to "
                 "be missing the S-Frames table `I3PrimaryInjectorInfo`."
             )
-        event_map = dict(
-            pdgid=("I3CorsikaWeight", "type"),
-            energy=("I3CorsikaWeight", "energy"),
-            zenith=("I3CorsikaWeight", "zenith"),
-            event_weight=("I3CorsikaWeight", "weight"),
-        )
+
         surface = sframe_corsika_surface(get_table(infile, info_obj), oversampling=False)
+        triggered = True
 
     elif nfiles is None:
-
         info_obj = "I3CorsikaInfo"
         if not has_table(infile, info_obj):
             raise RuntimeError(
                 f"File `{getattr(infile, 'filename', '<NONE>')}` is was not passed an parameter for nfiles "
                 "and no I3CorsikaInfo table was found."
             )
-        event_map = dict(
-            pdgid=("PolyplopiaPrimary", "type"),
-            energy=("PolyplopiaPrimary", "energy"),
-            zenith=("PolyplopiaPrimary", "zenith"),
-            event_weight=None,
-        )
         surface = sframe_corsika_surface(get_table(infile, info_obj), oversampling=True)
+        triggered = False
 
     else:
-
         if not isinstance(nfiles, numbers.Number):
             raise TypeError(
                 "CorsikaWeighter: argument nfiles must be a floating point number. Got " + str(nfiles)
@@ -133,13 +120,22 @@ def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
                 "I3CorsikaInfo table indicating it has S-Frames"
             )
 
-        event_map = dict(
-            energy=("PolyplopiaPrimary", "energy"),
-            pdgid=("PolyplopiaPrimary", "type"),
-            zenith=("PolyplopiaPrimary", "zenith"),
-            event_weight=None,
-        )
         table = get_table(infile, "CorsikaWeightMap")
         surface = nfiles * weight_map_corsika_surface(table)
+        triggered = False
 
-    return Weighter([(infile, event_map)], surface)
+    weighter = Weighter([infile], surface)
+
+    if triggered:
+        weighter.add_weight_column("pdgid", weighter.get_column("I3CorsikaWeight", "type"))
+        weighter.add_weight_column("energy", weighter.get_column("I3CorsikaWeight", "energy"))
+        weighter.add_weight_column("cos_zen", np.cos(weighter.get_column("I3CorsikaWeight", "zenith")))
+        weighter.add_weight_column("event_weight", weighter.get_column("I3CorsikaWeight", "weight"))
+    else:
+        energy = weighter.get_column("PolyplopiaPrimary", "energy")
+        weighter.add_weight_column("energy", energy)
+        weighter.add_weight_column("pdgid", weighter.get_column("PolyplopiaPrimary", "type"))
+        weighter.add_weight_column("cos_zen", np.cos(weighter.get_column("PolyplopiaPrimary", "zenith")))
+        weighter.add_weight_column("event_weight", np.full(len(energy), 1))
+
+    return weighter

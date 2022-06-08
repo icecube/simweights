@@ -23,6 +23,7 @@
    nugen_nuflux
    effective_area
    livetime
+   additional_flux_params
    without_tableio
    
 .. toctree::

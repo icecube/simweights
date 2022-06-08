@@ -12,7 +12,8 @@ weighter = simweights.NuGenWeighter(hdffile, nfiles=10)
 # create an function to represent the IceCube northern track limit
 # Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
 def northern_track(energy):
-    return 1.44e-18 / 2 * (energy/1e5)**-2.2
+    return 1.44e-18 / 2 * (energy / 1e5) ** -2.2
+
 
 # get the weights by passing the flux to the weighter
 weights = weights = weighter.get_weights(northern_track)

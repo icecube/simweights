@@ -75,7 +75,7 @@ print("Number of files  : {:8d}".format(nfiles))
 print("Number of Events : {:8d}".format(weights_simweights.size))
 print("Effective Area   : {:8.6g} m²".format(wobj.effective_area(erange, czrange)[0][0]))
 print("Event Rate       : {:8.6g} Hz".format(weights_simweights.sum()))
-print("Livetime         : {:8.6g} s".format(weights_simweights.sum() / (weights_simweights ** 2).sum()))
+print("Livetime         : {:8.6g} s".format(weights_simweights.sum() / (weights_simweights**2).sum()))
 
 fig, ax = plt.subplots(figsize=(12, 6))
 bins = np.logspace(1, 6, 25)

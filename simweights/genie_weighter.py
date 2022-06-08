@@ -5,7 +5,7 @@ import numpy as np
 from .generation_surface import GenerationSurface, NullSurface, generation_surface
 from .powerlaw import PowerLaw
 from .spatial import CircleInjector
-from .utils import get_table
+from .utils import constcol, get_table
 from .weighter import Weighter
 
 
@@ -23,9 +23,7 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
         )
         spectrum = PowerLaw(-row["power_law_index"], row["min_energy"], row["max_energy"])
         surfaces.append(
-            row["n_flux_events"]
-            / row["global_probability_scale"]
-            * generation_surface(int(row["primary_type"]), spectrum, spatial)
+            row["n_flux_events"] * generation_surface(int(row["primary_type"]), spectrum, spatial)
         )
     return sum(surfaces, NullSurface)
 
@@ -40,12 +38,14 @@ def GenieWeighter(infile: Any) -> Weighter:
 
     weight_table = get_table(infile, "I3GenieInfo")
     surface = genie_surface(weight_table)
+    global_probability_scale = constcol(weight_table, "global_probability_scale")
 
-    event_map = dict(
-        energy=("I3GenieResult", "Ev"),
-        pdgid=("I3GenieResult", "neu"),
-        zenith=None,
-        event_weight=("I3GenieResult", "wght"),
+    weighter = Weighter([infile], surface)
+    weighter.add_weight_column("energy", weighter.get_column("I3GenieResult", "Ev"))
+    weighter.add_weight_column("pdgid", weighter.get_column("I3GenieResult", "neu").astype(np.int32))
+    weighter.add_weight_column("cos_zen", np.full(len(weighter.get_column("I3GenieResult", "Ev")), 1))
+    weighter.add_weight_column(
+        "event_weight", global_probability_scale * weighter.get_column("I3GenieResult", "wght")
     )
 
-    return Weighter([(infile, event_map)], surface)
+    return weighter

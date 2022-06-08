@@ -28,6 +28,8 @@ jobs:
         env:
           SIMWEIGHTS_TESTDATA: ./simweights_testdata
         run: pytest
+      - name: Run MyPy
+        run: mypy simweights
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
