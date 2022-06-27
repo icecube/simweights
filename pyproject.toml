@@ -23,7 +23,7 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Physics',
     ]
-dependencies = ["numpy", "scipy"]
+dependencies = ["numpy>=1.21.2", "scipy"]
 dynamic = ["version", "description"]
 
 [project.urls]
