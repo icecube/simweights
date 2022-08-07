@@ -108,7 +108,7 @@ Documentation
 =============
 
 Full documentation is available on the 
-`IceCube Documentation Server <https://docs.icecube.aq/simweights/main>`_.
+`IceCube Documentation Server <https://docs.icecube.aq/simweights/main/>`_.
 
 Getting Help
 ============

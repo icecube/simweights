@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.9
+      - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: "3.10"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -17,7 +17,15 @@ jobs:
         working-directory: ./docs
         run: make html SPHINXOPTS="-W --keep-going"
       - name: Upload docs to docs.icecube.aq
+        if: ${{ github.ref_name == 'main' }}
         working-directory: ./docs
         env:
           ICECUBE_PASSWORD: ${{ secrets.ICECUBE_PASSWORD }}
-        run: ./upload-docs.sh
+        run: |
+          tar -czvf simweights_docs.tar.gz -C_build/html .
+          "curl -XPUT -i --data-binary simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${ICECUBE_PASSWORD}
+      - name: Check Links
+        working-directory: ./docs
+        env:
+          ICECUBE_PASSWORD: ${{ secrets.ICECUBE_PASSWORD }}
+        run: make linkcheck SPHINXOPTS="-W --keep-going"

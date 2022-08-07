@@ -10,7 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -52,3 +52,14 @@ html_theme = "sphinx_rtd_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+# Options for linkcheck builder
+# -----------------------------
+linkcheck_auth = [
+    (r"https://internal-apps.icecube.wisc.edu.+", ("icecube", os.environ.get("ICECUBE_PASSWORD", None))),
+]
+
+linkcheck_allowed_redirects = {
+    r"https://doi.org/.*": r".*",
+    r"https://icecube-spno.slack.com/.*": r"https://icecube-spno.slack.com/.*",
+}

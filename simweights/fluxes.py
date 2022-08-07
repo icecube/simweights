@@ -366,14 +366,14 @@ class _references:
     """
     .. [#Hoerandel] J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
        `Astropart. Phys. 19, 193 (2003)
-       <http://dx.doi.org/10.1016/S0927-6505(02)00198-6>`_.
+       <https://doi.org/10.1016/S0927-6505(02)00198-6>`_.
        `astro-ph/0210453 <https://arxiv.org/abs/astro-ph/0210453>`_.
     .. [#Becherini] Y. Becherini et al.,
        "A parameterisation of single and multiple muons in the deep water or ice,"
        `Astropart. Phys. 25, 1 (2006)
-       <http://dx.doi.org/10.1016/j.astropartphys.2005.10.005>`_.
+       <https://doi.org/10.1016/j.astropartphys.2005.10.005>`_.
        `hep-ph/0507228 <https://arxiv.org/abs/hep-ph/0507228>`_.
-    .. [#Schoenwald] A. Schoenwald, http://www.ifh.de/~arnes/Forever/Hoerandel_Plots/ [Dead Link]
+    .. [#Schoenwald] A. Schoenwald, ``http://www.ifh.de/~arnes/Forever/Hoerandel_Plots/`` [Dead Link]
     .. [#Gaisser1] T. Gaisser,
        "Cosmic ray spectrum and composition > 100 TeV," IceCube Internal Report
        `icecube/201102004-v2
