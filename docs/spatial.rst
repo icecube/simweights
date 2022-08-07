@@ -79,7 +79,7 @@ The formula for the cross-sectional area of a cylinder is:
 
     A(\theta) = \pi\cdot r^2\cdot\lvert\cos(\theta)\rvert + 2\cdot r\cdot l \cdot\sqrt{(1-\cos^2(\theta))}
 
-Accounting for the solid angle factor of :math:`cos(theta)` the intensity one needs to sample from to get the an isotropic flux is
+Accounting for the solid angle factor of :math:`cos(\theta)` the intensity one needs to sample from to get the an isotropic flux is
 
 .. math::
 
