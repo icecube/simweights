@@ -32,6 +32,7 @@
 
    weights_in_simulation
    weights_in_icecube
+   spatial
    reading_files
    reading_nugen
    units

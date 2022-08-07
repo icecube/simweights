@@ -101,7 +101,7 @@ class NaturalRateCylinder(CylinderBase):
 
     .. math::
 
-      I \propto r^2\cdot\pi\cdot\sin\theta\cdot(\cos\theta+2/\pi\cdot l/r\cdot\sin\theta)
+      I \propto \pi\cdot r^2\cdot\sin\theta\cdot(\cos\theta+2/\pi\cdot l/r\cdot\sin\theta)
     """
 
     def __init__(self, length: float, radius: float, cos_zen_min: float, cos_zen_max: float):
