@@ -23,6 +23,9 @@ jobs:
           ICECUBE_PASSWORD: ${{ secrets.ICECUBE_PASSWORD }}
         run: |
           tar -czvf simweights_docs.tar.gz -C_build/html .
+          file simweights_docs.tar.gz
+          tar lzvf simweights_docs.tar.gz
+          echo curl -XPUT -i --data-binary simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${ICECUBE_PASSWORD}
           curl -XPUT -i --data-binary simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${ICECUBE_PASSWORD}
       - name: Check Links
         working-directory: ./docs
