@@ -95,6 +95,10 @@ class TestCorsikaDatasets(unittest.TestCase):
 
         f.close()
 
+    def test_21889(self):
+        # low-level-ml minbias
+        self.cmp_dataset(True, "Level2_IC86.2016_corsika.021889.000000.hdf5", 122.83809329321922)
+
     def test_20904(self):
         # low-level-ml minbias
         self.cmp_dataset(False, "CORSIKA_20904_minbias_1.hdf5", 4419.067527326577)
