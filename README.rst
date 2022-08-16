@@ -99,7 +99,7 @@ Simulation created with ``genie-reader`` can be weighted with :code:`GenieWeight
   >>> weight_obj = simweights.GenieWeighter(simfile)
   >>> weights = weight_obj.get_weights(flux_model)
   >>> print(f'Rate = {weights.sum():5.2e} Hz')
-  Rate = 4.63e-03 Hz
+  Rate = 2.49e-03 Hz
 
 Also note that these examples use ``pandas``. SimWeights will work equally well with
 ``pandas``, ``h5py``, or ``pytables``.
