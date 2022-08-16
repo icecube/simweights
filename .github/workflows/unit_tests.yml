@@ -26,7 +26,6 @@ jobs:
           SIMWEIGHTS_TESTDATA: .
         run: |
           pytest
-          python3 -m doctest -v README.rst
           mypy simweights
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v1
