@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import Any, Callable, Iterable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray

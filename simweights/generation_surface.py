@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import namedtuple
 from copy import deepcopy
-from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -174,7 +173,9 @@ class GenerationSurface:
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
 
 
-def generation_surface(pdgid: int | PDGCode, energy_dist: PowerLaw, spatial_dist: SpatialDist) -> GenerationSurface:
+def generation_surface(
+    pdgid: int | PDGCode, energy_dist: PowerLaw, spatial_dist: SpatialDist
+) -> GenerationSurface:
     """
     Convenience function to generate a GenerationSurface for a single particle type
     """
