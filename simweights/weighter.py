@@ -24,9 +24,9 @@ class Weighter:
     def __init__(self, data: Iterable, surface: GenerationSurface):
         self.data = list(data)
         self.surface = surface
-        self.weight_cols: Dict[str, NDArray] = {}
+        self.weight_cols: dict[str, NDArray] = {}
         self.colnames = sorted(self.weight_cols.keys())
-        self.size: Optional[int] = None
+        self.size: int | None = None
 
     def get_column(self, table: str, column: str) -> NDArray[np.floating]:
         """
@@ -129,7 +129,7 @@ class Weighter:
         return weights
 
     def effective_area(
-        self, energy_bins: ArrayLike, cos_zenith_bins: ArrayLike, mask: Optional[ArrayLike] = None
+        self, energy_bins: ArrayLike, cos_zenith_bins: ArrayLike, mask: ArrayLike | None = None
     ) -> NDArray[np.floating]:
         r"""
         Calculate The effective area for the given energy and zenith bins.
@@ -200,7 +200,7 @@ class Weighter:
                 weighter.add_weight_column(colname, np.append(column, other.weight_cols[colname]))
         return weighter
 
-    def tostring(self, flux: Union[None, object, Callable, ArrayLike] = None) -> str:
+    def tostring(self, flux: None | object | Callable | ArrayLike = None) -> str:
         """
         Creates a string with important information about this weighting object:
         generation surface, event map, number of events, and effective area.

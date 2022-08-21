@@ -34,7 +34,7 @@ for flux_model in models:
     weights = weighter.get_weights(flux_model)
 
     # print the total rate of each model
-    print("{:26} {:8.2f} mHz".format(flux_model.name, 1e6 * weights.sum()))
+    print(f"{flux_model.name:26} {1e6 * weights.sum():8.2f} mHz")
 
     # histogram the primary energy with the weights
     plt.hist(primary_energy, weights=weights, bins=bins, histtype="step", label=flux_model.name)

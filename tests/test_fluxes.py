@@ -14,7 +14,7 @@ E = np.logspace(2, 10, 9)
 class TestCosmicRayModels(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        with open(os.path.dirname(__file__) + "/flux_values.json", "r") as f:
+        with open(os.path.dirname(__file__) + "/flux_values.json") as f:
             cls.flux_values = json.load(f)
 
     def flux_cmp(self, name):

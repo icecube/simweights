@@ -48,7 +48,7 @@ class CylinderBase:
         """
         raise NotImplementedError()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}"
             f"({self.length}, {self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
@@ -147,7 +147,7 @@ class CircleInjector:
             cosz, [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)], [self._normalization]
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"CircleInjector({self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
 
     def __eq__(self, other: object) -> bool:

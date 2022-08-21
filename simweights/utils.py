@@ -98,7 +98,7 @@ def check_run_counts(table: Any, nfiles: int) -> bool:  # pragma: no cover
     return ret
 
 
-def check_nfiles(runcol: NDArray[np.integer]):  # pragma: no cover
+def check_nfiles(runcol: NDArray[np.integer])-> None:  # pragma: no cover
     # pylint: disable=import-outside-toplevel
     """
     check that the number of jobs in the file is what the user claims they are

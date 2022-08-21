@@ -27,7 +27,7 @@ class GenerationSurface:
         """
         :param spectra: a collection of GenerationProbabilities.
         """
-        self.spectra: Dict[int, List[SurfaceTuple]] = {}
+        self.spectra: dict[int, list[SurfaceTuple]] = {}
         for spec in spectra:
             self._insert(spec)
 
@@ -87,13 +87,13 @@ class GenerationSurface:
                 )
         return count
 
-    def get_pdgids(self) -> List[Union[int, PDGCode]]:
+    def get_pdgids(self) -> list[int | PDGCode]:
         """
         Return a list of pdgids that this surface represents
         """
         return sorted(self.spectra.keys())
 
-    def get_energy_range(self, pdgid: Optional[PDGCode]) -> Tuple[float, float]:
+    def get_energy_range(self, pdgid: PDGCode | None) -> tuple[float, float]:
         """
         Return the energy range for given particle type over all surfaces
         """
@@ -113,7 +113,7 @@ class GenerationSurface:
         assert np.isfinite(emax)
         return emin, emax
 
-    def get_cos_zenith_range(self, pdgid: Optional[PDGCode]) -> Tuple[float, float]:
+    def get_cos_zenith_range(self, pdgid: PDGCode | None) -> tuple[float, float]:
         """
         Return the cos zenith range for given particle type over all surfaces
         """
@@ -174,7 +174,7 @@ class GenerationSurface:
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
 
 
-def generation_surface(pdgid: Union[int, PDGCode], energy_dist: PowerLaw, spatial_dist: SpatialDist):
+def generation_surface(pdgid: int | PDGCode, energy_dist: PowerLaw, spatial_dist: SpatialDist) -> GenerationSurface:
     """
     Convenience function to generate a GenerationSurface for a single particle type
     """

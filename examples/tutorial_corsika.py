@@ -65,12 +65,12 @@ livetime_Hoerandel = weights_GaisserH3a / weightssqr_Hoerandel
 
 erange = wobj.surface.get_energy_range(None)
 czrange = wobj.surface.get_cos_zenith_range(None)
-print("Number of files  : {}".format(len(corsika_filelist)))
-print("Number of events : {}".format(len(weights_GaisserH3a)))
-print("Effective Area   : {:10.2} m²".format(wobj.effective_area(erange, czrange)[0][0]))
+print(f"Number of files  : {len(corsika_filelist)}")
+print(f"Number of events : {len(weights_GaisserH3a)}")
+print(f"Effective Area   : {wobj.effective_area(erange, czrange)[0][0]:10.2} m²")
 
 print("           GaisserH3a Hoerandel")
-print("Rate     : {:10.4f} {:10.4f}".format(weights_GaisserH3a.sum(), weights_Hoerandel.sum()))
+print(f"Rate     : {weights_GaisserH3a.sum():10.4f} {weights_Hoerandel.sum():10.4f}")
 print(
     "Livetime : {:10.6f} {:10.6f}".format(
         weights_GaisserH3a.sum() / (weightssqr_GaisserH3a.sum()),

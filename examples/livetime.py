@@ -14,8 +14,8 @@ w = wobj.get_weights(flux_model)
 w *= f.root.FilterMask.cols.MuonFilter_13[:][:, 1]
 
 # print the total event rate and livetime
-print("Event Rate    : {:6.2f} Hz".format(w.sum()))
-print("Total Livetime: {:6.2f} s".format(w.sum() / (w**2).sum()))
+print(f"Event Rate    : {w.sum():6.2f} Hz")
+print(f"Total Livetime: {w.sum() / (w**2).sum():6.2f} s")
 
 # make bin edges from the energy range of the sample
 Ebins = np.geomspace(*wobj.surface.get_energy_range(None), 50)

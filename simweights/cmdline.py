@@ -29,7 +29,7 @@ def find_weighter(fileobj: pd.HDFStore, nfiles: int) -> simweights.Weighter:
     raise RuntimeError(f"Could not find a suitable weighter for file object `{fileobj.filename}`")
 
 
-def main():
+def main() -> int:
     """
     Command line utility to print some basic information about how a file will be weighted
     """
