@@ -1,4 +1,7 @@
-import simweights, nuflux, pandas
+import nuflux
+import pandas
+
+import simweights
 
 simfile = pandas.HDFStore("genie_reader_NuE_C_corr.hdf5")
 flux_model = nuflux.makeFlux("IPhonda2014_spl_solmax")

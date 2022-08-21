@@ -1,6 +1,6 @@
+import nuflux
 import pandas as pd
 import pylab as plt
-import nuflux
 
 # start-box1
 import simweights
