@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import nuflux
 import pandas as pd
 import pylab as plt
@@ -11,17 +13,20 @@ weighter = simweights.NuGenWeighter(hdffile, nfiles=10)
 bins = plt.geomspace(1e2, 1e8, 50)
 primary_energy = weighter.get_column("PolyplopiaPrimary", "energy")
 
-# create an function to represent the IceCube northern track limit
-# Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
-def NorthernTrack(energy):
+
+def northern_track(energy):
+    """
+    This function is a flux which represents the IceCube northern track limit
+    Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
+    """
     return 1.44e-18 / 2 * (energy / 1e5) ** -2.2
 
 
-NorthernTrack.name = "Northern Track 9.5 year"
+northern_track.name = "Northern Track 9.5 year"
 
 # Create models and put them in a list so we can iterate over them
 models = [
-    NorthernTrack,
+    northern_track,
     nuflux.makeFlux("CORSIKA_GaisserH3a_average"),
     nuflux.makeFlux("H3a_SIBYLL23C"),
     nuflux.makeFlux("honda2006"),

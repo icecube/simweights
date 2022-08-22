@@ -11,9 +11,7 @@ and plot each zenith bin separately.
     :start-after: start-example1
     :end-before: end-example1
 
-.. figure :: effective_area_zenith.png
-
-|
+.. figure :: effective_area_zenith.svg
 
 This example demonstrates the use of the mask parameter. 
 Effective areas are calculated separately for both NuMu and NuMuBar primaries.
@@ -25,9 +23,7 @@ is averaged over primary type.
     :start-after: start-example2
     :end-before: end-example2
 
-.. figure :: effective_area_type.png
-
-|
+.. figure :: effective_area_type.svg
 
 The final example shows a different use of the mask parameter.
 Three different filters are used as masks creating three different curves.
@@ -37,4 +33,4 @@ Again only a single zenith bin is used.
     :start-after: start-example3
     :end-before: end-example3
 
-.. figure :: effective_area_filters.png
+.. figure :: effective_area_filters.svg

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import glob
 
 import matplotlib.pyplot as plt
@@ -10,14 +12,15 @@ import simweights
 
 
 def get_most_energetic_muon(mmclist):
+    "Loop through the MMC track list and return the muon with the most energy"
     emax = 0
-    for m in list(mmclist):
-        p = m.particle
+    for muon in list(mmclist):
+        particle = muon.particle
         if (
-            p.type in (dataclasses.I3Particle.MuMinus, dataclasses.I3Particle.MuPlus)
-            and p.total_energy > emax
+            particle.type in (dataclasses.I3Particle.MuMinus, dataclasses.I3Particle.MuPlus)
+            and particle.total_energy > emax
         ):
-            emax = p.total_energy
+            emax = particle.total_energy
     return emax
 
 
@@ -37,8 +40,8 @@ weight_keys = [
     "OneWeight",
 ]
 
-dataset_dir = "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/21217/"
-filelist = list(glob.glob(dataset_dir + "0000000-0000999/Level2_IC86.2016_NuMu.021217.00000*.i3.zst"))
+DATASET_DIR = "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/21217/"
+filelist = list(glob.glob(DATASET_DIR + "0000000-0000999/Level2_IC86.2016_NuMu.021217.00000*.i3.zst"))
 MCmuonEnergy_nugen = np.array([])
 I3MCWeightDict = {k: [] for k in weight_keys}
 

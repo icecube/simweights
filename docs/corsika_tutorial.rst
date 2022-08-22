@@ -26,4 +26,4 @@ Now we can run a our script which calculates the weights and make a histogram.
 
 The output should look something like this:
 
-.. figure:: triggered_corsika_tutorial.png
+.. figure:: triggered_corsika_tutorial.svg

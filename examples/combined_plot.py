@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import pylab as plt
 import tables

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import glob
 
 import matplotlib.pyplot as plt
@@ -6,10 +8,11 @@ from icecube import dataio
 
 import simweights
 
-corsika_dataset_dir = "/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/20904/"
+CORSIKA_DATASET_DIR = "/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/20904/"
 corsika_filelist = list(
-    glob.glob(corsika_dataset_dir + "0000000-0000999/Level2_IC86.2016_corsika.020904.00000*.i3.zst")
+    glob.glob(CORSIKA_DATASET_DIR + "0000000-0000999/Level2_IC86.2016_corsika.020904.00000*.i3.zst")
 )
+assert corsika_filelist
 
 weight_keys = [
     "CylinderLength",
@@ -72,10 +75,8 @@ print(f"Effective Area   : {wobj.effective_area(erange, czrange)[0][0]:10.2} m²
 print("           GaisserH3a Hoerandel")
 print(f"Rate     : {weights_GaisserH3a.sum():10.4f} {weights_Hoerandel.sum():10.4f}")
 print(
-    "Livetime : {:10.6f} {:10.6f}".format(
-        weights_GaisserH3a.sum() / (weightssqr_GaisserH3a.sum()),
-        weights_Hoerandel.sum() / weightssqr_GaisserH3a.sum(),
-    )
+    f"Livetime : {weights_GaisserH3a.sum() / (weightssqr_GaisserH3a.sum()):10.6f} "
+    f"{weights_Hoerandel.sum() / weightssqr_GaisserH3a.sum():10.6f}"
 )
 
 fig, ax = plt.subplots(figsize=(12, 6))

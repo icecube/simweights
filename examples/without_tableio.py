@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from glob import glob
 
 import pylab as plt
@@ -5,8 +7,9 @@ from icecube import dataio, simclasses
 
 import simweights
 
-filedir = "/data/sim/scratch/IceSim/dynstack/21682/0000000-0000999/"
-filelist = sorted(glob(filedir + "Level2_IC86.2016_corsika.021682.00000?.i3.zst"))
+FILE_DIR = "/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/21889/0000000-0000999"
+filelist = sorted(glob(FILE_DIR + "/Level2_IC86.2016_corsika.021889.00000*.i3.zst"))
+assert filelist
 
 # SimWeights iterates over the info table row-wise so to mimic it we need a list
 I3PrimaryInjectorInfo = []
@@ -76,9 +79,10 @@ primary_energy = weighter.get_weight_column("energy")
 plt.hist(primary_energy, weights=weights, bins=bins)
 
 # make the plot look good
-plt.loglog()
 plt.xlabel("Primary Energy [GeV]")
 plt.ylabel("Event Rate [Hz]")
 plt.xlim(bins[0], bins[-1])
 plt.ylim(0.1, 10)
+plt.loglog()
+plt.savefig("without_tableio.svg")
 plt.show()

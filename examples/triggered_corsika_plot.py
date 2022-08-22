@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import pandas as pd
 import pylab as plt
 
 import simweights
 
 # load the hdf5 file that we just created using pandas
-hdffile = pd.HDFStore("Level2_IC86.2016_corsika.021682.hdf5", "r")
+hdffile = pd.HDFStore("Level2_IC86.2016_corsika.021889.hdf5", "r")
 
 # instantiate the weighter object by passing the pandas file to it
 weighter = simweights.CorsikaWeighter(hdffile)
@@ -33,4 +35,5 @@ plt.xlabel("Primary Energy [GeV]")
 plt.ylabel("Event Rate [Hz]")
 plt.xlim(bins[0], bins[-1])
 plt.ylim(0.1, 10)
+plt.savefig("triggered_corsika_tutorial.svg")
 plt.show()

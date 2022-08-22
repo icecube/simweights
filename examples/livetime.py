@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import pylab as plt
 import tables
@@ -28,16 +30,18 @@ h1, x2 = np.histogram(mcenergy, bins=Ebins, weights=w)
 h2, x1 = np.histogram(mcenergy, bins=Ebins, weights=w**2)
 
 # plot the rate
-plt.step(Ebins, np.r_[0, h1])
+plt.step(np.r_[Ebins, Ebins[-1]], np.r_[0, h1, 0])
 plt.semilogx()
 plt.xlabel("Energy [GeV]")
 plt.ylabel("Rate [Hz]")
+plt.savefig("livetime_rate.svg")
 
 # plot the livetime
 plt.figure()
-plt.step(Ebins, np.r_[0, h1 / h2])
+plt.step(np.r_[Ebins, Ebins[-1]], np.r_[0, h1 / h2, 0])
 plt.semilogx()
 plt.xlabel("Energy [GeV]")
 plt.ylabel("Livetime [s]")
+plt.savefig("livetime_livetime.svg")
 
 plt.show()

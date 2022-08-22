@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import pylab as plt
 import tables
@@ -35,7 +37,7 @@ plt.ylabel("Effective Area [m$^2$]")
 plt.xlim(energy_bins[0], energy_bins[-1])
 plt.loglog()
 plt.tight_layout()
-plt.savefig("effective_area_zenith.png")
+plt.savefig("effective_area_zenith.svg")
 
 plt.figure()
 
@@ -61,7 +63,7 @@ plt.ylabel("Effective Area [m$^2$]")
 plt.xlim(energy_bins[0], energy_bins[-1])
 plt.loglog()
 plt.tight_layout()
-plt.savefig("effective_area_type.png")
+plt.savefig("effective_area_type.svg")
 
 plt.figure()
 
@@ -84,6 +86,6 @@ plt.ylabel("Effective Area [m$^2$]")
 plt.xlim(energy_bins[0], energy_bins[-1])
 plt.loglog()
 plt.tight_layout()
-plt.savefig("effective_area_filters.png")
+plt.savefig("effective_area_filters.svg")
 
 plt.show()
