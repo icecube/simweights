@@ -30,8 +30,9 @@ dependencies = ["numpy>=1.21.2", "scipy"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-test = ["h5py", "tables", "pandas", "pytest-mypy", "pytest-cov", "pytest-isort", "pytest-black", "pytest-flake8", "pytest-pylint", "flake8~=4.0.0"]
+test = ["h5py", "tables", "pandas", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
+devel = ['pre-commit']
 
 [project.scripts]
 simweights = "simweights.cmdline:main"
