@@ -11,7 +11,7 @@
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials
-   
+
    corsika_tutorial
    nugen_tutorial
 
@@ -25,7 +25,7 @@
    livetime
    additional_flux_params
    without_tableio
-   
+
 .. toctree::
    :maxdepth: 1
    :caption: Explanations
@@ -41,8 +41,8 @@
    :maxdepth: 1
    :caption: Reference
 
-   apireference  
+   apireference
    cmdline
 
-The layout and orginization of this documentation is based on  
+The layout and orginization of this documentation is based on
 `The Documentation System <https://documentation.divio.com/>`_.

@@ -1,7 +1,7 @@
 How to Calculate Effective Areas
 ================================
 
-SimWeights objects have a method :py:func:`simweights.Weighter.effective_area` for calculating effective 
+SimWeights objects have a method :py:func:`simweights.Weighter.effective_area` for calculating effective
 areas. Some example usage is shown below.
 
 The first example will calculate effective area in 4 different zenith bins and 25 energy bins
@@ -13,7 +13,7 @@ and plot each zenith bin separately.
 
 .. figure :: effective_area_zenith.svg
 
-This example demonstrates the use of the mask parameter. 
+This example demonstrates the use of the mask parameter.
 Effective areas are calculated separately for both NuMu and NuMuBar primaries.
 Only a single zenith bin is used.
 The third call to ``effective_area()`` has both NuMu and NuMuBar and so the output

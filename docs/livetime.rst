@@ -5,7 +5,7 @@ The effective livetime of a simulation sample is calculated by dividing the sum 
 the sum of the weights.
 
 .. math::
-    
+
     L_{eff} = \frac{\sum{w_i^2}}{\sum{w_i}}
 
 

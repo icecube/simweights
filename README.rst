@@ -43,8 +43,8 @@ To install with pip:
 
   pip install [--user] git+https://github.com/icecube/simweights.git
 
-If you want to develop simweights you can install directly with flit. 
-The ``-s`` option will symlink the module into site-packages rather than copying it, 
+If you want to develop simweights you can install directly with flit.
+The ``-s`` option will symlink the module into site-packages rather than copying it,
 so that you can test changes without reinstalling the module:
 
 .. code-block:: shell-session
@@ -72,12 +72,12 @@ For triggered CORSIKA or CORSIKA produced by ``corsika-reader`` with S-Frames fi
 
 The value returned by ``get_weights()`` is the rate of events in Hz
 
-For traditional CORSIKA files made with ``corsika-reader`` you will also use 
-:code:`simweights.CorsikaWeighter()`, but you need to know the number of ``.i3`` 
+For traditional CORSIKA files made with ``corsika-reader`` you will also use
+:code:`simweights.CorsikaWeighter()`, but you need to know the number of ``.i3``
 files that contributed to create this hdf5 file and pass it as the ``nfiles`` parameter.
 
-For ``neutrino-generator`` you can use :code:`NuGenWeighter()` which also 
-requires you to know the number of files. 
+For ``neutrino-generator`` you can use :code:`NuGenWeighter()` which also
+requires you to know the number of files.
 Flux models from `nuflux <https://github.com/icecube/nuflux>`_ can be used:
 
 .. code-block:: python
@@ -107,22 +107,22 @@ Also note that these examples use ``pandas``. SimWeights will work equally well 
 Documentation
 =============
 
-Full documentation is available on the 
+Full documentation is available on the
 `IceCube Documentation Server <https://docs.icecube.aq/simweights/main/>`_.
 
 Getting Help
 ============
 
-Please direct any questions to ``@kjm`` on the slack channel 
+Please direct any questions to ``@kjm`` on the slack channel
 `#software <https://icecube-spno.slack.com/channels/software>`_.
 
 Contributing
 ============
 
-Any bugs or other issues can be filed at the 
+Any bugs or other issues can be filed at the
 `Issue Tracker <https://github.com/icecube/simweights/issues>`_ on GitHub.
 
-Contribution to the source code can done via the 
+Contribution to the source code can done via the
 `Pull Request <https://github.com/icecube/simweights/pulls>`_ tab on GitHub.
 
 .. Contributors

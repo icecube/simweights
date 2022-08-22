@@ -14,7 +14,7 @@ The output should look something like this:
 
 .. code-block ::
 
-    $ h5ls Level2_IC86.2016_corsika.021682.hdf5 
+    $ h5ls Level2_IC86.2016_corsika.021682.hdf5
     I3CorsikaWeight          Dataset {6948/Inf}
     I3PrimaryInjectorInfo    Dataset {40/Inf}
     PolyplopiaPrimary        Dataset {6948/Inf}

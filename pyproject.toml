@@ -62,7 +62,7 @@ line_length = 108
 max-line-length = "108"
 
 [tool.pylint.messages_control]
-disable = "C0330, C0326, C0114"
+disable = "C0114"
 
 [tool.pytest.ini_options]
 testpaths = ["simweights","tests"]

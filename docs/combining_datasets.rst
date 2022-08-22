@@ -11,8 +11,8 @@ correctly weight the combined sample.
 
 .. figure:: combined_mctruth.svg
 
-To obtain values from reconstructions with combined datasets the ``get_column()`` function is quite 
-useful. It will get the corresponding column from each hdf5 file and append them into a single 
+To obtain values from reconstructions with combined datasets the ``get_column()`` function is quite
+useful. It will get the corresponding column from each hdf5 file and append them into a single
 numpy array.
 
 .. literalinclude:: ../examples/combined_plot.py
