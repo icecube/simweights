@@ -32,7 +32,7 @@ dynamic = ["version", "description"]
 [project.optional-dependencies]
 test = ["h5py", "tables", "pandas", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
-dev = ['pre-commit']
+dev = ['pre-commit','pylint','mypy']
 
 [project.scripts]
 simweights = "simweights.cmdline:main"
