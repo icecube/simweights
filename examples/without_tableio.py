@@ -15,7 +15,7 @@ assert filelist
 I3PrimaryInjectorInfo = []
 
 # However, the weight object is iterated column-wise so we need to create a dictionary of lists
-I3CorsikaWeight = {"energy": [], "type": [], "zenith": [], "weight": []}
+I3CorsikaWeight: dict = {"energy": [], "type": [], "zenith": [], "weight": []}
 
 # loop over all the files we want to read
 for filename in filelist:

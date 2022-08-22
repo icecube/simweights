@@ -32,8 +32,8 @@ weight_keys = [
 
 particle_keys = ["type", "energy", "zenith"]
 
-CorsikaWeightMap = {k: [] for k in weight_keys}
-PolyplopiaPrimary = {k: [] for k in ["type", "energy", "zenith"]}
+CorsikaWeightMap: dict = {k: [] for k in weight_keys}
+PolyplopiaPrimary: dict = {k: [] for k in ["type", "energy", "zenith"]}
 MCtype_corsika = np.array([])
 MCenergy_corsika = np.array([])
 

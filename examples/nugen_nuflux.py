@@ -22,8 +22,6 @@ def northern_track(energy):
     return 1.44e-18 / 2 * (energy / 1e5) ** -2.2
 
 
-northern_track.name = "Northern Track 9.5 year"
-
 # Create models and put them in a list so we can iterate over them
 models = [
     northern_track,
@@ -38,11 +36,13 @@ for flux_model in models:
     # get the weights by passing the flux to the weighter
     weights = weighter.get_weights(flux_model)
 
+    NAME = getattr(flux_model, "name", "Northern Track 9.5 year")
+
     # print the total rate of each model
-    print(f"{flux_model.name:26} {1e6 * weights.sum():8.2f} mHz")
+    print(f"{NAME:26} {1e6 * weights.sum():8.2f} mHz")
 
     # histogram the primary energy with the weights
-    plt.hist(primary_energy, weights=weights, bins=bins, histtype="step", label=flux_model.name)
+    plt.hist(primary_energy, weights=weights, bins=bins, histtype="step", label=NAME)
 # end-box1
 
 # make the plot look good

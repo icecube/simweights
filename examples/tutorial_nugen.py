@@ -43,7 +43,7 @@ weight_keys = [
 DATASET_DIR = "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/21217/"
 filelist = list(glob.glob(DATASET_DIR + "0000000-0000999/Level2_IC86.2016_NuMu.021217.00000*.i3.zst"))
 MCmuonEnergy_nugen = np.array([])
-I3MCWeightDict = {k: [] for k in weight_keys}
+I3MCWeightDict: dict = {k: [] for k in weight_keys}
 
 for f in filelist:
     print("Reading", f)
