@@ -26,13 +26,13 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Physics',
     ]
-dependencies = ["numpy>=1.21.2", "scipy"]
+dependencies = ["numpy>=1.21.2"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-test = ["h5py", "tables", "pandas", "pytest-cov"]
+test = ["scipy", "h5py", "tables", "pandas", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
-dev = ['pre-commit','pylint','mypy']
+dev = ["pre-commit","pylint","mypy"]
 
 [project.scripts]
 simweights = "simweights.cmdline:main"
@@ -45,6 +45,9 @@ Collaboration = "https://icecube.wisc.edu"
 [tool.black]
 line-length = 108
 target-version = ['py37']
+
+[tool.coverage.report]
+exclude_lines = ["pragma:.*no cover", "@overload"]
 
 [tool.coverage.run]
 source = ["simweights"]

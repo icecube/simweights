@@ -3,7 +3,8 @@ from typing import Any, Union
 import numpy as np
 from numpy.random import RandomState
 from numpy.typing import ArrayLike, NDArray
-from scipy._lib._util import check_random_state  # type: ignore
+
+from .utils import check_random_state
 
 
 class PowerLaw:
@@ -108,7 +109,7 @@ class PowerLaw:
                ``RandomState`` instance is used, seeded with random_state. If `random_state` is already a
                ``RandomState`` or ``Generator`` instance, then that object is used. Default is None.
         """
-        rand_state: RandomState = check_random_state(random_state)
+        rand_state = check_random_state(random_state)
         return self._ppf(np.asfarray(rand_state.uniform(0, 1, size)))
 
     def __repr__(self) -> str:

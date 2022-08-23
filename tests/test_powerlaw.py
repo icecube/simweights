@@ -101,6 +101,15 @@ class TestPowerLaw(unittest.TestCase):
         self.assertEqual(type(x3), np.ndarray)
         self.assertEqual(x3.shape, (6, 8))
 
+        x4 = p.rvs(None, np.random.RandomState())
+        self.assertEqual(type(x4), np.float64)
+        x5 = p.rvs(1, np.random.Generator(np.random.PCG64()))
+        self.assertEqual(type(x5), np.ndarray)
+        self.assertEqual(x5.shape, (1,))
+
+        with self.assertRaises(ValueError):
+            p.rvs(1, object())
+
     def test_equal_operator(self):
         p1 = PowerLaw(-1, 1, 10)
         self.assertEqual(p1, PowerLaw(-1, 1, 10))

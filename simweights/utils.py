@@ -1,7 +1,12 @@
-from typing import Any
+import numbers
+from typing import Any, Optional, Union, overload
 
 import numpy as np
+from numpy.random import Generator, RandomState
 from numpy.typing import ArrayLike, NDArray
+
+IntNumber = Union[int, np.integer]
+GeneratorType = Union[Generator, RandomState]
 
 
 def has_table(file_obj: Any, name: str) -> bool:
@@ -98,30 +103,34 @@ def check_run_counts(table: Any, nfiles: int) -> bool:  # pragma: no cover
     return ret
 
 
-def check_nfiles(runcol: NDArray[np.integer]) -> None:  # pragma: no cover
-    # pylint: disable=import-outside-toplevel
+@overload
+def check_random_state(seed: Optional[IntNumber] = ...) -> np.random.Generator:
+    ...
+
+
+@overload
+def check_random_state(seed: GeneratorType) -> GeneratorType:
+    ...
+
+
+# copied from scipy/stats/_qmc.py
+def check_random_state(seed: GeneratorType | IntNumber | None = None) -> GeneratorType:
+    """Turn `seed` into a `numpy.random.Generator` instance.
+    Parameters
+    ----------
+    seed : {None, int, `numpy.random.Generator`, `numpy.random.RandomState`}, optional
+        If `seed` is None the `numpy.random.Generator` singleton is used.
+        If `seed` is an int, a new ``Generator`` instance is used,
+        seeded with `seed`.
+        If `seed` is already a ``Generator`` or ``RandomState`` instance then
+        that instance is used.
+    Returns
+    -------
+    seed : {`numpy.random.Generator`, `numpy.random.RandomState`}
+        Random number generator.
     """
-    check that the number of jobs in the file is what the user claims they are
-    Not Currently used
-    """
-    from scipy import stats  # type: ignore
-
-    unique_runs, run_counts = np.unique(runcol, return_counts=True)
-    nfiles = unique_runs.size
-
-    rmean = run_counts.mean()
-    rmin = run_counts.min()
-    rmax = run_counts.max()
-
-    hist_y, hist_x = np.histogram(run_counts, range=(rmin, rmax + 1), bins=rmax - rmin + 1)
-    hist_x = hist_x[:-1]
-    prob = stats.poisson.pmf(hist_x, rmean)
-    # pp = stats.poisson.logpmf(hist_y, p)
-    chi2, pval = stats.chisquare(hist_y, prob * hist_y.sum())
-    pois = stats.poisson.pmf(0, rmean)
-
-    print(f"NFiles={nfiles}")
-    print("Warning : Guessing the numbers of nugen files based on the number of unique datasets!")
-    print(f"Number of events per file matches a poisson distribution with mean {rmean}")
-    print(f"chi2 / ndof = {chi2} / {hist_y.size-1} --> p = {pval}")
-    print(f"the probability that a file would have zero events is {pois}")
+    if seed is None or isinstance(seed, (numbers.Integral, np.integer)):
+        return np.random.default_rng(seed)
+    if isinstance(seed, (RandomState, Generator)):
+        return seed
+    raise ValueError(f"{seed!r} cannot be used to seed a" " numpy.random.Generator instance")
