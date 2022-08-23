@@ -1,10 +1,9 @@
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
-from numpy.random import RandomState
 from numpy.typing import ArrayLike, NDArray
 
-from .utils import check_random_state
+from .utils import SeedType, check_random_state
 
 
 class PowerLaw:
@@ -95,9 +94,7 @@ class PowerLaw:
         qa = np.asfarray(q)
         return np.piecewise(qa, [(qa >= 0) & (qa <= 1)], [self._ppf, np.nan])
 
-    def rvs(
-        self, size: Any = None, random_state: Union[None, int, RandomState] = None
-    ) -> NDArray[np.floating]:
+    def rvs(self, size: Any = None, random_state: SeedType = None) -> NDArray[np.floating]:
         """
         Random variates
 

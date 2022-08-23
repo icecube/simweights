@@ -1,5 +1,5 @@
 import numbers
-from typing import Any, Optional, Union, overload
+from typing import Any, Union
 
 import numpy as np
 from numpy.random import Generator, RandomState
@@ -7,6 +7,7 @@ from numpy.typing import ArrayLike, NDArray
 
 IntNumber = Union[int, np.integer]
 GeneratorType = Union[Generator, RandomState]
+SeedType = Union[GeneratorType, IntNumber, None]
 
 
 def has_table(file_obj: Any, name: str) -> bool:
@@ -103,18 +104,7 @@ def check_run_counts(table: Any, nfiles: int) -> bool:  # pragma: no cover
     return ret
 
 
-@overload
-def check_random_state(seed: Optional[IntNumber] = ...) -> np.random.Generator:
-    ...
-
-
-@overload
-def check_random_state(seed: GeneratorType) -> GeneratorType:
-    ...
-
-
-# copied from scipy/stats/_qmc.py
-def check_random_state(seed: GeneratorType | IntNumber | None = None) -> GeneratorType:
+def check_random_state(seed: SeedType = None) -> GeneratorType:
     """Turn `seed` into a `numpy.random.Generator` instance.
     Parameters
     ----------
