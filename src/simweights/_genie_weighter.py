@@ -2,11 +2,11 @@ from typing import Any, Iterable, Mapping
 
 import numpy as np
 
-from .generation_surface import GenerationSurface, NullSurface, generation_surface
-from .powerlaw import PowerLaw
-from .spatial import CircleInjector
-from .utils import constcol, get_table
-from .weighter import Weighter
+from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._powerlaw import PowerLaw
+from ._spatial import CircleInjector
+from ._utils import constcol, get_table
+from ._weighter import Weighter
 
 
 def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:

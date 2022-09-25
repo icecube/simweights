@@ -5,7 +5,7 @@ import numpy as np
 from scipy import stats
 from scipy.integrate import quad
 
-from simweights.powerlaw import PowerLaw
+from simweights import PowerLaw
 
 
 class TestPowerLaw(unittest.TestCase):

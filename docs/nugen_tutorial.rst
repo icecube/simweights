@@ -12,7 +12,7 @@ the key which contains the information necessary to calculate the weights.
 You can check that the hdf5 file was created correctly by running ``h5ls``.
 The output should look something like this:
 
-.. code-block ::
+.. code-block :: shell-session
 
     $ h5ls Level2_IC86.2016_NuMu.021217.hdf5
     I3MCWeightDict           Dataset {7485/Inf}

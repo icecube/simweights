@@ -6,10 +6,9 @@ from copy import deepcopy
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from simweights.powerlaw import PowerLaw
-from simweights.spatial import SpatialDist
-
-from .pdgcode import PDGCode
+from ._pdgcode import PDGCode
+from ._powerlaw import PowerLaw
+from ._spatial import SpatialDist
 
 SurfaceTuple = namedtuple("SurfaceTuple", ["pdgid", "nevents", "energy_dist", "spatial_dist"])
 

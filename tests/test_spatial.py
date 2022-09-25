@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 
 from simweights import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
-from simweights.spatial import CylinderBase
+from simweights._spatial import CylinderBase
 
 
 class TestSpatial(unittest.TestCase):

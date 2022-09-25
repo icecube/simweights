@@ -8,4 +8,4 @@ API Reference
    :inherited-members:
    :special-members: __add__ __mul__
 
-.. automodule:: simweights.fluxes._references
+.. automodule:: simweights._fluxes._references

@@ -5,8 +5,7 @@ from copy import copy
 
 import numpy as np
 
-from simweights import TIG1996, NaturalRateCylinder, PowerLaw, generation_surface
-from simweights.weighter import Weighter
+from simweights import TIG1996, NaturalRateCylinder, PowerLaw, Weighter, generation_surface
 
 
 def fluxfun1(energy):

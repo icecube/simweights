@@ -7,8 +7,8 @@ from typing import Any, Callable, Iterable
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .generation_surface import GenerationSurface
-from .utils import get_column, get_table
+from ._generation_surface import GenerationSurface
+from ._utils import get_column, get_table
 
 
 class Weighter:

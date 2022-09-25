@@ -6,7 +6,7 @@ import unittest
 
 import numpy as np
 
-from simweights import fluxes
+from simweights import _fluxes
 
 E = np.logspace(2, 10, 9)
 
@@ -22,7 +22,7 @@ class TestCosmicRayModels(unittest.TestCase):
             args = ({2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4},)
         else:
             args = ()
-        flux = getattr(fluxes, name)(*args)
+        flux = getattr(_fluxes, name)(*args)
         v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name].keys()]))
         v2 = np.array(list(self.flux_values[name].values())) / 1e4
 

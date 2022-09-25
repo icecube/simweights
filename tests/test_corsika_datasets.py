@@ -6,7 +6,7 @@ import numpy as np
 import tables
 
 from simweights import CorsikaWeighter, GaisserH4a
-from simweights.utils import constcol
+from simweights._utils import constcol
 
 
 class TestCorsikaDatasets(unittest.TestCase):

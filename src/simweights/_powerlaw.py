@@ -3,7 +3,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .utils import SeedType, check_random_state
+from ._utils import SeedType, check_random_state
 
 
 class PowerLaw:

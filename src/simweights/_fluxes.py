@@ -15,7 +15,7 @@ from typing import Callable, List, Mapping, Union
 from numpy import asfarray, bool_, broadcast_arrays, exp, floating, integer, piecewise, sqrt
 from numpy.typing import ArrayLike, NDArray
 
-from .pdgcode import PDGCode
+from ._pdgcode import PDGCode
 
 # pylint: disable=too-few-public-methods
 

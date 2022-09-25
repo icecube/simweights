@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import numpy as np
 
 from simweights import Hoerandel
-from simweights.utils import constcol, corsika_to_pdg, get_column, get_table, has_column, has_table
+from simweights._utils import constcol, corsika_to_pdg, get_column, get_table, has_column, has_table
 
 
 class TestUtil(unittest.TestCase):

@@ -12,7 +12,7 @@ these are the keys which contain the information necessary to calculate the weig
 You can check that the hdf5 file was created correctly by running ``h5ls``.
 The output should look something like this:
 
-.. code-block ::
+.. code-block :: shell-session
 
     $ h5ls Level2_IC86.2016_corsika.021682.hdf5
     I3CorsikaWeight          Dataset {6948/Inf}

@@ -38,8 +38,8 @@ __all__ = [
     "Weighter",
 ]
 
-from .corsika_weighter import CorsikaWeighter
-from .fluxes import (
+from ._corsika_weighter import CorsikaWeighter
+from ._fluxes import (
     TIG1996,
     FixedFractionFlux,
     GaisserH3a,
@@ -52,11 +52,11 @@ from .fluxes import (
     Hoerandel_IT,
     Honda2004,
 )
-from .generation_surface import GenerationSurface, NullSurface, generation_surface
-from .genie_weighter import GenieWeighter
-from .nugen_weighter import NuGenWeighter
-from .pdgcode import PDGCode
-from .powerlaw import PowerLaw
-from .spatial import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
-from .utils import corsika_to_pdg
-from .weighter import Weighter
+from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._genie_weighter import GenieWeighter
+from ._nugen_weighter import NuGenWeighter
+from ._pdgcode import PDGCode
+from ._powerlaw import PowerLaw
+from ._spatial import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
+from ._utils import corsika_to_pdg
+from ._weighter import Weighter

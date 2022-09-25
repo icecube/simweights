@@ -46,13 +46,10 @@ Collaboration = "https://icecube.wisc.edu"
 line-length = 108
 target-version = ['py37']
 
-[tool.coverage.report]
-exclude_lines = ["pragma:.*no cover", "@overload"]
-
 [tool.coverage.run]
 source = ["simweights"]
 command_line = "-m pytest"
-omit = ["simweights/cmdline.py"]
+omit = ["src/simweights/cmdline.py"]
 
 [tool.isort]
 multi_line_output = 3

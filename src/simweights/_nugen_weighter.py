@@ -2,11 +2,11 @@ from typing import Any
 
 import numpy as np
 
-from .generation_surface import GenerationSurface, NullSurface, generation_surface
-from .powerlaw import PowerLaw
-from .spatial import CircleInjector, SpatialDist, UniformSolidAngleCylinder
-from .utils import constcol, get_column, get_table, has_column
-from .weighter import Weighter
+from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._powerlaw import PowerLaw
+from ._spatial import CircleInjector, SpatialDist, UniformSolidAngleCylinder
+from ._utils import constcol, get_column, get_table, has_column
+from ._weighter import Weighter
 
 
 def nugen_spatial(table: Any) -> SpatialDist:

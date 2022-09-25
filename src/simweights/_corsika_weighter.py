@@ -4,11 +4,11 @@ from typing import Any, Iterable, Mapping, Optional
 
 import numpy as np
 
-from .generation_surface import GenerationSurface, NullSurface, generation_surface
-from .powerlaw import PowerLaw
-from .spatial import NaturalRateCylinder
-from .utils import constcol, get_column, get_table, has_table
-from .weighter import Weighter
+from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._powerlaw import PowerLaw
+from ._spatial import NaturalRateCylinder
+from ._utils import constcol, get_column, get_table, has_table
+from ._weighter import Weighter
 
 
 def sframe_corsika_surface(table: Iterable[Mapping[str, float]], oversampling: bool) -> GenerationSurface:
