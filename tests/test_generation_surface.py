@@ -12,7 +12,7 @@ from simweights import (
     PowerLaw,
     generation_surface,
 )
-from simweights.generation_surface import SurfaceTuple  # noqa: F401
+from simweights.generation_surface import SurfaceTuple
 
 
 class Testgeneration_surface(unittest.TestCase):

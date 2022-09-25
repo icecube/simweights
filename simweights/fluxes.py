@@ -5,8 +5,8 @@ This files contains the same Cosmic Ray flux models as :file:`weighting/python/f
 However they have been refactored to:
 
 * output units in cm^2 rather than m^2
-* Use PDG particle codes natively instad of CORSIKA code
-* Use :py:func:`numpy.piecewise` instad of :py:mod:`numexpr`
+* Use PDG particle codes natively instead of CORSIKA code
+* Use :py:func:`numpy.piecewise` instead of :py:mod:`numexpr`
 * Follow :py:mod:`numpy` broadcasting rules
 
 """

@@ -52,7 +52,7 @@ numubar_mask = w.get_weight_column("pdgid") == simweights.PDGCode.NuMuBar
 ea_numubar = w.effective_area(energy_bins, [-1, 1], numubar_mask)
 plt.step(energy_bins, np.r_[0, ea_numubar[0]], label=r"$\bar{\nu}_{\mu}$")
 
-# not useing any mask will calculate the average
+# not using any mask will calculate the average
 ea_avg = w.effective_area(energy_bins, [-1, 1])
 plt.step(energy_bins, np.r_[0, ea_avg[0]], label="Average")
 # end-example2

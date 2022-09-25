@@ -44,5 +44,5 @@
    apireference
    cmdline
 
-The layout and orginization of this documentation is based on
+The layout and organization of this documentation is based on
 `The Documentation System <https://documentation.divio.com/>`_.

@@ -21,7 +21,7 @@ def has_table(file_obj: Any, name: str) -> bool:
 
 def get_table(file_obj: Any, name: str) -> Any:
     """
-    Helper function for getting a certian table from a file, works with h5py, pytables, and pandas
+    Helper function for getting a certain table from a file, works with h5py, pytables, and pandas
     """
     if hasattr(file_obj, "root"):
         return getattr(file_obj.root, name)
