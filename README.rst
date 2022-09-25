@@ -1,6 +1,5 @@
 
-|tests| |docs| |codecov| |LICENSE|
-
+|pre-commit.ci| |tests| |docs| |codecov| |LICENSE|
 
 .. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg?branch=main
   :target: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml
@@ -10,6 +9,9 @@
   :target: https://codecov.io/gh/icecube/simweights
 .. |LICENSE| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
   :target: https://www.gnu.org/licenses/gpl-3.0
+.. |pre-commit.ci| image:: https://results.pre-commit.ci/badge/github/icecube/simweights/main.svg
+   :target: https://results.pre-commit.ci/latest/github/icecube/simweights/main
+   :alt: pre-commit.ci status
 
 .. badge-break
 
