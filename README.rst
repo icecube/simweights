@@ -1,7 +1,7 @@
 
 |pre-commit.ci| |tests| |docs| |codecov| |LICENSE|
 
-.. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg?branch=main
+.. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yaml/badge.svg?branch=main
   :target: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml
 .. |docs| image:: https://github.com/icecube/simweights/actions/workflows/build_docs.yaml/badge.svg?branch=main
   :target: https://docs.icecube.aq/simweights/main
