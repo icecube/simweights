@@ -10,7 +10,7 @@ However they have been refactored to:
 * Follow :py:mod:`numpy` broadcasting rules
 
 """
-from typing import Callable, List, Mapping, Union
+from typing import Callable, List, Mapping, Optional, Union
 
 from numpy import asfarray, bool_, broadcast_arrays, exp, floating, integer, piecewise, sqrt
 from numpy.typing import ArrayLike, NDArray
@@ -333,7 +333,7 @@ class FixedFractionFlux(CosmicRayFlux):
     def __init__(
         self,
         fractions: Mapping[PDGCode, float],
-        basis: CosmicRayFlux = GaisserH4a_IT(),
+        basis: Optional[CosmicRayFlux] = None,
         normalized: bool = True,
     ):
         """
@@ -342,8 +342,11 @@ class FixedFractionFlux(CosmicRayFlux):
 
         :type fractions: a dictionary with dataclasses.ParticleType as keys
         """
-        self.flux = basis
-        fluxes = {int(k): 0.0 for k in basis.pdgids}
+        if basis:
+            self.flux = basis
+        else:
+            self.flux = GaisserH4a_IT()
+        fluxes = {int(k): 0.0 for k in self.flux.pdgids}
         fluxes.update({int(k): v for k, v in fractions.items()})
         self.pdgids = [PDGCode(k) for k in fluxes.keys()]
         self.fracs = list(fluxes.values())
