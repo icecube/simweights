@@ -42,20 +42,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x: NDArray[np.floating]) -> NDArray[np.floating]:
-        return x**self.g / self.integral
+    def _pdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        return np.asfarray(x**self.g / self.integral)
 
-    def _cdf(self, x: NDArray[np.floating]) -> NDArray[np.floating]:
+    def _cdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
-            return np.log(x / self.a) / self.integral
-        return (x**self.G - self.a**self.G) / self.G / self.integral
+            return np.asfarray(np.log(x / self.a) / self.integral)
+        return np.asfarray((x**self.G - self.a**self.G) / self.G / self.integral)
 
-    def _ppf(self, q: NDArray[np.floating]) -> NDArray[np.floating]:
+    def _ppf(self, q: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
-            return self.a * np.exp(q * self.integral)
-        return (q * self.G * self.integral + self.a**self.G) ** (1 / self.G)
+            return np.asfarray(self.a * np.exp(q * self.integral))
+        return np.asfarray((q * self.G * self.integral + self.a**self.G) ** (1 / self.G))
 
-    def pdf(self, x: ArrayLike) -> NDArray[np.floating]:
+    def pdf(self, x: ArrayLike) -> NDArray[np.float64]:
         r"""
         Probability density function
 
@@ -68,7 +68,7 @@ class PowerLaw:
         xa = np.asfarray(x)
         return np.piecewise(xa, [(xa >= self.a) & (xa <= self.b)], [self._pdf])
 
-    def cdf(self, x: ArrayLike) -> NDArray[np.floating]:
+    def cdf(self, x: ArrayLike) -> NDArray[np.float64]:
         r"""
         Cumulative distribution function
 
@@ -81,7 +81,7 @@ class PowerLaw:
         qa = np.asfarray(x)
         return np.piecewise(qa, [qa < self.a, qa > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q: ArrayLike) -> NDArray[np.floating]:
+    def ppf(self, q: ArrayLike) -> NDArray[np.float64]:
         """
         Percent point function (inverse of `cdf`) at `q`.
 
@@ -94,7 +94,7 @@ class PowerLaw:
         qa = np.asfarray(q)
         return np.piecewise(qa, [(qa >= 0) & (qa <= 1)], [self._ppf, np.nan])
 
-    def rvs(self, size: Any = None, random_state: SeedType = None) -> NDArray[np.floating]:
+    def rvs(self, size: Any = None, random_state: SeedType = None) -> NDArray[np.float64]:
         """
         Random variates
 

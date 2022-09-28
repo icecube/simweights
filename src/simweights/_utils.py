@@ -37,7 +37,7 @@ def has_column(table: Any, name: str) -> bool:
     return name in table
 
 
-def get_column(table: Any, name: str) -> NDArray[np.floating]:
+def get_column(table: Any, name: str) -> NDArray[np.float64]:
     """
     Helper function getting a column from a table, works with h5py, pytables, and pandas
     """
@@ -63,7 +63,7 @@ def constcol(table: Any, colname: str, mask: NDArray[np.bool_] = None) -> float:
     return val
 
 
-def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.floating]:
+def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:
     """
     Convert CORSIKA particle code to particle data group (PDG) Monte Carlo
     numbering scheme.

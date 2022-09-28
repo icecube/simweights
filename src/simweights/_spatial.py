@@ -24,24 +24,28 @@ class CylinderBase:
         self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = float(self._diff_etendue(self.cos_zen_max) - self._diff_etendue(self.cos_zen_min))
 
-    def projected_area(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
+    def projected_area(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         """
         Returns the cross sectional area of a cylinder in cm^2 as seen from the angle described by cos_zen
         """
         cosz = np.asfarray(cos_zen)
         assert np.all(cosz >= -1)
         assert np.all(cosz <= +1)
-        return self._cap * np.abs(cosz) + self._side * np.sqrt(1 - cosz**2)
+        return np.asfarray(self._cap * np.abs(cosz) + self._side * np.sqrt(1 - cosz**2))
 
-    def _diff_etendue(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
+    def _diff_etendue(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         cosz = np.asfarray(cos_zen)
         assert np.all(cosz >= -1)
         assert np.all(cosz <= +1)
-        return np.pi * (
-            self._cap * cosz * np.abs(cosz) + self._side * (cosz * np.sqrt(1 - cosz**2) - np.arccos(cosz))
+        return np.asfarray(
+            np.pi
+            * (
+                self._cap * cosz * np.abs(cosz)
+                + self._side * (cosz * np.sqrt(1 - cosz**2) - np.arccos(cosz))
+            )
         )
 
-    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
+    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         """
         Returns:
           the probability density function for the given zenith angle.
@@ -78,10 +82,10 @@ class UniformSolidAngleCylinder(CylinderBase):
 
     """
 
-    def _pdf(self, cos_zen: NDArray[np.floating]) -> NDArray[np.floating]:
+    def _pdf(self, cos_zen: NDArray[np.float64]) -> NDArray[np.float64]:
         return 1 / (2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self.projected_area(cos_zen))
 
-    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
+    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         cosz = np.asfarray(cos_zen)
         return np.piecewise(cosz, [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)], [self._pdf])
 
@@ -108,7 +112,7 @@ class NaturalRateCylinder(CylinderBase):
         super().__init__(length, radius, cos_zen_min, cos_zen_max)
         self._normalization = 1 / self.etendue
 
-    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
+    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         cosz = np.asfarray(cos_zen)
         return np.piecewise(
             cosz, [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)], [self._normalization]
@@ -137,7 +141,7 @@ class CircleInjector:
         # pylint: disable=unused-argument
         return self._cap
 
-    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.floating]:
+    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         """
         Returns:
           the probability density function for the given zenith angle.

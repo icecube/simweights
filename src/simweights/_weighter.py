@@ -24,15 +24,15 @@ class Weighter:
     def __init__(self, data: Iterable, surface: GenerationSurface):
         self.data = list(data)
         self.surface = surface
-        self.weight_cols: dict[str, NDArray] = {}
+        self.weight_cols: dict[str, NDArray[np.float64]] = {}
         self.colnames = sorted(self.weight_cols.keys())
         self.size: int | None = None
 
-    def get_column(self, table: str, column: str) -> NDArray[np.floating]:
+    def get_column(self, table: str, column: str) -> NDArray[np.float64]:
         """
         Helper function to get a specific column from the file
         """
-        retval: NDArray = np.array([])
+        retval: NDArray[np.float64] = np.array([])
         for datafile in self.data:
             retval = np.append(retval, get_column(get_table(datafile, table), column))
         return retval
@@ -52,13 +52,13 @@ class Weighter:
         self.weight_cols[name] = col
         self.colnames = sorted(self.weight_cols.keys())
 
-    def get_weight_column(self, name: str) -> NDArray[np.floating]:
+    def get_weight_column(self, name: str) -> NDArray[np.float64]:
         """
         Helper function to get a column needed in the weight calculation
         """
         return self.weight_cols[name]
 
-    def get_weights(self, flux: Any) -> NDArray[np.floating]:
+    def get_weights(self, flux: Any) -> NDArray[np.float64]:
         """
         Calculate the weights for the sample for the given flux.
 
@@ -130,7 +130,7 @@ class Weighter:
 
     def effective_area(
         self, energy_bins: ArrayLike, cos_zenith_bins: ArrayLike, mask: ArrayLike | None = None
-    ) -> NDArray[np.floating]:
+    ) -> NDArray[np.float64]:
         r"""
         Calculate The effective area for the given energy and zenith bins.
 
@@ -189,7 +189,7 @@ class Weighter:
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
-        return hist_val / (e_width * 2 * np.pi * z_width * nspecies)
+        return np.asfarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies))
 
     def __add__(self, other: Weighter) -> Weighter:
 

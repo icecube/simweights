@@ -63,7 +63,7 @@ class GenerationSurface:
     def __rmul__(self, factor: float) -> GenerationSurface:
         return self.__mul__(factor)
 
-    def get_epdf(self, pdgid: ArrayLike, energy: ArrayLike, cos_zen: ArrayLike) -> NDArray[np.floating]:
+    def get_epdf(self, pdgid: ArrayLike, energy: ArrayLike, cos_zen: ArrayLike) -> NDArray[np.float64]:
         """
         Get the extended pdf of an event.
 

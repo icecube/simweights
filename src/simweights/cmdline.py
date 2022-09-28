@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-import pandas as pd  # type: ignore
+import pandas as pd  # type: ignore[import]
 
 import simweights
 

@@ -17,11 +17,7 @@ class TestCosmicRayModels(unittest.TestCase):
         with open(os.path.dirname(__file__) + "/flux_values.json") as f:
             cls.flux_values = json.load(f)
 
-    def flux_cmp(self, name):
-        if name == "FixedFractionFlux":
-            args = ({2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4},)
-        else:
-            args = ()
+    def flux_cmp(self, name, *args):
         flux = getattr(_fluxes, name)(*args)
         v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name].keys()]))
         v2 = np.array(list(self.flux_values[name].values())) / 1e4
@@ -59,7 +55,12 @@ class TestCosmicRayModels(unittest.TestCase):
         self.flux_cmp("GlobalFitGST")
 
     def test_FixedFractionFlux(self):
-        self.flux_cmp("FixedFractionFlux")
+        self.flux_cmp("FixedFractionFlux", {2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4})
+        self.flux_cmp(
+            "FixedFractionFlux",
+            {2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4},
+            _fluxes.GaisserH4a_IT(),
+        )
 
 
 if __name__ == "__main__":
