@@ -5,7 +5,7 @@ import numpy as np
 from ._generation_surface import GenerationSurface, NullSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector
-from ._utils import constcol, get_table
+from ._utils import constcol, get_column, get_table
 from ._weighter import Weighter
 
 
@@ -14,16 +14,22 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
     Inspect the rows of a GENIE S-Frame table object to generate a surface object.
     """
     surfaces = []
-    for row in table:
-        assert row["power_law_index"] >= 0
+
+    for i in range(len(get_column(table, "n_flux_events"))):
+        assert get_column(table, "power_law_index")[i] >= 0
         spatial = CircleInjector(
-            row["cylinder_radius"],
-            np.cos(row["max_zenith"]),
-            np.cos(row["min_zenith"]),
+            get_column(table, "cylinder_radius")[i],
+            np.cos(get_column(table, "max_zenith")[i]),
+            np.cos(get_column(table, "min_zenith")[i]),
         )
-        spectrum = PowerLaw(-row["power_law_index"], row["min_energy"], row["max_energy"])
+        spectrum = PowerLaw(
+            -get_column(table, "power_law_index")[i],
+            get_column(table, "min_energy")[i],
+            get_column(table, "max_energy")[i],
+        )
         surfaces.append(
-            row["n_flux_events"] * generation_surface(int(row["primary_type"]), spectrum, spatial)
+            get_column(table, "n_flux_events")[i]
+            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
     return sum(surfaces, NullSurface)
 

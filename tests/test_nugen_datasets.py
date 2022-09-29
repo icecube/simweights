@@ -2,8 +2,11 @@
 import os
 import unittest
 
+import h5py
 import numpy as np
 import pandas as pd
+import tables
+import uproot
 
 from simweights import NuGenWeighter
 
@@ -17,103 +20,107 @@ class TestNugenDatasets(unittest.TestCase):
         cls.datadir = datadir + "/"
 
     def cmp_dataset(self, fname):
-        f = pd.HDFStore(self.datadir + "/" + fname, "r")
-        wd = f["I3MCWeightDict"]
-        w = NuGenWeighter(f, nfiles=1)
+
+        filename = os.path.join(self.datadir, fname)
+        reffile = pd.HDFStore(filename + ".hdf5", "r")
+
+        wd = reffile["I3MCWeightDict"]
         pdgid = wd["PrimaryNeutrinoType"][0]
 
         solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
         if "SolidAngle" in wd:
             np.testing.assert_allclose(solid_angle, wd["SolidAngle"])
 
-        cylinder = w.surface.spectra[pdgid][0].spatial_dist
-        proj_area = cylinder.projected_area(np.cos(wd["PrimaryNeutrinoZenith"]))
-
         if "InjectionAreaCGS" in wd:
             injection_area = wd["InjectionAreaCGS"]
         if "InjectionAreaNormCGS" in wd:
             injection_area = wd["InjectionAreaNormCGS"]
-        np.testing.assert_allclose(proj_area, injection_area)
-
-        sw_etendue = 1 / cylinder.pdf(np.cos(wd["PrimaryNeutrinoZenith"]))
-        np.testing.assert_allclose(sw_etendue, solid_angle * injection_area, 1e-5)
-
-        power_law = w.surface.spectra[pdgid][0].energy_dist
-        energy_factor = 1 / power_law.pdf(wd["PrimaryNeutrinoEnergy"])
 
         if "TotalWeight" in wd:
             total_weight = wd["TotalWeight"]
         elif "TotalInteractionProbabilityWeight" in wd:
             total_weight = wd["TotalInteractionProbabilityWeight"]
 
-        one_weight = total_weight * energy_factor * solid_angle * injection_area
-        np.testing.assert_allclose(one_weight, wd["OneWeight"])
-
-        one_weight = (
-            total_weight
-            / power_law.pdf(wd["PrimaryNeutrinoEnergy"])
-            / cylinder.pdf(np.cos(wd["PrimaryNeutrinoZenith"]))
-        )
-        np.testing.assert_allclose(one_weight, wd["OneWeight"], 1e-5)
-
         if "TypeWeight" in wd:
             type_weight = wd["TypeWeight"]
         else:
             type_weight = 0.5
-        np.testing.assert_allclose(w.get_weights(1), wd["OneWeight"] / (wd["NEvents"] * type_weight), 1e-5)
+        w0 = wd["OneWeight"] / (wd["NEvents"] * type_weight)
 
-        f.close()
+        fobjs = [
+            h5py.File(filename + ".hdf5", "r"),
+            tables.open_file(filename + ".hdf5", "r"),
+            reffile,
+            uproot.open(filename + ".root"),
+        ]
+
+        for fobj in fobjs:
+            with self.subTest(lib=str(fobj)):
+                w = NuGenWeighter(fobj, nfiles=1)
+
+                event_weight = w.get_weight_column("event_weight")
+                np.testing.assert_allclose(event_weight, total_weight)
+
+                cylinder = w.surface.spectra[pdgid][0].spatial_dist
+                proj_area = cylinder.projected_area(w.get_weight_column("cos_zen"))
+                np.testing.assert_allclose(proj_area, injection_area)
+
+                sw_etendue = 1 / cylinder.pdf(w.get_weight_column("cos_zen"))
+                np.testing.assert_allclose(sw_etendue, solid_angle * injection_area, 1e-5)
+
+                power_law = w.surface.spectra[pdgid][0].energy_dist
+                energy_factor = 1 / power_law.pdf(w.get_weight_column("energy"))
+                one_weight = (
+                    w.get_weight_column("event_weight") * energy_factor * solid_angle * injection_area
+                )
+                np.testing.assert_allclose(one_weight, wd["OneWeight"])
+
+                np.testing.assert_allclose(w.get_weights(1), w0, 1e-5)
+
+        for fobj in fobjs:
+            fobj.close()
 
     def test_20885(self):
-        self.cmp_dataset("Level2_IC86.2016_NuE.020885.000000.hdf5")
+        self.cmp_dataset("Level2_IC86.2016_NuE.020885.000000")
 
     def test_20878(self):
-        self.cmp_dataset("Level2_IC86.2016_NuMu.020878.000000.hdf5")
+        self.cmp_dataset("Level2_IC86.2016_NuMu.020878.000000")
 
     def test_20895(self):
-        self.cmp_dataset("Level2_IC86.2016_NuTau.020895.000000.hdf5")
+        self.cmp_dataset("Level2_IC86.2016_NuTau.020895.000000")
 
     def test_12646(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_nue.012646.000000.clsim-base-4.0.5.0.99_eff.hdf5")
-
-    def test_12034(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_nue.012034.000000.clsim-base-4.0.3.0.99_eff.hdf5")
-
-    def test_11981(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_nue.011981.000000.clsim-base-4.0.3.0.99_eff.hdf5")
-
-    def test_11883(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_numu.011883.000000.clsim-base-4.0.5.0.99_eff.hdf5")
+        self.cmp_dataset("Level2_IC86.2012_nugen_nue.012646.000000.clsim-base-4.0.5.0.99_eff")
 
     def test_11836(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_nutau.011836.000000.clsim-base-4.0.3.0.99_eff.hdf5")
+        self.cmp_dataset("Level2_IC86.2012_nugen_nutau.011836.000000.clsim-base-4.0.3.0.99_eff")
 
     def test_11477(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_nutau.011477.000000.clsim-base-4.0.3.0.99_eff.hdf5")
+        self.cmp_dataset("Level2_IC86.2012_nugen_nutau.011477.000000.clsim-base-4.0.3.0.99_eff")
 
     def test_11374(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_numu.011374.000050.clsim-base-4.0.3.0.99_eff.hdf5")
+        self.cmp_dataset("Level2_IC86.2012_nugen_numu.011374.000050.clsim-base-4.0.3.0.99_eff")
 
     def test_11297(self):
-        self.cmp_dataset("Level2_nugen_nutau_IC86.2012.011297.000000.hdf5")
+        self.cmp_dataset("Level2_nugen_nutau_IC86.2012.011297.000000")
 
     def test_11070(self):
-        self.cmp_dataset("Level2_nugen_numu_IC86.2012.011070.000000.hdf5")
+        self.cmp_dataset("Level2_nugen_numu_IC86.2012.011070.000000")
 
     def test_11069(self):
-        self.cmp_dataset("Level2_nugen_numu_IC86.2012.011069.000000.hdf5")
+        self.cmp_dataset("Level2_nugen_numu_IC86.2012.011069.000000")
 
     def test_11065(self):
-        self.cmp_dataset("Level2_IC86.2012_nugen_NuTau.011065.000001.hdf5")
+        self.cmp_dataset("Level2_IC86.2012_nugen_NuTau.011065.000001")
 
     def test_11029(self):
-        self.cmp_dataset("Level2_nugen_numu_IC86.2012.011029.000000.hdf5")
+        self.cmp_dataset("Level2_nugen_numu_IC86.2012.011029.000000")
 
     def test_20692(self):
-        self.cmp_dataset("Level2_IC86.2011_nugen_NuE.010692.000000.hdf5")
+        self.cmp_dataset("Level2_IC86.2011_nugen_NuE.010692.000000")
 
     def test_10634(self):
-        self.cmp_dataset("Level2_IC86.2011_nugen_NuMu.010634.000000.hdf5")
+        self.cmp_dataset("Level2_IC86.2011_nugen_NuMu.010634.000000")
 
 
 if __name__ == "__main__":

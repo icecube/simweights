@@ -1,4 +1,4 @@
-exclude: \.svg$
+exclude: \.svg$|contrib
 ci:
   autoupdate_commit_msg: 'chore: update pre-commit hooks'
 repos:
@@ -10,7 +10,7 @@ repos:
   - id: pretty-format-yaml
     args: [--autofix]
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.38.2
+  rev: v2.38.1
   hooks:
   - id: pyupgrade
     args: [--py37-plus]

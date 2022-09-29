@@ -27,7 +27,7 @@ dependencies = ["numpy>=1.21.2"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-test = ["scipy", "h5py", "tables", "pandas", "pytest-cov"]
+test = ["scipy", "h5py", "tables", "pandas", "uproot", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
 dev = ["pre-commit","pylint","mypy"]
 
@@ -58,6 +58,9 @@ line_length = 108
 
 [tool.mypy]
 plugins = "numpy.typing.mypy_plugin"
+show_error_codes = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [tool.pylint.format]
 max-line-length = "108"

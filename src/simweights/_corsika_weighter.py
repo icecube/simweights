@@ -1,6 +1,6 @@
 import numbers
 import warnings
-from typing import Any, Iterable, Mapping, Optional
+from typing import Any, Optional
 
 import numpy as np
 
@@ -11,30 +11,35 @@ from ._utils import constcol, get_column, get_table, has_table
 from ._weighter import Weighter
 
 
-def sframe_corsika_surface(table: Iterable[Mapping[str, float]], oversampling: bool) -> GenerationSurface:
+def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
     """
     Inspect the rows of a CORSIKA S-Frame table object to generate a surface object. This function works
     on files generated with either triggered CORSIKA or corsika-reader because `I3PrimaryInjectorInfo` and
     `I3CorsikaInfo` use exactly the same names for quantities.
     """
     surfaces = []
-    for row in table:
-        assert row["power_law_index"] <= 0
+
+    for i in range(len(get_column(table, "n_events"))):
+        assert get_column(table, "power_law_index")[i] <= 0
         spatial = NaturalRateCylinder(
-            row["cylinder_height"],
-            row["cylinder_radius"],
-            np.cos(row["max_zenith"]),
-            np.cos(row["min_zenith"]),
+            get_column(table, "cylinder_height")[i],
+            get_column(table, "cylinder_radius")[i],
+            np.cos(get_column(table, "max_zenith")[i]),
+            np.cos(get_column(table, "min_zenith")[i]),
         )
-        spectrum = PowerLaw(row["power_law_index"], row["min_energy"], row["max_energy"])
+        spectrum = PowerLaw(
+            get_column(table, "power_law_index")[i],
+            get_column(table, "min_energy")[i],
+            get_column(table, "max_energy")[i],
+        )
         if oversampling:
-            oversampling_val = row["oversampling"]
+            oversampling_val = get_column(table, "oversampling")[i]
         else:
             oversampling_val = 1
         surfaces.append(
-            row["n_events"]
+            get_column(table, "n_events")[i]
             * oversampling_val
-            * generation_surface(int(row["primary_type"]), spectrum, spatial)
+            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
     return sum(surfaces, NullSurface)
 

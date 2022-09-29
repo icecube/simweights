@@ -16,7 +16,7 @@ def has_table(file_obj: Any, name: str) -> bool:
     """
     if hasattr(file_obj, "root"):
         return hasattr(file_obj.root, name)
-    return name in file_obj.keys()
+    return name in file_obj
 
 
 def get_table(file_obj: Any, name: str) -> Any:
@@ -34,7 +34,11 @@ def has_column(table: Any, name: str) -> bool:
     """
     if hasattr(table, "cols"):
         return hasattr(table.cols, name)
-    return name in table
+    try:
+        table[name]  # pylint: disable=pointless-statement
+        return True
+    except (ValueError, KeyError):
+        return False
 
 
 def get_column(table: Any, name: str) -> NDArray[np.float64]:
@@ -42,8 +46,11 @@ def get_column(table: Any, name: str) -> NDArray[np.float64]:
     Helper function getting a column from a table, works with h5py, pytables, and pandas
     """
     if hasattr(table, "cols"):
-        return getattr(table.cols, name)[:]
-    return np.asfarray(table[name])
+        return np.asfarray(getattr(table.cols, name)[:])
+    column = table[name]
+    if hasattr(column, "array") and callable(column.array):
+        return column.array(library="np")
+    return np.asfarray(column)
 
 
 def constcol(table: Any, colname: str, mask: NDArray[np.bool_] = None) -> float:
