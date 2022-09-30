@@ -1,3 +1,7 @@
+REM SPDX-FileCopyrightText: © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+REM
+REM SPDX-License-Identifier: BSD-2-Clause
+
 @ECHO OFF
 
 pushd %~dp0

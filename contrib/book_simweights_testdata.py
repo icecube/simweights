@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+#
+# SPDX-License-Identifier: BSD-2-Clause
+
 import os.path
 import sys
 import tarfile

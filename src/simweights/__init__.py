@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+#
+# SPDX-License-Identifier: BSD-2-Clause
+
 """
 Pure python library for calculating the weights of Monte Carlo simulation for IceCube.
 

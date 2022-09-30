@@ -1,0 +1,12 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SimWeights
+Upstream-Contact: IceCube Collaboration <https://icecube.wisc.edu/>
+Source: https://github.com/icecube/simweights
+
+Files: docs/*.svg
+Copyright: 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+License: BSD-2-Clause
+
+Files: tests/flux_values.json
+Copyright: 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+License: BSD-2-Clause

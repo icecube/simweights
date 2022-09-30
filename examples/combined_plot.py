@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+#
+# SPDX-License-Identifier: BSD-2-Clause
+
 import numpy as np
 import pylab as plt
 import tables

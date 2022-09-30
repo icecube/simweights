@@ -1,3 +1,6 @@
+.. SPDX-FileCopyrightText: © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+..
+.. SPDX-License-Identifier: BSD-2-Clause
 
 .. include:: ../README.rst
    :start-after: badge-break

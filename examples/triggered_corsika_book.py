@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+#
+# SPDX-License-Identifier: BSD-2-Clause
+
 from glob import glob
 
 from I3Tray import I3Tray
