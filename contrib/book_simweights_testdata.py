@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os.path
+import sys
 import tarfile
 import tempfile
 
@@ -43,17 +44,21 @@ filelist = [
     "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/20885/0000000-0000999/Level2_IC86.2016_NuE.020885.000000.i3.zst",
     "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/20895/0000000-0000999/Level2_IC86.2016_NuTau.020895.000000.i3.zst",
     "/data/user/kmeagher/genie_reader_NuE.i3.gz",
+    "/home/kath/condor/L3dataprocessing/postProcessing/testoutput.i3.bz2",
 ]
 
-# tempdir = tempfile.TemporaryDirectory(prefix="simweights_testdata_")
-outdir = "/scratch/kmeagher/simweights/"
+if "notemp" in sys.argv:
+    outdir = "/scratch/kmeagher/simweights/"
+else:
+    tempdir = tempfile.TemporaryDirectory(prefix="simweights_testdata_")
+    outdir = tempdir.name
+
 
 for filename in filelist:
     basename = (
         os.path.basename(filename).replace(".i3.zst", "").replace(".i3.bz2", "").replace(".i3.gz", "")
     )
     assert basename != os.path.basename(filename)
-    outfile = os.path.join(outdir, basename)
 
     split = False
     if "corsika" in basename:
@@ -64,15 +69,29 @@ for filename in filelist:
             "CorsikaWeightMap",
             "I3CorsikaWeight",
         ]
+        streams = ["InIceSplit"]
     elif "genie" in basename:
         keys = ["I3GenieInfo", "I3GenieResult", "I3MCWeightDict"]
+        streams = ["NullSplit"]
         split = True
-    else:
+    elif "nugen" in basename or "Nu" in basename:
         keys = ["I3MCWeightDict"]
+        streams = ["InIceSplit", "in_ice"]
+    else:
+        keys = ["I3TopInjectorInfo", "MCPrimary"]
+        streams = ["IceTopSplit"]
+        basename = "icetop_" + basename
 
-    print(f"Booking {filename} -> {outfile}")
+    outfile = os.path.join(outdir, basename)
+
     if os.path.exists(outfile + ".hdf5"):
+        print(f"Skipping {filename}: {outfile} already exists!")
         continue
+
+    print(f"Booking  : {filename}")
+    print(f"  outfile: {outfile}")
+    print(f"  keys   : {keys}")
+    print(f"  streams: {streams}")
 
     tray = I3Tray()
     tray.Add("I3Reader", FileNameList=[filename])
@@ -83,15 +102,14 @@ for filename in filelist:
             Streams=[icetray.I3Frame.DAQ],
             If=lambda f: "I3EventHeader" not in f,
         )
-        tray.Add("I3NullSplitter", SubEventStreamName="InIceSplit")
-    tray.Add("Dump")
+        tray.Add("I3NullSplitter", SubEventStreamName="NullSplit")
     tray.Add(
         tableio.I3TableWriter,
         tableservice=[
             hdfwriter.I3HDFTableService(outfile + ".hdf5"),
             rootwriter.I3ROOTTableService(outfile + ".root"),
         ],
-        SubEventStreams=["InIceSplit", "in_ice"],
+        SubEventStreams=streams,
         keys=keys,
     )
 
@@ -99,7 +117,7 @@ for filename in filelist:
     del tray
 
 
-tarfilename = "/data/user/kmeagher/simweights_testdata.tar.gz"
+tarfilename = "/data/user/kmeagher/simweights_testdata_test.tar.gz"
 print(f"Writing tarfile {tarfilename}")
 
 with tarfile.open(tarfilename, "w:gz") as tar:

@@ -141,3 +141,4 @@ cython_debug/
 # Documentation specific file
 /docs/cmdline.txt
 *.tar.gz
+*.root

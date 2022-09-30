@@ -1,4 +1,3 @@
-exclude: \.svg$|contrib
 ci:
   autoupdate_commit_msg: 'chore: update pre-commit hooks'
 repos:
@@ -33,12 +32,14 @@ repos:
   hooks:
   - id: flake8
     additional_dependencies: [flake8-bugbear]
+    exclude: ^contrib/
 - repo: https://github.com/pycqa/pylint
   rev: v2.15.3
   hooks:
   - id: pylint
     args: [--max-line-length=108, -d E0401]
     files: simweights
+    exclude: ^contrib/
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v0.971
   hooks:
@@ -46,6 +47,7 @@ repos:
     files: simweights
     args: [--disallow-untyped-defs, --disallow-incomplete-defs, --check-untyped-defs, --disallow-untyped-decorators]
     additional_dependencies: [numpy]
+    exclude: ^contrib/
 - repo: https://github.com/codespell-project/codespell
   rev: v2.2.1
   hooks:
@@ -90,3 +92,4 @@ repos:
   - id: name-tests-test
     args: [--pytest-test-first]
   - id: trailing-whitespace
+    exclude: \.svg$
