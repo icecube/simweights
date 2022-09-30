@@ -10,8 +10,8 @@
   :target: https://docs.icecube.aq/simweights/main
 .. |codecov| image:: https://codecov.io/gh/icecube/simweights/branch/main/graph/badge.svg?token=LQ20TAMY9C
   :target: https://codecov.io/gh/icecube/simweights
-.. |LICENSE| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
-  :target: https://www.gnu.org/licenses/gpl-3.0
+.. |LICENSE| image:: https://img.shields.io/badge/License-BSD_2--Clause-orange.svg
+  :target: https://opensource.org/licenses/BSD-2-Clause
 .. |pre-commit.ci| image:: https://results.pre-commit.ci/badge/github/icecube/simweights/main.svg
    :target: https://results.pre-commit.ci/latest/github/icecube/simweights/main
    :alt: pre-commit.ci status
@@ -139,9 +139,9 @@ Contribution to the source code can done via the
 
 .. Contributors
 
-License
+Copying
 =======
 
-Code in this repository is Copyright (c) 2022, The IceCube Collaboration (https://icecube.wisc.edu)
+Code in this repository is copyright © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
 
-Code in this repository is listened under the GNU General Public License v3.0 or later(GPL-3.0-or-later). A copy is included in the LICENSE file.
+Code in this repository is listened under the The 2-Clause BSD License (BSD-2-Clause). A copy is available in LICENSES/BSD-2-Clause.txt.

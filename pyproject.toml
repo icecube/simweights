@@ -10,13 +10,13 @@ build-backend = "flit_core.buildapi"
 name = "simweights"
 readme = "README.rst"
 requires-python = "~=3.7"
-license = {file = "LICENCE.txt"}
+license = {file = "LICENSES/BSD-2-Clause.txt"}
 authors = [{name = "Kevin Meagher"}]
 keywords = ["python", "science", "astronomy", "astrophysics", "IceCube", "neutrino", "simulation"]
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+    'License :: OSI Approved :: BSD License',
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: POSIX :: Linux',
     'Programming Language :: Python',
@@ -33,7 +33,7 @@ dynamic = ["version", "description"]
 [project.optional-dependencies]
 test = ["scipy", "h5py", "tables", "pandas", "uproot", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
-dev = ["pre-commit","pylint","mypy"]
+dev = ["pre-commit"]
 
 [project.scripts]
 simweights = "simweights.cmdline:main"
