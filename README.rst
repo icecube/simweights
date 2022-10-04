@@ -138,10 +138,3 @@ Contribution to the source code can done via the
 `Pull Request <https://github.com/icecube/simweights/pulls>`_ tab on GitHub.
 
 .. Contributors
-
-Copying
-=======
-
-Code in this repository is copyright © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
-
-Code in this repository is listened under the The 2-Clause BSD License (BSD-2-Clause). A copy is available in LICENSES/BSD-2-Clause.txt.

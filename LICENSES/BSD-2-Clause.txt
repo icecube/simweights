@@ -1,4 +1,4 @@
-Copyright (c) 2022 the IceCube SimWeights contributors (https://github.com/icecube/simweights/graphs/contributors)
+Copyright (c) <year> <owner>
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

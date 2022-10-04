@@ -22,9 +22,9 @@ import os
 
 # -- Project information -----------------------------------------------------
 
-project = "simweights"
-copyright = "2021, The IceCube Collaboration"
-author = "The IceCube Collaboration"
+project = "SimWeights"
+copyright = "Copyright © 2022 the SimWeights contributors"
+author = "Kevin Meagher"
 
 # The full version, including alpha/beta/rc tags
 release = "0.1"
