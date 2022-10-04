@@ -1,4 +1,4 @@
-REM SPDX-FileCopyrightText: © 2022 IceCube Collaboration <https://icecube.wisc.edu/>
+REM SPDX-FileCopyrightText: © 2022 the SimWeights contributors
 REM
 REM SPDX-License-Identifier: BSD-2-Clause
 
