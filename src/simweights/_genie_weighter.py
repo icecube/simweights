@@ -38,7 +38,7 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
     return sum(surfaces, NullSurface)
 
 
-def GenieWeighter(infile: Any) -> Weighter:
+def GenieWeighter(file_obj: Any) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for GENIE simulation
@@ -46,11 +46,11 @@ def GenieWeighter(infile: Any) -> Weighter:
     Reads ``I3GenieInfo`` from S-Frames and ``I3GenieResult`` from Q-Frames.
     """
 
-    weight_table = get_table(infile, "I3GenieInfo")
+    weight_table = get_table(file_obj, "I3GenieInfo")
     surface = genie_surface(weight_table)
     global_probability_scale = constcol(weight_table, "global_probability_scale")
 
-    weighter = Weighter([infile], surface)
+    weighter = Weighter([file_obj], surface)
     weighter.add_weight_column("energy", weighter.get_column("I3GenieResult", "Ev"))
     weighter.add_weight_column("pdgid", weighter.get_column("I3GenieResult", "neu").astype(np.int32))
     weighter.add_weight_column("cos_zen", np.full(len(weighter.get_column("I3GenieResult", "Ev")), 1))

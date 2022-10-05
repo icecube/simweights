@@ -38,14 +38,14 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
     return sum(surfaces, NullSurface)
 
 
-def IceTopWeighter(infile: Any) -> Weighter:
+def IceTopWeighter(file_obj: Any) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for IceTop CORSIKA simulation made with I3TopSimulator.cxx
     """
 
-    surface = sframe_icetop_surface(get_table(infile, "I3TopInjectorInfo"))
-    weighter = Weighter([infile], surface)
+    surface = sframe_icetop_surface(get_table(file_obj, "I3TopInjectorInfo"))
+    weighter = Weighter([file_obj], surface)
 
     pdgid = weighter.get_column("MCPrimary", "type")
     weighter.add_weight_column("pdgid", pdgid)

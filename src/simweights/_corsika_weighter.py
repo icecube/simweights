@@ -78,7 +78,7 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
     return sum(surface, NullSurface)
 
 
-def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
+def CorsikaWeighter(file_obj: Any, nfiles: Optional[int] = None) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader
@@ -88,33 +88,33 @@ def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
     of files.
     """
 
-    if has_table(infile, "I3CorsikaWeight"):
+    if has_table(file_obj, "I3CorsikaWeight"):
         if nfiles is not None:
             raise RuntimeError(
-                f"This file, `{getattr(infile, 'filename', '<NONE>')}`, was identified as a triggered "
+                f"This file, `{getattr(file_obj, 'filename', '<NONE>')}`, was identified as a triggered "
                 "CORSIKA file based on the existence of the `I3CorsikaWeight` object. However the "
                 "parameter nfiles was passed to CorsikaWeighter. This is unnecessary."
             )
 
         info_obj = "I3PrimaryInjectorInfo"
-        if not has_table(infile, info_obj):
+        if not has_table(file_obj, info_obj):
             raise RuntimeError(
-                f"This file, `{getattr(infile, 'filename', '<NONE>')}`, was identified as a triggered "
+                f"This file, `{getattr(file_obj, 'filename', '<NONE>')}`, was identified as a triggered "
                 "CORSIKA file based on the existence of the `I3CorsikaWeight` object. However it seems to "
                 "be missing the S-Frames table `I3PrimaryInjectorInfo`."
             )
 
-        surface = sframe_corsika_surface(get_table(infile, info_obj), oversampling=False)
+        surface = sframe_corsika_surface(get_table(file_obj, info_obj), oversampling=False)
         triggered = True
 
     elif nfiles is None:
         info_obj = "I3CorsikaInfo"
-        if not has_table(infile, info_obj):
+        if not has_table(file_obj, info_obj):
             raise RuntimeError(
-                f"File `{getattr(infile, 'filename', '<NONE>')}` is was not passed an parameter for nfiles "
-                "and no I3CorsikaInfo table was found."
+                f"File `{getattr(file_obj, 'filename', '<NONE>')}` is was not passed an parameter for "
+                "nfiles and no I3CorsikaInfo table was found."
             )
-        surface = sframe_corsika_surface(get_table(infile, info_obj), oversampling=True)
+        surface = sframe_corsika_surface(get_table(file_obj, info_obj), oversampling=True)
         triggered = False
 
     else:
@@ -123,17 +123,17 @@ def CorsikaWeighter(infile: Any, nfiles: Optional[int] = None) -> Weighter:
                 "CorsikaWeighter: argument nfiles must be a floating point number. Got " + str(nfiles)
             )
 
-        if has_table(infile, "I3CorsikaInfo"):
+        if has_table(file_obj, "I3CorsikaInfo"):
             warnings.warn(
                 "CorsikaWeighter was given a value for nfiles, but this file has an "
                 "I3CorsikaInfo table indicating it has S-Frames"
             )
 
-        table = get_table(infile, "CorsikaWeightMap")
+        table = get_table(file_obj, "CorsikaWeightMap")
         surface = nfiles * weight_map_corsika_surface(table)
         triggered = False
 
-    weighter = Weighter([infile], surface)
+    weighter = Weighter([file_obj], surface)
 
     if triggered:
         weighter.add_weight_column("pdgid", weighter.get_column("I3CorsikaWeight", "type"))

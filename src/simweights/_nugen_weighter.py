@@ -90,7 +90,7 @@ def nugen_surface(table: Any) -> GenerationSurface:
     return sum(surfaces, NullSurface)
 
 
-def NuGenWeighter(infile: Any, nfiles: int) -> Weighter:
+def NuGenWeighter(file_obj: Any, nfiles: int) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for neutrino-generator (NuGen) simulation
@@ -101,10 +101,10 @@ def NuGenWeighter(infile: Any, nfiles: int) -> Weighter:
     the neutrino cross-section, detector density, and distance traveled through the generation volume.
     """
 
-    weight_table = get_table(infile, "I3MCWeightDict")
+    weight_table = get_table(file_obj, "I3MCWeightDict")
     surface = nfiles * nugen_surface(weight_table)
 
-    weighter = Weighter([infile], surface)
+    weighter = Weighter([file_obj], surface)
     weighter.add_weight_column("energy", weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoEnergy"))
     weighter.add_weight_column(
         "pdgid", weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoType").astype(np.int32)
