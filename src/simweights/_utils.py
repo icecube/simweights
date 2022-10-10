@@ -98,7 +98,7 @@ def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:
     )
 
 
-def check_run_counts(table: Any, nfiles: int) -> bool:  # pragma: no cover
+def check_run_counts(table: Any, nfiles: float) -> bool:  # pragma: no cover
     """
     check that the number of jobs in the file is what the user claims they are
     Not Currently used
@@ -134,4 +134,4 @@ def check_random_state(seed: SeedType = None) -> GeneratorType:
         return np.random.default_rng(seed)
     if isinstance(seed, (RandomState, Generator)):
         return seed
-    raise ValueError(f"{seed!r} cannot be used to seed a" " numpy.random.Generator instance")
+    raise ValueError(f"{seed!r} cannot be used to seed a numpy.random.Generator instance")

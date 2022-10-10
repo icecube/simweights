@@ -90,7 +90,7 @@ def nugen_surface(table: Any) -> GenerationSurface:
     return sum(surfaces, NullSurface)
 
 
-def NuGenWeighter(file_obj: Any, nfiles: int) -> Weighter:
+def NuGenWeighter(file_obj: Any, nfiles: float) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for neutrino-generator (NuGen) simulation

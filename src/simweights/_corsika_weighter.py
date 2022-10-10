@@ -78,7 +78,7 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
     return sum(surface, NullSurface)
 
 
-def CorsikaWeighter(file_obj: Any, nfiles: Optional[int] = None) -> Weighter:
+def CorsikaWeighter(file_obj: Any, nfiles: Optional[float] = None) -> Weighter:
     # pylint: disable=invalid-name
     """
     Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader

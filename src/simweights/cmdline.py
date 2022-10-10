@@ -10,7 +10,7 @@ import pandas as pd  # type: ignore[import]
 import simweights
 
 
-def find_weighter(fileobj: pd.HDFStore, nfiles: int) -> simweights.Weighter:
+def find_weighter(fileobj: pd.HDFStore, nfiles: float) -> simweights.Weighter:
     """
     Try to automatically determine which type of file this is and return the correct weighter
     """
@@ -41,7 +41,7 @@ def main() -> int:
         "A simple utility to quickly print basic info about how simweights will weight a simulation file"
     )
     parser.add_argument("filename")
-    parser.add_argument("-n", "--nfiles", type=int, default=1)
+    parser.add_argument("-n", "--nfiles", type=float, default=1)
     parser.add_argument("-f", "--flux", default=None)
     parser.add_argument("-w", "--weighter", default="TriggeredCorsikaWeighter")
     args = parser.parse_args()
