@@ -128,13 +128,9 @@ Getting Help
 Please direct any questions to ``@kjm`` on the slack channel
 `#software <https://icecube-spno.slack.com/channels/software>`_.
 
+.. contrib-break
+
 Contributing
 ============
 
-Any bugs or other issues can be filed at the
-`Issue Tracker <https://github.com/icecube/simweights/issues>`_ on GitHub.
-
-Contribution to the source code can done via the
-`Pull Request <https://github.com/icecube/simweights/pulls>`_ tab on GitHub.
-
-.. Contributors
+See the `contributing guide <CONTRIBUTING.rst>`_

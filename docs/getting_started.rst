@@ -10,3 +10,4 @@ The source code for simweights is available on `github <https://github.com/icecu
 
 .. include:: ../README.rst
     :start-after: doc-break
+    :end-before: contrib-break

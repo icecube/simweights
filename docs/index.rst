@@ -10,6 +10,7 @@
    :maxdepth: 1
 
    getting_started
+   contributing
 
 .. toctree::
    :maxdepth: 1

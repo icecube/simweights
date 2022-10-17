@@ -67,4 +67,6 @@ linkcheck_auth = [
 linkcheck_allowed_redirects = {
     r"https://doi.org/.*": r".*",
     r"https://icecube-spno.slack.com/.*": r"https://icecube-spno.slack.com/.*",
+    r"https://docs.pytest.org": r"https://docs.pytest.org/.*",
+    r"https://results.pre-commit.ci/.*": r"https://results.pre-commit.ci/.*",
 }
