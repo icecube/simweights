@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector
 from ._utils import get_column, get_table
@@ -35,7 +35,7 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
             get_column(table, "n_events")[i]
             * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
-    return sum(surfaces, NullSurface)
+    return sum(surfaces)
 
 
 def IceTopWeighter(file_obj: Any) -> Weighter:

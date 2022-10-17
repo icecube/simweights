@@ -195,7 +195,12 @@ class Weighter:
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
         return np.asfarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies))
 
-    def __add__(self, other: Weighter) -> Weighter:
+    def __add__(self, other: Weighter | int) -> Weighter:
+
+        if other == 0:
+            return self
+        if not isinstance(other, Weighter):
+            raise TypeError(f"cannot add {other!r} to weighter object {self!r}")
 
         weighter = Weighter(self.data + other.data, self.surface + other.surface)
 
@@ -203,6 +208,10 @@ class Weighter:
             if colname in other.weight_cols:
                 weighter.add_weight_column(colname, np.append(column, other.weight_cols[colname]))
         return weighter
+
+    def __radd__(self, other: Weighter | int) -> Weighter:
+
+        return self + other
 
     def tostring(self, flux: None | object | Callable | ArrayLike = None) -> str:
         """

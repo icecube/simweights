@@ -9,14 +9,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from simweights import (
-    GenerationSurface,
-    NaturalRateCylinder,
-    NullSurface,
-    PDGCode,
-    PowerLaw,
-    generation_surface,
-)
+from simweights import GenerationSurface, NaturalRateCylinder, PDGCode, PowerLaw, generation_surface
 from simweights._generation_surface import SurfaceTuple
 
 
@@ -104,9 +97,9 @@ class Testgeneration_surface(unittest.TestCase):
         n0 = 10000
         n1 = 20000
 
-        sa = self.s0 + NullSurface
+        sa = self.s0 + 0
         self.assertEqual(sa, self.s0)
-        sb = NullSurface + self.s0
+        sb = 0 + self.s0
         self.assertEqual(sb, self.s0)
 
         s = self.s0 + self.s1
@@ -258,9 +251,9 @@ class Testgeneration_surface(unittest.TestCase):
 
     def test_addition_gsc(self):
 
-        sa = self.gsc1 + NullSurface
+        sa = self.gsc1 + 0
         self.assertEqual(sa, self.gsc1)
-        sb = NullSurface + self.gsc1
+        sb = 0 + self.gsc1
         self.assertEqual(sb, self.gsc1)
 
         s0 = self.gsc1 + self.s0
@@ -299,6 +292,10 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(s6.spectra[2212][0].nevents, 20000)
         self.assertEqual(s6.spectra[2212][1].nevents, 10000)
         self.assertEqual(s6.spectra[2213][0].nevents, 10000)
+
+        self.assertEqual(
+            sum([self.gsc1, self.gsc2, self.gsc3, self.gsc4]), self.gsc1 + self.gsc2 + self.gsc3 + self.gsc4
+        )
 
         with self.assertRaises(TypeError):
             self.gsc2 + 47

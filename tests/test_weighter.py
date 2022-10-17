@@ -237,6 +237,36 @@ class TestWeighter(unittest.TestCase):
         self.assertEqual(self.weighter1.colnames, weighterc.colnames)
         self.check_weight(weighterc, 2 * self.N1, self.p1.integral * self.c1.etendue)
 
+        weighterd = self.weighter1 + 0
+        self.assertEqual(len(self.weighter1.data), len(weighterd.data))
+        self.assertEqual(self.weighter1.surface, weighterd.surface)
+        self.assertEqual(self.weighter1.colnames, weighterd.colnames)
+        self.check_weight(weighterd, self.N1, self.p1.integral * self.c1.etendue)
+
+        weightere = 0 + self.weighter1
+        self.assertEqual(len(self.weighter1.data), len(weightere.data))
+        self.assertEqual(self.weighter1.surface, weightere.surface)
+        self.assertEqual(self.weighter1.colnames, weightere.colnames)
+        self.check_weight(weightere, self.N1, self.p1.integral * self.c1.etendue)
+
+        weighterf = sum([self.weighter1, self.weighter2])
+        self.assertEqual(2 * len(self.weighter1.data), len(weighterf.data))
+        self.assertEqual(2 * self.weighter1.surface, weighterf.surface)
+        self.assertEqual(self.weighter1.colnames, weighterf.colnames)
+        self.check_weight(weighterf, 2 * self.N1, self.p1.integral * self.c1.etendue)
+
+        with self.assertRaises(TypeError):
+            5 + self.weighter1
+
+        with self.assertRaises(TypeError):
+            self.weighter1 + 33.3
+
+        with self.assertRaises(TypeError):
+            None + self.weighter1
+
+        with self.assertRaises(TypeError):
+            self.weighter1 + object()
+
     def test_nuflux(self):
         try:
             import nuflux

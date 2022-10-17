@@ -45,8 +45,10 @@ class GenerationSurface:
         else:
             self.spectra[key].append(deepcopy(surface))
 
-    def __add__(self, other: GenerationSurface) -> GenerationSurface:
+    def __add__(self, other: int | GenerationSurface) -> GenerationSurface:
         output = deepcopy(self)
+        if other == 0:
+            return output
         if not isinstance(other, GenerationSurface):
             raise TypeError(f"Cannot add {type(self)} to {type(other)}")
         for _, ospectra in other.spectra.items():
@@ -54,7 +56,7 @@ class GenerationSurface:
                 output._insert(ospec)
         return output
 
-    def __radd__(self, other: GenerationSurface) -> GenerationSurface:
+    def __radd__(self, other: int | GenerationSurface) -> GenerationSurface:
         return self + other
 
     def __mul__(self, factor: float) -> GenerationSurface:
@@ -185,6 +187,3 @@ def generation_surface(
     return GenerationSurface(
         SurfaceTuple(pdgid=pdgid, nevents=1.0, energy_dist=energy_dist, spatial_dist=spatial_dist)
     )
-
-
-NullSurface = GenerationSurface()

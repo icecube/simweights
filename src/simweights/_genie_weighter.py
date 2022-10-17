@@ -6,7 +6,7 @@ from typing import Any, Iterable, Mapping
 
 import numpy as np
 
-from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector
 from ._utils import constcol, get_column, get_table
@@ -35,7 +35,7 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
             get_column(table, "n_flux_events")[i]
             * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
-    return sum(surfaces, NullSurface)
+    return sum(surfaces)
 
 
 def GenieWeighter(file_obj: Any) -> Weighter:

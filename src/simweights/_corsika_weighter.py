@@ -8,7 +8,7 @@ from typing import Any, Optional
 
 import numpy as np
 
-from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import NaturalRateCylinder
 from ._utils import constcol, get_column, get_table, has_table
@@ -45,7 +45,7 @@ def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
             * oversampling_val
             * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
-    return sum(surfaces, NullSurface)
+    return sum(surfaces)
 
 
 def weight_map_corsika_surface(table: Any) -> GenerationSurface:
@@ -54,7 +54,7 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
 
     """
     pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
-    surface = []
+    surface: int | GenerationSurface = 0
     for pdgid in pdgids:
         mask = pdgid == get_column(table, "ParticleType")
 
@@ -74,8 +74,9 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
             constcol(table, "EnergyPrimaryMax", mask),
         )
         nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
-        surface.append(nevents * generation_surface(pdgid, spectrum, spatial))
-    return sum(surface, NullSurface)
+        surface += nevents * generation_surface(pdgid, spectrum, spatial)
+    assert isinstance(surface, GenerationSurface)
+    return surface
 
 
 def CorsikaWeighter(file_obj: Any, nfiles: Optional[float] = None) -> Weighter:

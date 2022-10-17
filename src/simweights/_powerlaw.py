@@ -118,5 +118,5 @@ class PowerLaw:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PowerLaw):
-            raise ValueError(f"{self} cannot be compared to {other}")
+            raise TypeError(f"{self} cannot be compared to {other}")
         return self.g == other.g and self.a == other.a and self.b == other.b

@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from ._generation_surface import GenerationSurface, NullSurface, generation_surface
+from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector, SpatialDist, UniformSolidAngleCylinder
 from ._utils import constcol, get_column, get_table, has_column
@@ -87,7 +87,9 @@ def nugen_surface(table: Any) -> GenerationSurface:
         primary_type = constcol(table, "PrimaryNeutrinoType", mask)
         n_events = type_weight * constcol(table, "NEvents", mask)
         surfaces.append(n_events * generation_surface(int(primary_type), spectrum, spatial))
-    return sum(surfaces, NullSurface)
+    ret = sum(surfaces)
+    assert isinstance(ret, GenerationSurface)
+    return ret
 
 
 def NuGenWeighter(file_obj: Any, nfiles: float) -> Weighter:

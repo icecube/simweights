@@ -142,9 +142,9 @@ class TestPowerLaw(unittest.TestCase):
     def test_raises(self):
 
         p = PowerLaw(1, 1, 1000)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             p == object()  # noqa: B015
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             p == np.array([])  # noqa: B015
 
 
