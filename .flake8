@@ -1,7 +1,0 @@
-# SPDX-FileCopyrightText: © 2022 the SimWeights contributors
-#
-# SPDX-License-Identifier: BSD-2-Clause
-
-[flake8]
-max-line-length = 108
-extend-ignore = F401, W503
