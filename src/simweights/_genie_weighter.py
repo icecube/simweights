@@ -35,7 +35,9 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
             get_column(table, "n_flux_events")[i]
             * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
-    return sum(surfaces)
+    retval = sum(surfaces)
+    assert isinstance(retval, GenerationSurface)
+    return retval
 
 
 def GenieWeighter(file_obj: Any) -> Weighter:

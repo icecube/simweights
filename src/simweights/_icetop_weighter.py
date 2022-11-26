@@ -35,7 +35,9 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
             get_column(table, "n_events")[i]
             * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
-    return sum(surfaces)
+    retval = sum(surfaces)
+    assert isinstance(retval, GenerationSurface)
+    return retval
 
 
 def IceTopWeighter(file_obj: Any) -> Weighter:

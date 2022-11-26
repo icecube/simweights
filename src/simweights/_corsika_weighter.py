@@ -45,7 +45,9 @@ def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
             * oversampling_val
             * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
         )
-    return sum(surfaces)
+    retval = sum(surfaces)
+    assert isinstance(retval, GenerationSurface)
+    return retval
 
 
 def weight_map_corsika_surface(table: Any) -> GenerationSurface:
