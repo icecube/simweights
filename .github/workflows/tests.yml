@@ -16,10 +16,10 @@ jobs:
     - uses: actions/checkout@v3
     - name: Apt-Get Install Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.python-version=='3.11' }}
-      run: sudo apt-get -y install libhdf5-dev
+      run: sudo apt-get -y install libblosc-dev libhdf5-dev
     - name: HomeBrew Install Dependencies
       if: ${{ contains(matrix.os, 'macos') && matrix.python-version=='3.11' }}
-      run: brew install libhdf5
+      run: brew install c-blosc hdf5
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -42,30 +42,3 @@ jobs:
       with:
         fail_ci_if_error: false
         verbose: true
-  BuildDocs:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        cache: pip
-        cache-dependency-path: pyproject.toml
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install .[docs]
-    - name: Run Sphinx
-      working-directory: ./docs
-      run: make html SPHINXOPTS="-W --keep-going"
-    - name: Upload docs to docs.icecube.aq
-      if: ${{ github.ref_name == 'main' }}
-      working-directory: ./docs
-      run: |
-        tar -czvf simweights_docs.tar.gz -C_build/html .
-        curl -XPUT -i --data-binary @simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${{ secrets.ICECUBE_PASSWORD }}
-    - name: Check Links
-      working-directory: ./docs
-      env:
-        ICECUBE_PASSWORD: ${{ secrets.ICECUBE_PASSWORD }}
-      run: make linkcheck SPHINXOPTS="-W --keep-going"
