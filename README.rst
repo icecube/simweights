@@ -4,9 +4,9 @@
 
 |pre-commit.ci| |tests| |docs| |codecov| |LICENSE|
 
-.. |tests| image:: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml/badge.svg?branch=main
-  :target: https://github.com/icecube/simweights/actions/workflows/unit_tests.yml
-.. |docs| image:: https://github.com/icecube/simweights/actions/workflows/build_docs.yml/badge.svg?branch=main
+.. |tests| image:: https://github.com/icecube/simweights/actions/workflows/ci.yml/badge.svg?branch=main
+  :target: https://github.com/icecube/simweights/actions/workflows/ci.yml
+.. |docs| image:: https://github.com/icecube/simweights/actions/workflows/ci.yml/badge.svg?branch=main
   :target: https://docs.icecube.aq/simweights/main
 .. |codecov| image:: https://codecov.io/gh/icecube/simweights/branch/main/graph/badge.svg?token=LQ20TAMY9C
   :target: https://codecov.io/gh/icecube/simweights
