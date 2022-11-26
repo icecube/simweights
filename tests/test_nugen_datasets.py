@@ -5,13 +5,16 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import os
+import sys
 import unittest
 
 import h5py
 import numpy as np
-import pandas as pd
-import tables
 import uproot
+
+if sys.hexversion < 0x30B0000:
+    import tables
+    import pandas as pd
 
 from simweights import NuGenWeighter
 
@@ -27,37 +30,39 @@ class TestNugenDatasets(unittest.TestCase):
     def cmp_dataset(self, fname):
 
         filename = os.path.join(self.datadir, fname)
-        reffile = pd.HDFStore(filename + ".hdf5", "r")
+        reffile = h5py.File(filename + ".hdf5", "r")
 
         wd = reffile["I3MCWeightDict"]
         pdgid = wd["PrimaryNeutrinoType"][0]
 
         solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
-        if "SolidAngle" in wd:
+        if "SolidAngle" in wd.dtype.names:
             np.testing.assert_allclose(solid_angle, wd["SolidAngle"])
 
-        if "InjectionAreaCGS" in wd:
+        if "InjectionAreaCGS" in wd.dtype.names:
             injection_area = wd["InjectionAreaCGS"]
-        if "InjectionAreaNormCGS" in wd:
+        if "InjectionAreaNormCGS" in wd.dtype.names:
             injection_area = wd["InjectionAreaNormCGS"]
 
-        if "TotalWeight" in wd:
+        if "TotalWeight" in wd.dtype.names:
             total_weight = wd["TotalWeight"]
-        elif "TotalInteractionProbabilityWeight" in wd:
+        elif "TotalInteractionProbabilityWeight" in wd.dtype.names:
             total_weight = wd["TotalInteractionProbabilityWeight"]
 
-        if "TypeWeight" in wd:
+        if "TypeWeight" in wd.dtype.names:
             type_weight = wd["TypeWeight"]
         else:
             type_weight = 0.5
         w0 = wd["OneWeight"] / (wd["NEvents"] * type_weight)
 
         fobjs = [
-            h5py.File(filename + ".hdf5", "r"),
-            tables.open_file(filename + ".hdf5", "r"),
             reffile,
             uproot.open(filename + ".root"),
         ]
+
+        if sys.hexversion < 0x30B0000:
+            fobjs.append(tables.open_file(filename + ".hdf5", "r"))
+            fobjs.append(pd.HDFStore(filename + ".hdf5", "r"))
 
         for fobj in fobjs:
             with self.subTest(lib=str(fobj)):

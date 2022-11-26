@@ -5,13 +5,16 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import os
+import sys
 import unittest
 
 import h5py
 import numpy as np
-import pandas
-import tables
 import uproot
+
+if sys.hexversion < 0x30B0000:
+    import pandas
+    import tables
 
 from simweights import CorsikaWeighter, GaisserH4a
 from simweights._utils import constcol
@@ -27,38 +30,38 @@ class TestCorsikaDatasets(unittest.TestCase):
         cls.datadir = datadir + "/"
 
     def untriggered_weights(self, f):
-        cwm = f.root.CorsikaWeightMap
-        pflux = self.flux(cwm.cols.PrimaryEnergy[:], cwm.cols.PrimaryType[:])
-        if (cwm.cols.PrimarySpectralIndex[:] == -1).any():
-            assert (cwm.cols.PrimarySpectralIndex[:] == -1).all()
-            energy_integral = np.log(cwm.cols.EnergyPrimaryMax[:] / cwm.cols.EnergyPrimaryMin[:])
+        cwm = f["CorsikaWeightMap"]
+        pflux = self.flux(cwm["PrimaryEnergy"], cwm["PrimaryType"])
+        if (cwm["PrimarySpectralIndex"] == -1).any():
+            assert (cwm["PrimarySpectralIndex"] == -1).all()
+            energy_integral = np.log(cwm["EnergyPrimaryMax"] / cwm["EnergyPrimaryMin"])
         else:
             energy_integral = (
-                cwm.cols.EnergyPrimaryMax[:] ** (cwm.cols.PrimarySpectralIndex[:] + 1)
-                - cwm.cols.EnergyPrimaryMin[:] ** (cwm.cols.PrimarySpectralIndex[:] + 1)
-            ) / (cwm.cols.PrimarySpectralIndex[:] + 1)
+                cwm["EnergyPrimaryMax"] ** (cwm["PrimarySpectralIndex"] + 1)
+                - cwm["EnergyPrimaryMin"] ** (cwm["PrimarySpectralIndex"] + 1)
+            ) / (cwm["PrimarySpectralIndex"] + 1)
 
-        energy_weight = cwm.cols.PrimaryEnergy[:] ** cwm.cols.PrimarySpectralIndex[:]
+        energy_weight = cwm["PrimaryEnergy"] ** cwm["PrimarySpectralIndex"]
         return (
             1e4
             * pflux
             * energy_integral
             / energy_weight
-            * cwm.cols.AreaSum[:]
-            / (cwm.cols.NEvents[:] * cwm.cols.OverSampling[:])
+            * cwm["AreaSum"]
+            / (cwm["NEvents"] * cwm["OverSampling"])
         )
 
     def triggered_weights(self, f):
-        i3cw = f.root.I3CorsikaWeight
-        flux_val = self.flux(i3cw.cols.energy[:], i3cw.cols.type)
-        info = f.root.I3PrimaryInjectorInfo
-        energy = i3cw.cols.energy[:]
+        i3cw = f["I3CorsikaWeight"]
+        flux_val = self.flux(i3cw["energy"], i3cw["type"])
+        info = f["I3PrimaryInjectorInfo"]
+        energy = i3cw["energy"]
         epdf = np.zeros_like(energy, dtype=float)
 
-        for ptype in np.unique(info.cols.primary_type[:]):
+        for ptype in np.unique(info["primary_type"]):
 
-            info_mask = info.cols.primary_type[:] == ptype
-            n_events = info.cols.n_events[:][info_mask].sum()
+            info_mask = info["primary_type"] == ptype
+            n_events = info["n_events"][info_mask].sum()
             min_energy = constcol(info, "min_energy", info_mask)
             max_energy = constcol(info, "max_energy", info_mask)
             min_zenith = constcol(info, "min_zenith", info_mask)
@@ -80,11 +83,11 @@ class TestCorsikaDatasets(unittest.TestCase):
             )
             etendue = np.pi * (ET1 - ET2)
 
-            mask = ptype == i3cw.cols.type[:]
+            mask = ptype == i3cw["type"]
             energy_term = energy[mask] ** power_law_index * G / (max_energy**G - min_energy**G)
             epdf[mask] += n_events * energy_term / etendue
 
-        return i3cw.cols.weight[:] * flux_val / epdf
+        return i3cw["weight"] * flux_val / epdf
 
     def cmp_dataset(self, triggered, fname, rate):
         fname = self.datadir + fname
@@ -96,15 +99,17 @@ class TestCorsikaDatasets(unittest.TestCase):
             nfiles = 1
             refweight = self.untriggered_weights
 
-        reffile = tables.open_file(fname + ".hdf5", "r")
+        reffile = h5py.File(fname + ".hdf5", "r")
         w0 = refweight(reffile)
 
         inputfiles = [
-            ("tables", reffile),
-            ("h5py", h5py.File(fname + ".hdf5", "r")),
-            ("pandas", pandas.HDFStore(fname + ".hdf5", "r")),
+            ("h5py", reffile),
             ("uproot", uproot.open(fname + ".root")),
         ]
+
+        if sys.hexversion < 0x30B0000:
+            inputfiles.append(("tables", tables.open_file(fname + ".hdf5", "r")))
+            inputfiles.append(("pandas", pandas.HDFStore(fname + ".hdf5", "r")))
 
         for name, infile in inputfiles:
             with self.subTest(name):

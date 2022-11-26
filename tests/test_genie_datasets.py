@@ -5,13 +5,16 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import os
+import sys
 import unittest
 
 import h5py
 import numpy as np
-import pandas as pd
-import tables
 import uproot
+
+if sys.hexversion < 0x30B0000:
+    import pandas as pd
+    import tables
 
 from simweights import GenieWeighter
 from simweights._utils import get_column, get_table
@@ -27,7 +30,7 @@ class TestNugenDatasets(unittest.TestCase):
 
     def cmp_dataset(self, fname):
         filename = os.path.join(self.datadir, fname)
-        reffile = pd.HDFStore(filename + ".hdf5", "r")
+        reffile = h5py.File(filename + ".hdf5", "r")
         wd = reffile["I3MCWeightDict"]
 
         solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
@@ -44,11 +47,13 @@ class TestNugenDatasets(unittest.TestCase):
         final_weight = wd["OneWeight"] / (get_column(get_table(reffile, "I3GenieInfo"), "n_flux_events")[0])
 
         fobjs = [
-            h5py.File(filename + ".hdf5", "r"),
-            tables.open_file(filename + ".hdf5", "r"),
             reffile,
             uproot.open(filename + ".root"),
         ]
+
+        if sys.hexversion < 0x30B0000:
+            fobjs.append(tables.open_file(filename + ".hdf5", "r"))
+            fobjs.append(pd.HDFStore(filename + ".hdf5", "r"))
 
         for fobj in fobjs:
             with self.subTest(lib=str(fobj)):

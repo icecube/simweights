@@ -5,13 +5,16 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import os
+import sys
 import unittest
 
 import h5py
 import numpy as np
-import pandas as pd
-import tables
 import uproot
+
+if sys.hexversion < 0x30B0000:
+    import pandas as pd
+    import tables
 
 from simweights import IceTopWeighter
 
@@ -26,10 +29,10 @@ class TestIceTopDatasets(unittest.TestCase):
 
     def cmp_dataset(self, fname):
         filename = os.path.join(self.datadir, fname)
-        reffile = pd.HDFStore(filename + ".hdf5", "r")
+        reffile = h5py.File(filename + ".hdf5", "r")
 
         assert len(reffile["I3TopInjectorInfo"]) == 1
-        si = reffile["I3TopInjectorInfo"].iloc[0]
+        si = reffile["I3TopInjectorInfo"][0]
         pri = reffile["MCPrimary"]
         solid_angle = 2 * np.pi * (np.cos(si["min_zenith"]) - np.cos(si["max_zenith"]))
         injection_area = np.pi * (si["sampling_radius"] * 1e2) ** 2
@@ -38,11 +41,13 @@ class TestIceTopDatasets(unittest.TestCase):
         final_weight = energy_factor * solid_angle * injection_area / si["n_events"]
 
         fobjs = [
-            h5py.File(filename + ".hdf5", "r"),
-            tables.open_file(filename + ".hdf5", "r"),
             reffile,
             uproot.open(filename + ".root"),
         ]
+
+        if sys.hexversion < 0x30B0000:
+            fobjs.append(tables.open_file(filename + ".hdf5", "r"))
+            fobjs.append(pd.HDFStore(filename + ".hdf5", "r"))
 
         for fobj in fobjs:
             with self.subTest(lib=str(fobj)):
