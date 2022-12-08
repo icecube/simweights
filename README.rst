@@ -102,16 +102,41 @@ Flux models from `nuflux <https://github.com/icecube/nuflux>`_ can be used:
   >>> print(f'Rate = {weights.sum():5.2e} Hz')
   Rate = 1.41e-02 Hz
 
+To weight a spectrum with a function you can also pass a callable to :code:`get_weights()`
+
+.. code-block:: python
+
+  >>> weights = weight_obj.get_weights(lambda energy: 7.2e-8 * energy ** -2.2)
+  >>> print(f'Rate = {weights.sum():5.2e} Hz')
+  Rate = 2.34e-05 Hz
+
+You can also pass flux values as a numpy array with the same length as the sample
+
+.. code-block:: python
+
+  >>> fluxes = 7.2e-8 * simfile["I3MCWeightDict"]["PrimaryNeutrinoEnergy"] ** -2.2
+  >>> weights = weight_obj.get_weights(fluxes)
+  >>> print(f'Rate = {weights.sum():5.2e} Hz')
+  Rate = 2.34e-05 Hz
+
+You can also pass a scalar to weight all events with the same flux. Passing
+a value of ``1.0`` will result in the well known qunatity OneWeight divided
+by the number of events.
+
+.. code-block:: python
+
+  >>> OneWeight = weight_obj.get_weights(1.0)
+
 Simulation created with ``genie-reader`` can be weighted with :code:`GenieWeighter()`:
 
 .. code-block:: python
 
-  >>> simfile = pandas.HDFStore('genie_reader_NuE_C_corr.hdf5')
+  >>> simfile = pandas.HDFStore('genie_reader_NuE.hdf5')
   >>> flux_model = nuflux.makeFlux('IPhonda2014_spl_solmax')
   >>> weight_obj = simweights.GenieWeighter(simfile)
   >>> weights = weight_obj.get_weights(flux_model)
   >>> print(f'Rate = {weights.sum():5.2e} Hz')
-  Rate = 2.49e-03 Hz
+  Rate = 3.78e+00 Hz
 
 Also note that these examples use ``pandas``. SimWeights will work equally well with
 ``pandas``, ``h5py``, or ``pytables``.
