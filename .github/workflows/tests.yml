@@ -44,31 +44,3 @@ jobs:
       with:
         fail_ci_if_error: false
         verbose: true
-  Docs:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        cache: pip
-        cache-dependency-path: pyproject.toml
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install .[docs]
-    - name: Run Sphinx
-      working-directory: ./docs
-      run: make html SPHINXOPTS="-W --keep-going"
-    - name: Upload docs to docs.icecube.aq
-      if: ${{ github.ref_name == 'main' }}
-      working-directory: ./docs
-      run: |
-        tar -czvf simweights_docs.tar.gz -C_build/html .
-        curl -XPUT -i --data-binary @simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${{ secrets.ICECUBE_PASSWORD }}
-    - name: Check Links
-      working-directory: ./docs
-      env:
-        ICECUBE_PASSWORD: ${{ secrets.ICECUBE_PASSWORD }}
-      run: make linkcheck SPHINXOPTS="-W --keep-going"

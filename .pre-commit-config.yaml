@@ -7,18 +7,18 @@ ci:
   autoupdate_schedule: quarterly
 repos:
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.4.0
+  rev: v2.5.0
   hooks:
   - id: pretty-format-toml
     args: [--autofix]
   - id: pretty-format-yaml
     args: [--autofix]
 - repo: https://github.com/fsfe/reuse-tool
-  rev: v1.0.0
+  rev: v1.1.0
   hooks:
   - id: reuse
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.2.2
+  rev: v3.3.1
   hooks:
   - id: pyupgrade
     args: [--py37-plus]
@@ -43,7 +43,7 @@ repos:
     additional_dependencies: [flake8-bugbear]
     exclude: ^contrib/
 - repo: https://github.com/pycqa/pylint
-  rev: v2.15.6
+  rev: v2.15.8
   hooks:
   - id: pylint
     args: [--max-line-length=108, -d E0401]
