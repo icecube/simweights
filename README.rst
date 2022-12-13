@@ -120,12 +120,15 @@ You can also pass flux values as a numpy array with the same length as the sampl
   Rate = 2.34e-05 Hz
 
 You can also pass a scalar to weight all events with the same flux. Passing
-a value of ``1.0`` will result in the well known qunatity OneWeight divided
+a value of ``1.0`` will result in the well known quantity OneWeight divided
 by the number of events.
 
 .. code-block:: python
 
   >>> OneWeight = weight_obj.get_weights(1.0)
+  >>> OldOneWeight = simfile["I3MCWeightDict"]["OneWeight"]/(simfile["I3MCWeightDict"]["NEvents"]/2)
+  >>> (OneWeight - OldOneWeight).median()
+  0.0
 
 Simulation created with ``genie-reader`` can be weighted with :code:`GenieWeighter()`:
 
