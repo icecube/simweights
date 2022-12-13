@@ -18,6 +18,7 @@ jobs:
         - os: macos-12
           python-version: '3.11'
     steps:
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -29,7 +30,6 @@ jobs:
       run: |
         sudo apt-get -y install libbz2-dev liblzo2-dev libblosc-dev libhdf5-dev
         python3 -m pip install git+https://github.com/PyTables/PyTables.git@v3.7.0
-    - uses: actions/checkout@v3
     - name: Install SimWeights
       run: |
         python3 -m pip install --upgrade pip
