@@ -62,14 +62,14 @@ class TestNugenDatasets(unittest.TestCase):
 
                 np.testing.assert_allclose(w.get_weight_column("event_weight"), total_prob)
 
-                cylinder = w.surface.spectra[12][0].spatial_dist
+                cylinder = w.surface.spectra[14][0].spatial_dist
                 proj_area = cylinder.projected_area(0)
                 np.testing.assert_allclose(proj_area, injection_area)
 
                 sw_etendue = 1 / cylinder.pdf(0)
                 np.testing.assert_allclose(sw_etendue, solid_angle * injection_area, 1e-5)
 
-                power_law = w.surface.spectra[12][0].energy_dist
+                power_law = w.surface.spectra[14][0].energy_dist
                 energy_term = 1 / power_law.pdf(w.get_weight_column("energy"))
                 np.testing.assert_allclose(energy_term, energy_factor)
 
@@ -82,7 +82,7 @@ class TestNugenDatasets(unittest.TestCase):
             fobj.close()
 
     def test_NuE(self):
-        self.cmp_dataset("genie_reader_NuE")
+        self.cmp_dataset("upgrade_genie_step3_140021_000000")
 
 
 if __name__ == "__main__":

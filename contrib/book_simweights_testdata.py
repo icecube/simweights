@@ -48,8 +48,8 @@ filelist = [
     "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/20878/0000000-0000999/Level2_IC86.2016_NuMu.020878.000000.i3.zst",
     "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/20885/0000000-0000999/Level2_IC86.2016_NuE.020885.000000.i3.zst",
     "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/20895/0000000-0000999/Level2_IC86.2016_NuTau.020895.000000.i3.zst",
-    "/data/user/kmeagher/genie_reader_NuE.i3.gz",
-    "/home/kath/condor/L3dataprocessing/postProcessing/testoutput.i3.bz2",
+    "/data/ana/CosmicRay/IceTop_level3/sim/IC86.2012/SIBYLL2.1/p/12360_v1s/Level3_IC86.2012_SIBYLL2.1_p_12360_E6.0_0.i3.bz2",
+    "/data/sim/IceCubeUpgrade/genie/step3/140021/upgrade_genie_step3_140021_000000.i3.zst",
 ]
 
 if "notemp" in sys.argv:
@@ -57,7 +57,6 @@ if "notemp" in sys.argv:
 else:
     tempdir = tempfile.TemporaryDirectory(prefix="simweights_testdata_")
     outdir = tempdir.name
-
 
 for filename in filelist:
     basename = (
@@ -85,7 +84,6 @@ for filename in filelist:
     else:
         keys = ["I3TopInjectorInfo", "MCPrimary"]
         streams = ["IceTopSplit"]
-        basename = "icetop_" + basename
 
     outfile = os.path.join(outdir, basename)
 
