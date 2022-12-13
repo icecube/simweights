@@ -10,11 +10,9 @@ import unittest
 
 import h5py
 import numpy as np
+import pandas
+import tables
 import uproot
-
-if sys.hexversion < 0x30B0000:
-    import pandas
-    import tables
 
 from simweights import CorsikaWeighter, GaisserH4a
 from simweights._utils import constcol
@@ -105,11 +103,9 @@ class TestCorsikaDatasets(unittest.TestCase):
         inputfiles = [
             ("h5py", reffile),
             ("uproot", uproot.open(fname + ".root")),
+            ("tables", tables.open_file(fname + ".hdf5", "r")),
+            ("pandas", pandas.HDFStore(fname + ".hdf5", "r")),
         ]
-
-        if sys.hexversion < 0x30B0000:
-            inputfiles.append(("tables", tables.open_file(fname + ".hdf5", "r")))
-            inputfiles.append(("pandas", pandas.HDFStore(fname + ".hdf5", "r")))
 
         for name, infile in inputfiles:
             with self.subTest(name):

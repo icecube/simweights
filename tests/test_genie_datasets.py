@@ -10,11 +10,9 @@ import unittest
 
 import h5py
 import numpy as np
+import pandas as pd
+import tables
 import uproot
-
-if sys.hexversion < 0x30B0000:
-    import pandas as pd
-    import tables
 
 from simweights import GenieWeighter
 from simweights._utils import get_column, get_table
@@ -49,11 +47,9 @@ class TestNugenDatasets(unittest.TestCase):
         fobjs = [
             reffile,
             uproot.open(filename + ".root"),
+            tables.open_file(filename + ".hdf5", "r"),
+            pd.HDFStore(filename + ".hdf5", "r"),
         ]
-
-        if sys.hexversion < 0x30B0000:
-            fobjs.append(tables.open_file(filename + ".hdf5", "r"))
-            fobjs.append(pd.HDFStore(filename + ".hdf5", "r"))
 
         for fobj in fobjs:
             with self.subTest(lib=str(fobj)):
