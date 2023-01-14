@@ -18,6 +18,7 @@
 
    corsika_tutorial
    nugen_tutorial
+   icetop_tutorial
 
 .. toctree::
    :maxdepth: 1
