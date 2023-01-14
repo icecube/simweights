@@ -23,7 +23,7 @@ jobs:
       working-directory: ./docs
       run: make html SPHINXOPTS="-W --keep-going"
     - name: Upload docs to docs.icecube.aq
-      if: ${{ github.ref_name == 'main' and !github.event.act }}
+      if: ${{ github.ref_name == 'main' && !github.event.act }}
       working-directory: ./docs
       run: |
         tar -czvf simweights_docs.tar.gz -C_build/html .
