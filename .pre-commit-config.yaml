@@ -6,99 +6,111 @@ ci:
   autoupdate_commit_msg: autoupdate pre-commit hooks
   autoupdate_schedule: quarterly
 repos:
-# - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-#   rev: v2.5.0
-#   hooks:
-#   - id: pretty-format-toml
-#     args: [--autofix]
-#   - id: pretty-format-yaml
-#     args: [--autofix]
-- repo: https://github.com/fsfe/reuse-tool
-  rev: v1.1.0
-  hooks:
-  - id: reuse
-- repo: https://github.com/asottile/pyupgrade
-  rev: v3.3.1
-  hooks:
-  - id: pyupgrade
-    args: [--py37-plus]
-- repo: https://github.com/pycqa/isort
-  rev: 5.11.4
-  hooks:
-  - id: isort
-    name: isort (python)
-- repo: https://github.com/psf/black
-  rev: 22.12.0
-  hooks:
-  - id: black
-- repo: https://github.com/asottile/yesqa
-  rev: v1.4.0
-  hooks:
-  - id: yesqa
-    additional_dependencies: [flake8-bugbear]
-- repo: https://github.com/PyCQA/flake8
-  rev: 6.0.0
-  hooks:
-  - id: flake8
-    additional_dependencies: [flake8-bugbear]
-    exclude: ^contrib/
-- repo: https://github.com/pycqa/pylint
-  rev: v2.16.0b0
-  hooks:
-  - id: pylint
-    args: [--max-line-length=108, -d E0401]
-    files: simweights
-    exclude: ^contrib/
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.991
-  hooks:
-  - id: mypy
-    files: simweights
-    args: [--disallow-untyped-defs, --disallow-incomplete-defs, --check-untyped-defs, --disallow-untyped-decorators]
-    additional_dependencies: [numpy]
-    exclude: ^contrib/
-- repo: https://github.com/codespell-project/codespell
-  rev: v2.2.2
-  hooks:
-  - id: codespell
-    args: [-L, livetime]
-- repo: https://github.com/pre-commit/pygrep-hooks
-  rev: v1.10.0
-  hooks:
-  - id: python-check-blanket-noqa
-  - id: python-no-log-warn
-  - id: python-no-eval
-    exclude: ^tests/.*
-  - id: python-use-type-annotations
-  - id: rst-backticks
-  - id: rst-directive-colons
-  - id: rst-inline-touching-normal
-- repo: https://github.com/Lucas-C/pre-commit-hooks
-  rev: v1.3.1
-  hooks:
-  - id: forbid-crlf
-  - id: forbid-tabs
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
-  hooks:
-  - id: check-added-large-files
-  - id: check-ast
-  - id: check-builtin-literals
-  - id: check-case-conflict
-  - id: check-docstring-first
-  - id: check-executables-have-shebangs
-  - id: check-json
-  - id: check-merge-conflict
-  - id: check-shebang-scripts-are-executable
-  - id: check-toml
-  - id: check-vcs-permalinks
-  - id: check-yaml
-  - id: debug-statements
-  - id: detect-private-key
-  - id: end-of-file-fixer
-  - id: fix-byte-order-marker
-  - id: mixed-line-ending
-  - id: name-tests-test
-    args: [--pytest-test-first]
-  - id: trailing-whitespace
-    exclude: \.svg$
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.0-alpha.4
+    hooks:
+      - id: prettier
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v1.1.0
+    hooks:
+      - id: reuse
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+      - id: pyupgrade
+        args: [--py37-plus]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.11.4
+    hooks:
+      - id: isort
+        name: isort (python)
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
+    hooks:
+      - id: black
+  - repo: https://github.com/keewis/blackdoc
+    rev: "v0.3.8"
+    hooks:
+      - id: blackdoc
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.4.0
+    hooks:
+      - id: yesqa
+        additional_dependencies: [flake8-bugbear]
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        additional_dependencies: [flake8-bugbear]
+        exclude: ^contrib/
+  - repo: https://github.com/pycqa/pylint
+    rev: v2.16.0b1
+    hooks:
+      - id: pylint
+        args: [--max-line-length=108, -d E0401]
+        files: simweights
+        exclude: ^contrib/
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.991
+    hooks:
+      - id: mypy
+        files: simweights
+        args:
+          [
+            --disallow-untyped-defs,
+            --disallow-incomplete-defs,
+            --check-untyped-defs,
+            --disallow-untyped-decorators,
+          ]
+        additional_dependencies: [numpy]
+        exclude: ^contrib/
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.2
+    hooks:
+      - id: codespell
+        args: [-L, livetime]
+  - repo: https://github.com/PyCQA/doc8
+    rev: "v1.1.1"
+    hooks:
+      - id: doc8
+
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-no-log-warn
+      - id: python-no-eval
+        exclude: ^tests/.*
+      - id: python-use-type-annotations
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.4.1
+    hooks:
+      - id: forbid-crlf
+      - id: forbid-tabs
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-yaml
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+      - id: name-tests-test
+        args: [--pytest-test-first]
+      - id: trailing-whitespace
+        exclude: \.svg$

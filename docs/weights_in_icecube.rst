@@ -33,17 +33,19 @@ denoted as :math:`R`
     R = \frac{N_{obs}}{T_{live}}
     = \int \mathrm{d}E \int \mathrm{d}A \int \mathrm{d}\Omega \cdot \mathcal{D}(E,\theta,\phi,\bar{x}) \cdot \Phi(E,\theta, \phi)
 
-Monte Carlo integration will be performed by sampling primary particles on a 5-dimensional surface of energy,
-direction, and impact parameter on the area perpendicular to the direction of travel. The integral will be
+Monte Carlo integration will be performed by sampling primary particles on a 5-dimensional surface of
+energy, direction, and impact parameter on the area perpendicular to the direction of travel.
+The integral will be
 
 .. math::
 
     R = \sum_{i=1}^{N_{gen}} g_i \cdot \mathcal{D}_i \cdot \Phi(E_i,\theta_i,\phi_i)
 
-The quantity :math:`\mathcal{D}_i` is a binary describing weather or not the :math:`i^{th}` event passed a series of
-quality cuts and :math:`g_i` is generation bias of the :math:`i^{th}` event. Since the majority of simulated events
-won't pass the cut, it is easier from a bookkeeping point of view to simply remove the events from the
-sample that don't pass the quality cuts and only sum over the :math:`N_{pass}` events that do pass the cuts.
+The quantity :math:`\mathcal{D}_i` is a binary describing weather or not the :math:`i^{th}` event passed a
+series of quality cuts and :math:`g_i` is generation bias of the :math:`i^{th}` event. Since the majority
+of simulated events won't pass the cut, it is easier from a bookkeeping point of view to simply remove the
+events from the sample that don't pass the quality cuts and only sum over the :math:`N_{pass}` events that
+do pass the cuts.
 
 .. math::
 
@@ -52,14 +54,14 @@ sample that don't pass the quality cuts and only sum over the :math:`N_{pass}` e
 It is clear that :math:`g_i` will have units of Energy * Area * Solid Angle, the same units as the surface
 on which primary particles were generated.
 
-Simulation of IceCube events does not just entail the random sampling of primary particles on a 5 dimensional
-surface. It uses random sampling to propagate particles' interaction with matter and the electronics in
-the detector. The number of such samplings which occur will often depend on the value of samplings which
-occurred earlier in the particle propagation, making the dimensionality of the Monte Carlo integration vary
-from event to event.
-In principle the generation bias of an event should be the product of all of the pdfs from every random sampling
-which occurs. However most of these random samplings occur at the natural rate which means that the value
-of the pdf is one and therefore do not have to be kept track of.
+Simulation of IceCube events does not just entail the random sampling of primary particles on a 5
+dimensional surface. It uses random sampling to propagate particles' interaction with matter and the
+electronics in the detector. The number of such samplings which occur will often depend on the value of
+samplings which occurred earlier in the particle propagation, making the dimensionality of the Monte Carlo
+integration vary from event to event.
+In principle the generation bias of an event should be the product of all of the pdfs from every random
+sampling which occurs. However most of these random samplings occur at the natural rate which means that
+the value of the pdf is one and therefore do not have to be kept track of.
 
 Thus the value of the pdf of event :math:`i` is going to be
 
@@ -75,7 +77,8 @@ Since most generators used in IceCube simulation do not bias based on azimuth or
 only show the energy energy and zenith terms.
 
 Assuming that the pdfs for :math:`E` and :math:`\theta` are independent and replacing :math:`p_i^{int}`
-with a generation bias :math:`g_i^{int} = 1 / p_i^{int}` the expression for the generation bias for a single sample becomes
+with a generation bias :math:`g_i^{int} = 1 / p_i^{int}` the expression for the generation bias for a
+single sample becomes
 
 .. math::
 

@@ -6,13 +6,14 @@ Reading Neutrino-Generator Files
 ================================
 
 Correctly interpreting the weighting information for neutrino-generator can be difficult for a number
-of reasons. The icetray modules for Neutrino-Generator have a lot of options for generating primary neutrinos
-using a number of different generation surfaces.
+of reasons. The icetray modules for Neutrino-Generator have a lot of options for generating primary
+neutrinos using a number of different generation surfaces.
 The scope of SimWeights is limited to configuration which have been used by simulation production and not
-try to attempt compatibility with every single configuration option which is available in neutrino-generator.
+try to attempt compatibility with every single configuration option which is available in
+neutrino-generator.
 SimWeights has been tested to work with all simulation production datasets
-going back to at least datasets 10634 which was produced in 2014. Reading older dataset is possible but will require
-additional work.
+going back to at least datasets 10634 which was produced in 2014. Reading older dataset is possible but
+will require additional work.
 
 The primary way to weight neutrino-generator data is with the function
 :py:class:`simweights.Weighter` which will inspect the ``I3MCWeightDict`` of the given file and
@@ -28,7 +29,8 @@ SimWeights will use whichever column is present.
 The biggest change in neutrino-generator that affected weighting was the change in the zenith distribution.
 In version 3 and before of simulation, the cosine of the zenith angle was drawn from a uniform distribution
 and the position of the particle was drawn from a circle perpendicular to the primary's momentum.
-In version 4 this was changed to generate events on the surface of a cylinder with an `ad hoc zenith distribution
+In version 4 this was changed to generate events on the surface of a cylinder with an
+`ad hoc zenith distribution
 <https://docs.icecube.aq/icetray/main/projects/neutrino-generator/weighting.html#zenith-weight>`_
 to account for a deficit of vertical neutrinos in certain analyses.
 The since neutrino generator includes the zenith weight in ``TotalWeight`` and

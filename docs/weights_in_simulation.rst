@@ -18,7 +18,8 @@ Consider the multidimensional integral
 
     I = \int_\Omega f(\bar{x}) \mathrm{d}\bar{x}
 
-where :math:`\bar{x}` is an m-dimensional vector and :math:`\Omega` is a subset of :math:`\mathbb{R}^m` with a volume of
+where :math:`\bar{x}` is an m-dimensional vector and :math:`\Omega` is a subset of :math:`\mathbb{R}^m`
+with a volume of
 
 .. math::
 

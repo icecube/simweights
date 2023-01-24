@@ -80,3 +80,6 @@ log_cli_level = "INFO"
 xfail_strict = true
 filterwarnings = ["error"]
 addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights"]
+
+[tool.doc8]
+max-line-length=108

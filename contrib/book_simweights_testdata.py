@@ -23,6 +23,7 @@ def fake_event_header(frame):
 
 fake_event_header.event_id = 0
 
+
 filelist = [
     "/data/sim/IceCube/2015/filtered/level2/CORSIKA-in-ice/12602/0000000-0000999/Level2_IC86.2015_corsika.012602.000000.i3.bz2",
     "/data/sim/IceCube/2015/filtered/level2/CORSIKA-in-ice/20014/0000000-0000999/Level2_IC86.2015_corsika.020014.000000.i3.bz2",

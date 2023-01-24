@@ -48,9 +48,9 @@ The real problem was the bookkeeping issue that this storage strategy created.
 Because not all simulation jobs execute successfully, and it is not always necessary to use all of the jobs
 in a dataset, if one simply combines a bunch of i3 files, there is no way to know how many jobs contributed
 to the final event sample.
-Since each job is given a unique ``RunId`` in the ``I3EventHeader``, counting the number of unique ``RunID``\ s
-could in principle work, but at high cut levels there is no guarantee that at least on event from every
-job makes it to the final sample.
+Since each job is given a unique ``RunId`` in the ``I3EventHeader``, counting the number of unique
+``RunID``\ s could in principle work, but at high cut levels there is no guarantee that at least on event
+from every job makes it to the final sample.
 The solution that most analyzers arrive at is to count the number of i3 files when handed to I3Writer
 when booking and to store that number in the filename of the resulting hdf5 file.
 This works but is less than ideal.

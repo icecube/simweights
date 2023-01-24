@@ -72,14 +72,14 @@ Basic Usage
 For triggered CORSIKA or CORSIKA produced by ``corsika-reader`` with S-Frames files use
 ``CorsikaWeighter()`` without any additional arguments:
 
-.. code-block:: python
+.. code-block:: pycon
 
   >>> import simweights, pandas
-  >>> simfile = pandas.HDFStore('Level2_IC86.2016_corsika.021889.000000.hdf5', 'r')
+  >>> simfile = pandas.HDFStore("Level2_IC86.2016_corsika.021889.000000.hdf5", "r")
   >>> flux_model = simweights.GaisserH4a()
   >>> weight_obj = simweights.CorsikaWeighter(simfile)
   >>> weights = weight_obj.get_weights(flux_model)
-  >>> print(f'Rate = {weights.sum():5.2f} Hz')
+  >>> print(f"Rate = {weights.sum():5.2f} Hz")
   Rate = 122.84 Hz
 
 The value returned by ``get_weights()`` is the rate of events in Hz
@@ -92,53 +92,53 @@ For ``neutrino-generator`` you can use :code:`NuGenWeighter()` which also
 requires you to know the number of files.
 Flux models from `nuflux <https://github.com/icecube/nuflux>`_ can be used:
 
-.. code-block:: python
+.. code-block:: pycon
 
   >>> import nuflux
-  >>> simfile = pandas.HDFStore('Level2_IC86.2016_NuMu.020878.000000.hdf5')
-  >>> flux_model = nuflux.makeFlux('CORSIKA_GaisserH3a_QGSJET-II')
+  >>> simfile = pandas.HDFStore("Level2_IC86.2016_NuMu.020878.000000.hdf5")
+  >>> flux_model = nuflux.makeFlux("CORSIKA_GaisserH3a_QGSJET-II")
   >>> weight_obj = simweights.NuGenWeighter(simfile, nfiles=1)
   >>> weights = weight_obj.get_weights(flux_model)
-  >>> print(f'Rate = {weights.sum():5.2e} Hz')
+  >>> print(f"Rate = {weights.sum():5.2e} Hz")
   Rate = 1.41e-02 Hz
 
 To weight a spectrum with a function you can also pass a callable to :code:`get_weights()`
 
-.. code-block:: python
+.. code-block:: pycon
 
-  >>> weights = weight_obj.get_weights(lambda energy: 7.2e-8 * energy ** -2.2)
-  >>> print(f'Rate = {weights.sum():5.2e} Hz')
+  >>> weights = weight_obj.get_weights(lambda energy: 7.2e-8 * energy**-2.2)
+  >>> print(f"Rate = {weights.sum():5.2e} Hz")
   Rate = 2.34e-05 Hz
 
 You can also pass flux values as a numpy array with the same length as the sample
 
-.. code-block:: python
+.. code-block:: pycon
 
   >>> fluxes = 7.2e-8 * simfile["I3MCWeightDict"]["PrimaryNeutrinoEnergy"] ** -2.2
   >>> weights = weight_obj.get_weights(fluxes)
-  >>> print(f'Rate = {weights.sum():5.2e} Hz')
+  >>> print(f"Rate = {weights.sum():5.2e} Hz")
   Rate = 2.34e-05 Hz
 
 You can also pass a scalar to weight all events with the same flux. Passing
 a value of ``1.0`` will result in the well known quantity OneWeight divided
 by the number of events.
 
-.. code-block:: python
+.. code-block:: pycon
 
   >>> OneWeight = weight_obj.get_weights(1.0)
-  >>> OldOneWeight = simfile["I3MCWeightDict"]["OneWeight"]/(simfile["I3MCWeightDict"]["NEvents"]/2)
+  >>> OldOneWeight = simfile["I3MCWeightDict"]["OneWeight"] / (simfile["I3MCWeightDict"]["NEvents"] / 2)
   >>> (OneWeight - OldOneWeight).median()
   0.0
 
 Simulation created with ``genie-reader`` can be weighted with :code:`GenieWeighter()`:
 
-.. code-block:: python
+.. code-block:: pycon
 
-  >>> simfile = pandas.HDFStore('genie_reader_NuE.hdf5')
-  >>> flux_model = nuflux.makeFlux('IPhonda2014_spl_solmax')
+  >>> simfile = pandas.HDFStore("genie_reader_NuE.hdf5")
+  >>> flux_model = nuflux.makeFlux("IPhonda2014_spl_solmax")
   >>> weight_obj = simweights.GenieWeighter(simfile)
   >>> weights = weight_obj.get_weights(flux_model)
-  >>> print(f'Rate = {weights.sum():5.2e} Hz')
+  >>> print(f"Rate = {weights.sum():5.2e} Hz")
   Rate = 3.78e+00 Hz
 
 Also note that these examples use ``pandas``. SimWeights will work equally well with

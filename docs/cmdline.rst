@@ -11,7 +11,7 @@ will use to weight events, the number of events in the file, and the effective a
 provided at the command line it will also print the event rate and livetime. An example for a CORSIKA file
 is shown below.
 
-.. code:: none
+.. code:: shell-session
 
     $ simweights Level2_IC86.2016_corsika.020789.000000.hdf5 -f GaisserH3a
     < GenerationSurfaceCollection
