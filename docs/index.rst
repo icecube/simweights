@@ -11,6 +11,7 @@
 
    getting_started
    contributing
+   changelog
 
 .. toctree::
    :maxdepth: 1
