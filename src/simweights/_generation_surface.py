@@ -50,7 +50,8 @@ class GenerationSurface:
         if other == 0:
             return output
         if not isinstance(other, GenerationSurface):
-            raise TypeError(f"Cannot add {type(self)} to {type(other)}")
+            mesg = f"Cannot add {type(self)} to {type(other)}"
+            raise TypeError(mesg)
         for _, ospectra in other.spectra.items():
             for ospec in ospectra:
                 output._insert(ospec)
@@ -179,11 +180,13 @@ class GenerationSurface:
 
 
 def generation_surface(
-    pdgid: int | PDGCode, energy_dist: PowerLaw, spatial_dist: SpatialDist
+    pdgid: int | PDGCode,
+    energy_dist: PowerLaw,
+    spatial_dist: SpatialDist,
 ) -> GenerationSurface:
     """
     Convenience function to generate a GenerationSurface for a single particle type
     """
     return GenerationSurface(
-        SurfaceTuple(pdgid=pdgid, nevents=1.0, energy_dist=energy_dist, spatial_dist=spatial_dist)
+        SurfaceTuple(pdgid=pdgid, nevents=1.0, energy_dist=energy_dist, spatial_dist=spatial_dist),
     )

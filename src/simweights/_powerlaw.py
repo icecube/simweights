@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+
 from typing import Any
 
 import numpy as np
@@ -118,5 +119,6 @@ class PowerLaw:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PowerLaw):
-            raise TypeError(f"{self} cannot be compared to {other}")
+            mesg = f"{self} cannot be compared to {other}"
+            raise TypeError(mesg)
         return self.g == other.g and self.a == other.a and self.b == other.b

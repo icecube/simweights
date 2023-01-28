@@ -10,7 +10,7 @@ from copy import deepcopy
 import numpy as np
 
 from simweights import GenerationSurface, NaturalRateCylinder, PDGCode, PowerLaw, generation_surface
-from simweights._generation_surface import SurfaceTuple
+from simweights._generation_surface import SurfaceTuple  # noqa : F401
 
 
 class Testgeneration_surface(unittest.TestCase):
@@ -110,7 +110,8 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(n0, self.s0.spectra[2212][0].nevents)
         self.assertEqual(n1, self.s1.spectra[2212][0].nevents)
         self.assertAlmostEqual(
-            s.get_epdf(2212, 50, 0), self.s0.get_epdf(2212, 50, 0) + self.s1.get_epdf(2212, 50, 0)
+            s.get_epdf(2212, 50, 0),
+            self.s0.get_epdf(2212, 50, 0) + self.s1.get_epdf(2212, 50, 0),
         )
 
         ss = self.s0 + self.s2
@@ -120,7 +121,8 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(ss.spectra[2212][0], self.s0.spectra[2212][0])
         self.assertEqual(ss.spectra[2212][1], self.s2.spectra[2212][0])
         self.assertAlmostEqual(
-            ss.get_epdf(2212, 50, 0), self.s0.get_epdf(2212, 50, 0) + self.s2.get_epdf(2212, 50, 0)
+            ss.get_epdf(2212, 50, 0),
+            self.s0.get_epdf(2212, 50, 0) + self.s2.get_epdf(2212, 50, 0),
         )
 
         s3 = self.s0 + self.s3
@@ -130,7 +132,8 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(s3.spectra[2212][0], self.s0.spectra[2212][0])
         self.assertEqual(s3.spectra[2212][1], self.s3.spectra[2212][0])
         self.assertAlmostEqual(
-            s3.get_epdf(2212, 50, 0), self.s0.get_epdf(2212, 50, 0) + self.s3.get_epdf(2212, 50, 0)
+            s3.get_epdf(2212, 50, 0),
+            self.s0.get_epdf(2212, 50, 0) + self.s3.get_epdf(2212, 50, 0),
         )
 
         s4 = self.s0 + self.s4
@@ -199,7 +202,8 @@ class Testgeneration_surface(unittest.TestCase):
         )
 
         self.assertAlmostEqual(
-            area, self.s0.spectra[2212][0].energy_dist.span * self.s0.spectra[2212][0].spatial_dist.etendue
+            area,
+            self.s0.spectra[2212][0].energy_dist.span * self.s0.spectra[2212][0].spatial_dist.etendue,
         )
         self.assertAlmostEqual(w.sum() / area, 1, 4)
 
@@ -294,7 +298,8 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(s6.spectra[2213][0].nevents, 10000)
 
         self.assertEqual(
-            sum([self.gsc1, self.gsc2, self.gsc3, self.gsc4]), self.gsc1 + self.gsc2 + self.gsc3 + self.gsc4
+            sum([self.gsc1, self.gsc2, self.gsc3, self.gsc4]),
+            self.gsc1 + self.gsc2 + self.gsc3 + self.gsc4,
         )
 
         with self.assertRaises(TypeError):

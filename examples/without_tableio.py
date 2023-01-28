@@ -7,7 +7,7 @@
 from glob import glob
 
 import pylab as plt
-from icecube import dataio, simclasses
+from icecube import dataio, simclasses  # noqa: F401
 
 import simweights
 
@@ -59,7 +59,7 @@ for filename in filelist:
             I3CorsikaWeight["weight"].append(w.weight)
 
 # make a dictionary object to mimic the file structure of a pandas file
-fileobj = dict(I3PrimaryInjectorInfo=I3PrimaryInjectorInfo, I3CorsikaWeight=I3CorsikaWeight)
+fileobj = {"I3PrimaryInjectorInfo": I3PrimaryInjectorInfo, "I3CorsikaWeight": I3CorsikaWeight}
 
 # create the weighter object
 weighter = simweights.CorsikaWeighter(fileobj)

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+
 from typing import Any
 
 import numpy as np
@@ -109,10 +110,12 @@ def NuGenWeighter(file_obj: Any, nfiles: float) -> Weighter:
     weighter = Weighter([file_obj], surface)
     weighter.add_weight_column("energy", weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoEnergy"))
     weighter.add_weight_column(
-        "pdgid", weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoType").astype(np.int32)
+        "pdgid",
+        weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoType").astype(np.int32),
     )
     weighter.add_weight_column(
-        "cos_zen", np.cos(weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoZenith"))
+        "cos_zen",
+        np.cos(weighter.get_column("I3MCWeightDict", "PrimaryNeutrinoZenith")),
     )
 
     # the event weight is stored in `TotalWeight` in newer simulation and

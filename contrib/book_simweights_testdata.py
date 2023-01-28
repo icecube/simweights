@@ -10,7 +10,7 @@ import tarfile
 import tempfile
 
 from I3Tray import I3Tray
-from icecube import dataclasses, hdfwriter, icetray, rootwriter, simclasses, tableio
+from icecube import dataclasses, hdfwriter, icetray, rootwriter, simclasses, tableio  # noqa: F401
 
 
 def fake_event_header(frame):

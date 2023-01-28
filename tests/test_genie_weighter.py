@@ -52,17 +52,18 @@ class TestCorsikaWeighter(unittest.TestCase):
                         p1.a,
                         p1.b,
                         p1.g,
-                    )
+                    ),
                 ]
                 info = np.array(rows, dtype=info_dtype)
-                d = dict(I3GenieResult=weight, I3GenieInfo=info)
+                d = {"I3GenieResult": weight, "I3GenieInfo": info}
 
                 for flux in [0.1, 1, 10]:
 
                     wobj = simweights.GenieWeighter(d)
                     w = wobj.get_weights(flux)
                     np.testing.assert_allclose(
-                        w.sum(), flux * event_weight * c1.etendue * p1.integral / nfiles
+                        w.sum(),
+                        flux * event_weight * c1.etendue * p1.integral / nfiles,
                     )
                     E = d["I3GenieResult"]["Ev"]
                     y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
@@ -73,7 +74,7 @@ class TestCorsikaWeighter(unittest.TestCase):
             simweights.GenieWeighter(d, nfiles=10)
 
         with self.assertRaises(KeyError):
-            simweights.GenieWeighter(dict(I3CorsikaWeight=weight))
+            simweights.GenieWeighter({"I3CorsikaWeight": weight})
 
 
 if __name__ == "__main__":

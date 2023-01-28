@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+
 from typing import Any
 
 import numpy as np
@@ -33,7 +34,7 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
         )
         surfaces.append(
             get_column(table, "n_events")[i]
-            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
+            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)

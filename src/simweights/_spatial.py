@@ -16,7 +16,7 @@ class CylinderBase:
     def __init__(self, length: float, radius: float, cos_zen_min: float, cos_zen_max: float):
         if cos_zen_min < -1 or cos_zen_max > 1:
             raise ValueError(
-                self.__class__.__name__ + ": both cos_zen_min and cos_zen_max must be between -1 and +1"
+                self.__class__.__name__ + ": both cos_zen_min and cos_zen_max must be between -1 and +1",
             )
         if cos_zen_min >= cos_zen_max:
             raise ValueError(self.__class__.__name__ + ": cos_zen_min must be less than cos_zen_max")
@@ -46,7 +46,7 @@ class CylinderBase:
             * (
                 self._cap * cosz * np.abs(cosz)
                 + self._side * (cosz * np.sqrt(1 - cosz**2) - np.arccos(cosz))
-            )
+            ),
         )
 
     def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
@@ -119,7 +119,9 @@ class NaturalRateCylinder(CylinderBase):
     def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         cosz = np.asfarray(cos_zen)
         return np.piecewise(
-            cosz, [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)], [self._normalization]
+            cosz,
+            [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)],
+            [self._normalization],
         )
 
 
@@ -152,7 +154,9 @@ class CircleInjector:
         """
         cosz = np.asfarray(cos_zen)
         return np.piecewise(
-            cosz, [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)], [self._normalization]
+            cosz,
+            [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)],
+            [self._normalization],
         )
 
     def __repr__(self) -> str:

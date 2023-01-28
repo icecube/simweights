@@ -5,12 +5,11 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import os
-import sys
 import unittest
 
 import h5py
 import numpy as np
-import pandas
+import pandas as pd
 import tables
 import uproot
 
@@ -104,7 +103,7 @@ class TestCorsikaDatasets(unittest.TestCase):
             ("h5py", reffile),
             ("uproot", uproot.open(fname + ".root")),
             ("tables", tables.open_file(fname + ".hdf5", "r")),
-            ("pandas", pandas.HDFStore(fname + ".hdf5", "r")),
+            ("pandas", pd.HDFStore(fname + ".hdf5", "r")),
         ]
 
         for name, infile in inputfiles:

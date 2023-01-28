@@ -14,6 +14,8 @@ However they have been refactored to:
 * Follow :py:mod:`numpy` broadcasting rules
 
 """
+
+
 from typing import Callable, List, Mapping, Optional, Union
 
 from numpy import asfarray, bool_, broadcast_arrays, exp, float64, int32, piecewise, sqrt
@@ -278,13 +280,14 @@ class Honda2004(CosmicRayFlux):
     ]
 
     def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> List[NDArray[bool_]]:
+        energy_break = 100
         return [
-            (pdgid == 2212) * (energy < 100),
-            (pdgid == 2212) * (energy >= 100),
-            pdgid == 1000020040,
-            pdgid == 1000070140,
-            pdgid == 1000130270,
-            pdgid == 1000260560,
+            (pdgid == PDGCode.PPlus) * (energy < energy_break),
+            (pdgid == PDGCode.PPlus) * (energy >= energy_break),
+            pdgid == PDGCode.He4Nucleus,
+            pdgid == PDGCode.N14Nucleus,
+            pdgid == PDGCode.Al27Nucleus,
+            pdgid == PDGCode.Fe56Nucleus,
         ]
 
 
@@ -298,7 +301,11 @@ class TIG1996(CosmicRayFlux):
     _funcs = [lambda E: 1.70 * E**-2.7, lambda E: 1.74e2 * E**-3.0, 0]
 
     def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> List[NDArray[bool_]]:
-        return [(pdgid == 2212) * (energy < 5e6), (pdgid == 2212) * (energy >= 5e6)]
+        energy_break = 5e6
+        return [
+            (pdgid == PDGCode.PPlus) * (energy < energy_break),
+            (pdgid == PDGCode.PPlus) * (energy >= energy_break),
+        ]
 
 
 class GlobalFitGST(CosmicRayFlux):
@@ -355,7 +362,7 @@ class FixedFractionFlux(CosmicRayFlux):
         self.pdgids = [PDGCode(k) for k in fluxes.keys()]
         self.fracs = list(fluxes.values())
         if normalized:
-            assert sum(self.fracs) == 1.0
+            assert sum(self.fracs) == 1.0  # noqa: PLR2004
 
     def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
         """

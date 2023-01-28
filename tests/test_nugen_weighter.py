@@ -35,7 +35,7 @@ def make_new_table(pdgid, nevents, spatial, spectrum):
     weight["MinEnergyLog"] = np.log10(spectrum.a)
     weight["MaxEnergyLog"] = np.log10(spectrum.b)
     weight["PrimaryNeutrinoZenith"] = np.arccos(
-        np.linspace(spatial.cos_zen_max, spatial.cos_zen_min, nevents)
+        np.linspace(spatial.cos_zen_max, spatial.cos_zen_min, nevents),
     )
     weight["PrimaryNeutrinoEnergy"] = spectrum.ppf(np.linspace(0, 1, nevents))
     return weight
@@ -52,13 +52,14 @@ class TestNugenWeighter(unittest.TestCase):
 
         for weight in 0.1, 1, 10:
             t1["TotalWeight"] = weight
-            f1 = dict(I3MCWeightDict=t1)
+            f1 = {"I3MCWeightDict": t1}
             for nfiles in [1, 10, 100]:
                 wf = NuGenWeighter(f1, nfiles=nfiles)
                 for flux in [1e-6, 1, 1e6]:
                     w1 = wf.get_weights(flux)
                     np.testing.assert_allclose(
-                        w1.sum(), 2 * weight * flux * p1.integral * c1.etendue / nfiles
+                        w1.sum(),
+                        2 * weight * flux * p1.integral * c1.etendue / nfiles,
                     )
                     E = t1["PrimaryNeutrinoEnergy"]
                     y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])
@@ -73,13 +74,14 @@ class TestNugenWeighter(unittest.TestCase):
             t1["TotalWeight"] = weight
             t1["InjectionSurfaceR"] = -1
             t1["TypeWeight"] = 0.5
-            f1 = dict(I3MCWeightDict=t1)
+            f1 = {"I3MCWeightDict": t1}
             for nfiles in [1, 10, 100]:
                 wf = NuGenWeighter(f1, nfiles=nfiles)
                 for flux in [1e-6, 1, 1e6]:
                     w1 = wf.get_weights(flux)
                     np.testing.assert_allclose(
-                        w1.sum(), 2 * weight * flux * p1.integral * c1.etendue / nfiles
+                        w1.sum(),
+                        2 * weight * flux * p1.integral * c1.etendue / nfiles,
                     )
                     E = t1["PrimaryNeutrinoEnergy"]
                     y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])
@@ -93,13 +95,14 @@ class TestNugenWeighter(unittest.TestCase):
         for weight in 0.1, 1, 10:
             t1["TotalInteractionProbabilityWeight"] = weight
             t1["InjectionSurfaceR"] = c1.radius
-            f1 = dict(I3MCWeightDict=t1)
+            f1 = {"I3MCWeightDict": t1}
             for nfiles in [1, 10, 100]:
                 wf = NuGenWeighter(f1, nfiles=nfiles)
                 for flux in [1e-6, 1, 1e6]:
                     w1 = wf.get_weights(flux)
                     np.testing.assert_allclose(
-                        w1.sum(), 2 * weight * flux * p1.integral * c1.etendue / nfiles
+                        w1.sum(),
+                        2 * weight * flux * p1.integral * c1.etendue / nfiles,
                     )
                     E = t1["PrimaryNeutrinoEnergy"]
                     y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])

@@ -7,7 +7,7 @@
 from glob import glob
 
 from I3Tray import I3Tray
-from icecube import hdfwriter, simclasses
+from icecube import hdfwriter, simclasses  # noqa: F401
 
 FILE_DIR = "/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/21889/0000000-0000999"
 file = sorted(glob(FILE_DIR + "/Level2_IC86.2016_corsika.021889.00000*.i3.zst"))

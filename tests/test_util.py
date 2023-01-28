@@ -17,8 +17,8 @@ class TestUtil(unittest.TestCase):
     def test_table_and_column(self):
         t1 = SimpleNamespace(cols=SimpleNamespace(a=np.full(10, 3), b=np.array(5 * [3] + 5 * [4])))
         f1 = SimpleNamespace(root=SimpleNamespace(x=t1))
-        t2 = dict(a=np.full(10, 7), b=np.arange(10))
-        f2 = dict(x=t2)
+        t2 = {"a": np.full(10, 7), "b": np.arange(10)}
+        f2 = {"x": t2}
 
         self.assertEqual(has_table(f1, "x"), True)
         self.assertEqual(has_table(f1, "y"), False)
@@ -48,7 +48,7 @@ class TestUtil(unittest.TestCase):
         with self.assertRaises(KeyError):
             get_column(t2, "c")
 
-        mask = np.arange(10) < 5
+        mask = np.arange(10) < 5  # noqa: PLR2004
         self.assertEqual(constcol(t1, "a"), 3)
         self.assertEqual(constcol(t1, "b", mask), 3)
         self.assertEqual(constcol(t1, "b", ~mask), 4)

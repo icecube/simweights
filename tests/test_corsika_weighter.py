@@ -71,7 +71,7 @@ def make_corsika_data(pdgid, nevents, c, p):
     primary["zenith"] = np.arccos(get_cos_zenith_dist(c, nevents))
     np.random.shuffle(primary["zenith"])
     primary["energy"] = p.ppf(np.linspace(0, 1, nevents))
-    return dict(CorsikaWeightMap=weight, PolyplopiaPrimary=primary)
+    return {"CorsikaWeightMap": weight, "PolyplopiaPrimary": primary}
 
 
 class TestCorsikaWeighter(unittest.TestCase):
@@ -90,7 +90,8 @@ class TestCorsikaWeighter(unittest.TestCase):
                 for flux in [0.1, 1, 10]:
                     w = wobj.get_weights(flux)
                     np.testing.assert_allclose(
-                        w.sum(), flux * c1.etendue * p1.integral / nfiles / oversampling
+                        w.sum(),
+                        flux * c1.etendue * p1.integral / nfiles / oversampling,
                     )
                     E = d["PolyplopiaPrimary"]["energy"]
                     y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
@@ -123,7 +124,7 @@ class TestCorsikaWeighter(unittest.TestCase):
                         p1.a,
                         p1.b,
                         p1.g,
-                    )
+                    ),
                 ]
                 d["I3CorsikaInfo"] = np.array(rows, dtype=info_dtype)
                 wobj = CorsikaWeighter(d)
@@ -131,7 +132,8 @@ class TestCorsikaWeighter(unittest.TestCase):
                 for flux in [0.1, 1, 10]:
                     w = wobj.get_weights(flux)
                     np.testing.assert_allclose(
-                        w.sum(), flux * c1.etendue * p1.integral / nfiles / oversampling
+                        w.sum(),
+                        flux * c1.etendue * p1.integral / nfiles / oversampling,
                     )
                     E = d["PolyplopiaPrimary"]["energy"]
                     y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
@@ -185,17 +187,18 @@ class TestCorsikaWeighter(unittest.TestCase):
                         p1.a,
                         p1.b,
                         p1.g,
-                    )
+                    ),
                 ]
                 info = np.array(rows, dtype=info_dtype)
-                d = dict(I3CorsikaWeight=weight, I3PrimaryInjectorInfo=info)
+                d = {"I3CorsikaWeight": weight, "I3PrimaryInjectorInfo": info}
 
                 for flux in [0.1, 1, 10]:
 
                     wobj = CorsikaWeighter(d)
                     w = wobj.get_weights(flux)
                     np.testing.assert_allclose(
-                        w.sum(), flux * event_weight * c1.etendue * p1.integral / nfiles
+                        w.sum(),
+                        flux * event_weight * c1.etendue * p1.integral / nfiles,
                     )
                     E = d["I3CorsikaWeight"]["energy"]
                     y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
@@ -206,7 +209,7 @@ class TestCorsikaWeighter(unittest.TestCase):
             CorsikaWeighter(d, nfiles=10)
 
         with self.assertRaises(RuntimeError):
-            CorsikaWeighter(dict(I3CorsikaWeight=weight))
+            CorsikaWeighter({"I3CorsikaWeight": weight})
 
 
 if __name__ == "__main__":

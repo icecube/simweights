@@ -9,6 +9,8 @@ import numpy as np
 from numpy.random import Generator, RandomState
 from numpy.typing import ArrayLike, NDArray
 
+from ._pdgcode import PDGCode
+
 IntNumber = Union[int, np.integer]
 GeneratorType = Union[Generator, RandomState]
 SeedType = Union[GeneratorType, IntNumber, None]
@@ -91,10 +93,13 @@ def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:
         array_like: PDG codes
     """
     cid = np.asarray(cid, dtype=int)
+    corsika_pplus = 14
+    corsika_min_nucleus = 100
+    corsika_max_nucleus = 9999
     return np.piecewise(
         cid,
-        [cid == 14, (cid >= 100) & (cid <= 9999)],
-        [2212, lambda c: 1000000000 + 10000 * (c % 100) + 10 * (c // 100)],
+        [cid == corsika_pplus, (cid >= corsika_min_nucleus) & (cid <= corsika_max_nucleus)],
+        [PDGCode.PPlus, lambda c: 1000000000 + 10000 * (c % 100) + 10 * (c // 100)],
     )
 
 
@@ -134,4 +139,5 @@ def check_random_state(seed: SeedType = None) -> GeneratorType:
         return np.random.default_rng(seed)
     if isinstance(seed, (RandomState, Generator)):
         return seed
-    raise ValueError(f"{seed!r} cannot be used to seed a numpy.random.Generator instance")
+    mesg = f"{seed!r} cannot be used to seed a numpy.random.Generator instance"
+    raise ValueError(mesg)

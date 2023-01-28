@@ -30,7 +30,8 @@ def find_weighter(fileobj: pd.HDFStore, nfiles: float) -> simweights.Weighter:
         return simweights.GenieWeighter(fileobj)
     except AttributeError:
         pass
-    raise RuntimeError(f"Could not find a suitable weighter for file object `{fileobj.filename}`")
+    mesg = f"Could not find a suitable weighter for file object `{fileobj.filename}`"
+    raise RuntimeError(mesg)
 
 
 def main() -> int:
@@ -38,7 +39,7 @@ def main() -> int:
     Command line utility to print some basic information about how a file will be weighted
     """
     parser = argparse.ArgumentParser(
-        "A simple utility to quickly print basic info about how simweights will weight a simulation file"
+        "A simple utility to quickly print basic info about how simweights will weight a simulation file",
     )
     parser.add_argument("filename")
     parser.add_argument("-n", "--nfiles", type=float, default=1)

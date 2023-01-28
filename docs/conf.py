@@ -23,7 +23,7 @@ import os
 # -- Project information -----------------------------------------------------
 
 project = "SimWeights"
-copyright = "Copyright © 2022 the SimWeights contributors"
+copyright = "Copyright © 2022 the SimWeights contributors"  # NoQA: A001
 author = "Kevin Meagher"
 
 # The full version, including alpha/beta/rc tags

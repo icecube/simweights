@@ -14,7 +14,7 @@ import simweights
 
 CORSIKA_DATASET_DIR = "/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/20904/"
 corsika_filelist = list(
-    glob.glob(CORSIKA_DATASET_DIR + "0000000-0000999/Level2_IC86.2016_corsika.020904.00000*.i3.zst")
+    glob.glob(CORSIKA_DATASET_DIR + "0000000-0000999/Level2_IC86.2016_corsika.020904.00000*.i3.zst"),
 )
 assert corsika_filelist
 
@@ -59,7 +59,7 @@ for f in corsika_filelist:
                 PolyplopiaPrimary["type"].append(frame["PolyplopiaPrimary"].type)
                 PolyplopiaPrimary["energy"].append(frame["PolyplopiaPrimary"].energy)
 
-fobj = dict(CorsikaWeightMap=CorsikaWeightMap, PolyplopiaPrimary=PolyplopiaPrimary)
+fobj = {"CorsikaWeightMap": CorsikaWeightMap, "PolyplopiaPrimary": PolyplopiaPrimary}
 wobj = simweights.CorsikaWeighter(fobj, nfiles=len(corsika_filelist))
 weights_GaisserH3a = wobj.get_weights(simweights.GaisserH3a())
 weights_Hoerandel = wobj.get_weights(simweights.Hoerandel())
@@ -80,7 +80,7 @@ print("           GaisserH3a Hoerandel")
 print(f"Rate     : {weights_GaisserH3a.sum():10.4f} {weights_Hoerandel.sum():10.4f}")
 print(
     f"Livetime : {weights_GaisserH3a.sum() / (weightssqr_GaisserH3a.sum()):10.6f} "
-    f"{weights_Hoerandel.sum() / weightssqr_GaisserH3a.sum():10.6f}"
+    f"{weights_Hoerandel.sum() / weightssqr_GaisserH3a.sum():10.6f}",
 )
 
 fig, ax = plt.subplots(figsize=(12, 6))

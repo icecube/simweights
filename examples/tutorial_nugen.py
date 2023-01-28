@@ -9,8 +9,7 @@ import glob
 import matplotlib.pyplot as plt
 import nuflux
 import numpy as np
-from icecube import dataclasses, dataio, simclasses
-from icecube.icetray import I3Units
+from icecube import dataclasses, dataio, simclasses  # noqa: F401
 
 import simweights
 
@@ -57,7 +56,8 @@ for f in filelist:
         if "FilterMask" in frame:
             if frame["FilterMask"]["MuonFilter_13"].condition_passed:
                 MCmuonEnergy_nugen = np.append(
-                    MCmuonEnergy_nugen, get_most_energetic_muon(frame["MMCTrackList"])
+                    MCmuonEnergy_nugen,
+                    get_most_energetic_muon(frame["MMCTrackList"]),
                 )
                 for k in weight_keys:
                     I3MCWeightDict[k].append(frame["I3MCWeightDict"][k])

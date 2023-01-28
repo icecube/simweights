@@ -49,7 +49,8 @@ class Weighter:
         col = np.array(column)
         if self.size:
             if self.size != col.size:
-                raise ValueError(f"{self.size}  != {col.size}")
+                mesg = f"{self.size}  != {col.size}"
+                raise ValueError(mesg)
         else:
             self.size = col.size
 
@@ -103,10 +104,11 @@ class Weighter:
             try:
                 arguments = {k: self.get_weight_column(k) for k in keys}
             except KeyError as missing_params:
-                raise ValueError(
+                mesg = (
                     f"get_weights() was passed callable {repr(flux)} which has parameters {list(keys)}. "
                     "The weight columns which are available are {repr(self.colnames)}"
-                ) from missing_params
+                )
+                raise ValueError(mesg) from missing_params
             flux_val = flux(**arguments)
         elif hasattr(flux, "__len__"):
             # this is an array with a length equal to the number of events
@@ -115,7 +117,8 @@ class Weighter:
             # this is a scalar
             flux_val = np.full(epdf.shape, flux)
         else:
-            raise ValueError(f"I do not understand what to do with flux {flux}")
+            mesg = f"I do not understand what to do with flux {flux}"
+            raise ValueError(mesg)
         assert flux_val.shape == epdf.shape
 
         # Getting events with epdf=0 indicates some sort of mismatch between the
@@ -126,14 +129,17 @@ class Weighter:
         if not np.all(mask):
             warnings.warn(
                 f"simweights :: {np.logical_not(mask).sum()} events out of {mask.size} were found to be "
-                "outside the generation surface. This could indicate a problem with this dataset."
+                "outside the generation surface. This could indicate a problem with this dataset.",
             )
         weights = np.zeros_like(epdf)
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
         return weights
 
     def effective_area(
-        self, energy_bins: ArrayLike, cos_zenith_bins: ArrayLike, mask: ArrayLike | None = None
+        self,
+        energy_bins: ArrayLike,
+        cos_zenith_bins: ArrayLike,
+        mask: ArrayLike | None = None,
     ) -> NDArray[np.float64]:
         r"""
         Calculate The effective area for the given energy and zenith bins.
@@ -167,8 +173,8 @@ class Weighter:
 
         assert energy_bins.ndim == 1
         assert cos_zenith_bins.ndim == 1
-        assert len(energy_bins) >= 2
-        assert len(cos_zenith_bins) >= 2
+        assert len(energy_bins) >= 2  # noqa: PLR2004
+        assert len(cos_zenith_bins) >= 2  # noqa: PLR2004
 
         energy = self.get_weight_column("energy")
         cos_zen = self.get_weight_column("cos_zen")
@@ -200,7 +206,8 @@ class Weighter:
         if other == 0:
             return self
         if not isinstance(other, Weighter):
-            raise TypeError(f"cannot add {other!r} to weighter object {self!r}")
+            mesg = f"cannot add {other!r} to weighter object {self!r}"
+            raise TypeError(mesg)
 
         weighter = Weighter(self.data + other.data, self.surface + other.surface)
 
@@ -224,7 +231,8 @@ class Weighter:
         output += f"Weight Columns   : {', '.join(self.colnames)}\n"
         output += f"Number of Events : {len(self.get_weights(1)):8d}\n"
         eff_area = self.effective_area(
-            self.surface.get_energy_range(None), self.surface.get_cos_zenith_range(None)
+            self.surface.get_energy_range(None),
+            self.surface.get_cos_zenith_range(None),
         )
         output += f"Effective Area   : {eff_area[0][0]:8.6g} m²\n"
         if flux:

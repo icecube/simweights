@@ -48,10 +48,10 @@ class TestIceTopWeighter(unittest.TestCase):
                     p1.a,
                     p1.b,
                     p1.g,
-                )
+                ),
             ]
             info = np.array(rows, dtype=info_dtype)
-            d = dict(MCPrimary=weight, I3TopInjectorInfo=info)
+            d = {"MCPrimary": weight, "I3TopInjectorInfo": info}
 
             for flux in [0.1, 1, 10]:
 
@@ -67,10 +67,10 @@ class TestIceTopWeighter(unittest.TestCase):
             simweights.IceTopWeighter(d, nfiles=10)
 
         with self.assertRaises(KeyError):
-            simweights.IceTopWeighter(dict(MCParticle=weight))
+            simweights.IceTopWeighter({"MCParticle": weight})
 
         with self.assertRaises(KeyError):
-            simweights.IceTopWeighter(dict(I3TopInjectorInfo=info))
+            simweights.IceTopWeighter({"I3TopInjectorInfo": info})
 
 
 if __name__ == "__main__":

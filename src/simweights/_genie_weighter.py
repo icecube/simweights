@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+
 from typing import Any, Iterable, Mapping
 
 import numpy as np
@@ -33,7 +34,7 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
         )
         surfaces.append(
             get_column(table, "n_flux_events")[i]
-            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial)
+            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)
@@ -57,7 +58,8 @@ def GenieWeighter(file_obj: Any) -> Weighter:
     weighter.add_weight_column("pdgid", weighter.get_column("I3GenieResult", "neu").astype(np.int32))
     weighter.add_weight_column("cos_zen", np.full(len(weighter.get_column("I3GenieResult", "Ev")), 1))
     weighter.add_weight_column(
-        "event_weight", global_probability_scale * weighter.get_column("I3GenieResult", "wght")
+        "event_weight",
+        global_probability_scale * weighter.get_column("I3GenieResult", "wght"),
     )
 
     return weighter

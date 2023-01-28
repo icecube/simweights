@@ -71,7 +71,7 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 max-line-length = "108"
 
 [tool.pylint.messages_control]
-disable = "C0114"
+disable = "C0114, E0601"
 
 [tool.pytest.ini_options]
 minversion = 7.0
@@ -83,3 +83,27 @@ addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights"]
 
 [tool.doc8]
 max-line-length=108
+
+[tool.ruff]
+select = ["ALL"]
+ignore = [
+    "I",    # isort
+    "N",    # pep8-naming
+    "D",    # pydocstyle
+    "ANN",  # flake8-annotations
+    "S101", # flake8-bandit assert-used
+    "FBT",  # flake8-boolean-trap
+    "INP",  # flake8-no-pep420
+    "T20",  # flake8-print
+    "PT",   # flake8-pytest-style
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "ARG",  # flake8-unused-arguments
+    "PTH",  # flake8-use-pathlib
+    "ERA",  # eradicate
+    "PGH",  # pygrep-hooks
+    "TRY",  # tryceratops
+    "S101", #assert-used
+    ]
+line-length = 108
+target-version = "py37"
