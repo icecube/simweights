@@ -76,13 +76,11 @@ def make_corsika_data(pdgid, nevents, c, p):
 
 class TestCorsikaWeighter(unittest.TestCase):
     def test_old_corsika(self):
-
         c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
         p1 = simweights.PowerLaw(0, 1e3, 1e4)
         d = make_corsika_data(2212, 10000, c1, p1)
 
         for oversampling in [1, 5, 50]:
-
             d["CorsikaWeightMap"]["OverSampling"] = oversampling
             for nfiles in [1, 10, 100]:
                 wobj = CorsikaWeighter(d, nfiles=nfiles)
@@ -105,7 +103,6 @@ class TestCorsikaWeighter(unittest.TestCase):
             CorsikaWeighter(d, nfiles=object())
 
     def test_sframe_corsika(self):
-
         c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
         p1 = simweights.PowerLaw(0, 1e3, 1e4)
         print(dir(c1))
@@ -144,7 +141,6 @@ class TestCorsikaWeighter(unittest.TestCase):
             CorsikaWeighter(d, nfiles=10)
 
     def test_triggered_corsika(self):
-
         weight_dtype = [
             ("type", np.int32),
             ("energy", np.float64),
@@ -193,7 +189,6 @@ class TestCorsikaWeighter(unittest.TestCase):
                 d = {"I3CorsikaWeight": weight, "I3PrimaryInjectorInfo": info}
 
                 for flux in [0.1, 1, 10]:
-
                     wobj = CorsikaWeighter(d)
                     w = wobj.get_weights(flux)
                     np.testing.assert_allclose(

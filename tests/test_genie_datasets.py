@@ -52,7 +52,6 @@ class TestNugenDatasets(unittest.TestCase):
 
         for fobj in fobjs:
             with self.subTest(lib=str(fobj)):
-
                 w = GenieWeighter(fobj)
 
                 np.testing.assert_allclose(w.get_weight_column("event_weight"), total_prob)

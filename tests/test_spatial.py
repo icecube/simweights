@@ -14,7 +14,6 @@ from simweights._spatial import CylinderBase
 
 class TestSpatial(unittest.TestCase):
     def check_diff_etendue(self, c, le, r):
-
         le *= 1e2
         r *= 1e2
 
@@ -120,7 +119,6 @@ class TestSpatial(unittest.TestCase):
                 self.assertEqual(float(x[3]), 1)
 
     def check_uniform_pdf(self, c, solid_angle, area_int):
-
         area_int *= 1e4
         self.assertAlmostEqual(c.etendue, solid_angle * area_int, 4)
 

@@ -56,7 +56,6 @@ class TestCorsikaDatasets(unittest.TestCase):
         epdf = np.zeros_like(energy, dtype=float)
 
         for ptype in np.unique(info["primary_type"]):
-
             info_mask = info["primary_type"] == ptype
             n_events = info["n_events"][info_mask].sum()
             min_energy = constcol(info, "min_energy", info_mask)

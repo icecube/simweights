@@ -71,7 +71,7 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 max-line-length = "108"
 
 [tool.pylint.messages_control]
-disable = "C0114, E0601"
+disable = "C0114"
 
 [tool.pytest.ini_options]
 minversion = 7.0

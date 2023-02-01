@@ -26,7 +26,6 @@ particle_dtype = [("type", np.int32), ("energy", np.float64), ("zenith", np.floa
 
 class TestIceTopWeighter(unittest.TestCase):
     def test_icetop_corsika(self):
-
         nevents = 10000
         pdgid = 12
         c1 = simweights.CircleInjector(300, 0, 1)
@@ -54,7 +53,6 @@ class TestIceTopWeighter(unittest.TestCase):
             d = {"MCPrimary": weight, "I3TopInjectorInfo": info}
 
             for flux in [0.1, 1, 10]:
-
                 wobj = simweights.IceTopWeighter(d)
                 w = wobj.get_weights(flux)
                 np.testing.assert_allclose(w.sum(), flux * c1.etendue * p1.integral / nfiles)

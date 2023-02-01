@@ -25,7 +25,6 @@ class TestNugenDatasets(unittest.TestCase):
         cls.datadir = datadir + "/"
 
     def cmp_dataset(self, fname):
-
         filename = os.path.join(self.datadir, fname)
         reffile = h5py.File(filename + ".hdf5", "r")
 

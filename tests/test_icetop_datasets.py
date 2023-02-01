@@ -46,7 +46,6 @@ class TestIceTopDatasets(unittest.TestCase):
 
         for fobj in fobjs:
             with self.subTest(lib=str(fobj)):
-
                 w = IceTopWeighter(fobj)
                 spatial = w.surface.spectra[2212][0].spatial_dist
                 proj_area = spatial.projected_area(1)

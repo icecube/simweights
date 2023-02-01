@@ -27,7 +27,6 @@ result_dtype = [("neu", np.int32), ("Ev", np.float64), ("wght", np.float64)]
 
 class TestCorsikaWeighter(unittest.TestCase):
     def test_triggered_corsika(self):
-
         nevents = 10000
         pdgid = 12
         c1 = simweights.CircleInjector(300, 0, 1)
@@ -58,7 +57,6 @@ class TestCorsikaWeighter(unittest.TestCase):
                 d = {"I3GenieResult": weight, "I3GenieInfo": info}
 
                 for flux in [0.1, 1, 10]:
-
                     wobj = simweights.GenieWeighter(d)
                     w = wobj.get_weights(flux)
                     np.testing.assert_allclose(

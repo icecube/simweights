@@ -32,7 +32,6 @@ class fake_nuflux:
 class TestWeighter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-
         cls.N1 = 15
         cls.data1 = {
             "I3Weight": {
@@ -124,7 +123,6 @@ class TestWeighter(unittest.TestCase):
             self.weighter1.get_weights(None)
 
     def test_columns(self):
-
         np.testing.assert_array_equal(
             self.weighter1.get_column("I3Weight", "type"),
             self.weighter1.get_weight_column("pdgid"),
@@ -211,7 +209,6 @@ class TestWeighter(unittest.TestCase):
         )
 
     def test_weighter_addition(self):
-
         weighter_sum = self.weighter1 + self.weighter1
         w1 = self.weighter1.get_weights(1)
         ws = weighter_sum.get_weights(1)

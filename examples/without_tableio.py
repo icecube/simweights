@@ -23,14 +23,12 @@ I3CorsikaWeight: dict = {"energy": [], "type": [], "zenith": [], "weight": []}
 
 # loop over all the files we want to read
 for filename in filelist:
-
     # open the i3 files with the dataio interface
     infile = dataio.I3File(filename)
     print("Reading " + filename)
 
     # loop over the frames in the file
     while infile.more():
-
         # get the frame
         frame = infile.pop_frame()
 
@@ -47,7 +45,6 @@ for filename in filelist:
 
         # if this is a physics event in the right sub-event stream
         elif frame.Stop == frame.Physics and frame["I3EventHeader"].sub_event_stream == "InIceSplit":
-
             # get the weighting object
             w = frame["I3CorsikaWeight"]
 

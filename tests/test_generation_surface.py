@@ -254,7 +254,6 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertIsNot(surf.spectra[2212][1].energy_dist, self.s2.spectra[2212][0].energy_dist)
 
     def test_addition_gsc(self):
-
         sa = self.gsc1 + 0
         self.assertEqual(sa, self.gsc1)
         sb = 0 + self.gsc1

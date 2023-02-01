@@ -12,11 +12,6 @@ jobs:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         os: [ubuntu-20.04, ubuntu-22.04, macos-11, macos-12]
-        exclude:
-          - os: macos-11
-            python-version: "3.11"
-          - os: macos-12
-            python-version: "3.11"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -25,11 +20,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Apt-Get Install Dependencies
-        if: ${{ contains(matrix.os, 'ubuntu') && matrix.python-version=='3.11' }}
-        run: |
-          sudo apt-get -y install libbz2-dev liblzo2-dev libblosc-dev libhdf5-dev
-          python3 -m pip install git+https://github.com/PyTables/PyTables.git@v3.7.0
       - name: Install SimWeights
         run: |
           python3 -m pip install --upgrade pip

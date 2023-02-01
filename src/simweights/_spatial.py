@@ -54,7 +54,7 @@ class CylinderBase:
         Returns:
           the probability density function for the given zenith angle.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def __repr__(self) -> str:
         return (

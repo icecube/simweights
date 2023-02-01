@@ -202,7 +202,6 @@ class Weighter:
         return np.asfarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies))
 
     def __add__(self, other: Weighter | int) -> Weighter:
-
         if other == 0:
             return self
         if not isinstance(other, Weighter):
@@ -217,7 +216,6 @@ class Weighter:
         return weighter
 
     def __radd__(self, other: Weighter | int) -> Weighter:
-
         return self + other
 
     def tostring(self, flux: None | object | Callable | ArrayLike = None) -> str:

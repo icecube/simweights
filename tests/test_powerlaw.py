@@ -140,7 +140,6 @@ class TestPowerLaw(unittest.TestCase):
         self.check_sample(-2.5)
 
     def test_raises(self):
-
         p = PowerLaw(1, 1, 1000)
         with self.assertRaises(TypeError):
             p == object()  # noqa: B015
