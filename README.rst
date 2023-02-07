@@ -54,8 +54,8 @@ To install with pip:
 .. code-block:: shell-session
 
   pip install git+https://github.com/icecube/simweights.git
-  
-On certian installs of python on cvmfs you might get the following error:
+
+On certain installs of python on cvmfs you might get the following error:
 ``ModuleNotFoundError: No module named 'glob'``. If this happens you can add the
 following option ``--no-build-isolation`` to the above command.
 
