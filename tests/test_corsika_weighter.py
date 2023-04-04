@@ -69,7 +69,7 @@ def make_corsika_data(pdgid, nevents, c, p):
     primary = np.zeros(nevents, dtype=primary_dtype)
     primary["type"] = pdgid
     primary["zenith"] = np.arccos(get_cos_zenith_dist(c, nevents))
-    np.random.shuffle(primary["zenith"])
+    np.random.default_rng().shuffle(primary["zenith"])
     primary["energy"] = p.ppf(np.linspace(0, 1, nevents))
     return {"CorsikaWeightMap": weight, "PolyplopiaPrimary": primary}
 

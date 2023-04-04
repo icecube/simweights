@@ -65,7 +65,7 @@ NaturalRateCylinder
 Due to the necessity to produce high CORSIKA statistics corsika-reader needs to use
 the most efficient method of generating primaries. This means generating events on the
 smallest surface that encompasses all events which would trigger the detector.
-A cylinder with a vertical axis is suffient for the geometry of IceCube's.
+A cylinder with a vertical axis is sufficient for the geometry of IceCube's.
 If an isotropic flux of particles were incident on a cylinder then the rate that they
 would intersect the surface of a cylinder is proportional to the cross section of that
 cylinder perpendicular to the direction of motion.

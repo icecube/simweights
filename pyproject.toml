@@ -104,6 +104,9 @@ ignore = [
     "PGH",  # pygrep-hooks
     "TRY",  # tryceratops
     "S101", #assert-used
+    "SLF001",
+    "B028",
+    "PLR0915",
     ]
 line-length = 108
 target-version = "py37"
