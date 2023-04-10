@@ -5,11 +5,10 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import json
-import os.path
 import unittest
+from pathlib import Path
 
 import numpy as np
-
 from simweights import _fluxes
 
 E = np.logspace(2, 10, 9)
@@ -18,12 +17,12 @@ E = np.logspace(2, 10, 9)
 class TestCosmicRayModels(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        with open(os.path.dirname(__file__) + "/flux_values.json") as f:
+        with (Path(__file__).parent / "flux_values.json").open() as f:
             cls.flux_values = json.load(f)
 
     def flux_cmp(self, name, *args):
         flux = getattr(_fluxes, name)(*args)
-        v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name].keys()]))
+        v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name]]))
         v2 = np.array(list(self.flux_values[name].values())) / 1e4
 
         np.testing.assert_allclose(v1, v2, 1e-13)

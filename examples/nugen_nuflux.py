@@ -19,9 +19,8 @@ primary_energy = weighter.get_column("PolyplopiaPrimary", "energy")
 
 
 def northern_track(energy):
-    """
-    This function is a flux which represents the IceCube northern track limit
-    Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
+    """This function is a flux which represents the IceCube northern track limit
+    Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type.
     """
     return 1.44e-18 / 2 * (energy / 1e5) ** -2.2
 

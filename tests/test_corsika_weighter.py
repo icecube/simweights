@@ -7,9 +7,8 @@
 import unittest
 
 import numpy as np
-from scipy.interpolate import interp1d
-
 import simweights
+from scipy.interpolate import interp1d
 from simweights import CorsikaWeighter
 
 info_dtype = [
@@ -105,7 +104,6 @@ class TestCorsikaWeighter(unittest.TestCase):
     def test_sframe_corsika(self):
         c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
         p1 = simweights.PowerLaw(0, 1e3, 1e4)
-        print(dir(c1))
         d = make_corsika_data(2212, 10000, c1, p1)
         for oversampling in [1, 5, 50]:
             for nfiles in [1, 10, 100]:

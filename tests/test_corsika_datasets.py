@@ -12,7 +12,6 @@ import numpy as np
 import pandas as pd
 import tables
 import uproot
-
 from simweights import CorsikaWeighter, GaisserH4a
 from simweights._utils import constcol
 

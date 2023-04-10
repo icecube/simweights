@@ -15,9 +15,7 @@ from ._weighter import Weighter
 
 
 def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
-    """
-    Inspect the rows of a GENIE S-Frame table object to generate a surface object.
-    """
+    """Inspect the rows of a GENIE S-Frame table object to generate a surface object."""
     surfaces = []
 
     for i in range(len(get_column(table, "n_flux_events"))):
@@ -41,14 +39,12 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
     return retval
 
 
-def GenieWeighter(file_obj: Any) -> Weighter:
+def GenieWeighter(file_obj: Any) -> Weighter:  # noqa: N802
     # pylint: disable=invalid-name
-    """
-    Weighter for GENIE simulation
+    """Weighter for GENIE simulation.
 
     Reads ``I3GenieInfo`` from S-Frames and ``I3GenieResult`` from Q-Frames.
     """
-
     weight_table = get_table(file_obj, "I3GenieInfo")
     surface = genie_surface(weight_table)
     global_probability_scale = constcol(weight_table, "global_probability_scale")

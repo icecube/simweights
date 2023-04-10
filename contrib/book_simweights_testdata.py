@@ -8,6 +8,7 @@ import os.path
 import sys
 import tarfile
 import tempfile
+from pathlib import Path
 
 from I3Tray import I3Tray
 from icecube import dataclasses, hdfwriter, icetray, rootwriter, simclasses, tableio  # noqa: F401
@@ -60,9 +61,7 @@ else:
     outdir = tempdir.name
 
 for filename in filelist:
-    basename = (
-        os.path.basename(filename).replace(".i3.zst", "").replace(".i3.bz2", "").replace(".i3.gz", "")
-    )
+    basename = Path(filename).name.replace(".i3.zst", "").replace(".i3.bz2", "").replace(".i3.gz", "")
     assert basename != os.path.basename(filename)
 
     split = False

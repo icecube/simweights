@@ -24,6 +24,7 @@ from numpy.typing import ArrayLike, NDArray
 from ._pdgcode import PDGCode
 
 # pylint: disable=too-few-public-methods
+# flake8: noqa: N803
 
 
 class CosmicRayFlux:
@@ -40,7 +41,11 @@ class CosmicRayFlux:
     pdgids: List[PDGCode] = []
     _funcs: List[Union[float, Callable[[float], float]]] = []
 
-    def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> List[NDArray[bool_]]:
+    def _condition(
+        self,
+        energy: NDArray[float64],
+        pdgid: NDArray[int32],
+    ) -> List[NDArray[bool_]]:
         # pylint: disable=unused-argument
         return [pdgid == p for p in self.pdgids]
 
@@ -359,10 +364,10 @@ class FixedFractionFlux(CosmicRayFlux):
             self.flux = GaisserH4a_IT()
         fluxes = {int(k): 0.0 for k in self.flux.pdgids}
         fluxes.update({int(k): v for k, v in fractions.items()})
-        self.pdgids = [PDGCode(k) for k in fluxes.keys()]
+        self.pdgids = [PDGCode(k) for k in fluxes]
         self.fracs = list(fluxes.values())
         if normalized:
-            assert sum(self.fracs) == 1.0  # noqa: PLR2004
+            assert sum(self.fracs) == 1.0
 
     def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
         """

@@ -7,7 +7,6 @@
 import unittest
 
 import numpy as np
-
 import simweights
 
 info_dtype = [

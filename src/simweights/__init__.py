@@ -2,8 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-"""
-Pure python library for calculating the weights of Monte Carlo simulation for IceCube.
+"""Pure python library for calculating the weights of Monte Carlo simulation for IceCube.
 
 SimWeights was designed with goal of calculating weights for IceCube simulation in a way that it
 is easy to combine combine datasets with different generation parameters into a single sample.

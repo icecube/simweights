@@ -16,8 +16,7 @@ from ._weighter import Weighter
 
 
 def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
-    """
-    Inspect the rows of a CORSIKA S-Frame table object to generate a surface object. This function works
+    """Inspect the rows of a CORSIKA S-Frame table object to generate a surface object. This function works
     on files generated with either triggered CORSIKA or corsika-reader because `I3PrimaryInjectorInfo` and
     `I3CorsikaInfo` use exactly the same names for quantities.
     """
@@ -36,10 +35,7 @@ def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
             get_column(table, "min_energy")[i],
             get_column(table, "max_energy")[i],
         )
-        if oversampling:
-            oversampling_val = get_column(table, "oversampling")[i]
-        else:
-            oversampling_val = 1
+        oversampling_val = get_column(table, "oversampling")[i] if oversampling else 1
         surfaces.append(
             get_column(table, "n_events")[i]
             * oversampling_val
@@ -51,10 +47,7 @@ def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
 
 
 def weight_map_corsika_surface(table: Any) -> GenerationSurface:
-    """
-    Inspect the `CorsikaWeightMap` table object of a corsika file to generate a surface object
-
-    """
+    """Inspect the `CorsikaWeightMap` table object of a corsika file to generate a surface object."""
     pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
     surface: int | GenerationSurface = 0
     for pdgid in pdgids:
@@ -81,16 +74,14 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
     return surface
 
 
-def CorsikaWeighter(file_obj: Any, nfiles: Optional[float] = None) -> Weighter:
+def CorsikaWeighter(file_obj: Any, nfiles: Optional[float] = None) -> Weighter:  # noqa: N802
     # pylint: disable=invalid-name
-    """
-    Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader
+    """Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader.
 
     I3CORSIKAReader not use S-Frames and stores the surface information in an I3MapStringDouble so that
     the user does not know how many jobs contributed to the current sample, so it needs to know the number
     of files.
     """
-
     if has_table(file_obj, "I3CorsikaWeight"):
         if nfiles is not None:
             mesg = (
@@ -133,6 +124,7 @@ def CorsikaWeighter(file_obj: Any, nfiles: Optional[float] = None) -> Weighter:
             warnings.warn(
                 "CorsikaWeighter was given a value for nfiles, but this file has an "
                 "I3CorsikaInfo table indicating it has S-Frames",
+                stacklevel=2,
             )
 
         table = get_table(file_obj, "CorsikaWeightMap")

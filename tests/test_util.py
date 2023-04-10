@@ -8,7 +8,6 @@ import unittest
 from types import SimpleNamespace
 
 import numpy as np
-
 from simweights import Hoerandel
 from simweights._utils import constcol, corsika_to_pdg, get_column, get_table, has_column, has_table
 
@@ -48,7 +47,7 @@ class TestUtil(unittest.TestCase):
         with self.assertRaises(KeyError):
             get_column(t2, "c")
 
-        mask = np.arange(10) < 5  # noqa: PLR2004
+        mask = np.arange(10) < 5
         self.assertEqual(constcol(t1, "a"), 3)
         self.assertEqual(constcol(t1, "b", mask), 3)
         self.assertEqual(constcol(t1, "b", ~mask), 4)

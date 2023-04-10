@@ -11,9 +11,7 @@ import simweights
 
 
 def find_weighter(fileobj: pd.HDFStore, nfiles: float) -> simweights.Weighter:
-    """
-    Try to automatically determine which type of file this is and return the correct weighter
-    """
+    """Try to automatically determine which type of file this is and return the correct weighter."""
     try:
         return simweights.CorsikaWeighter(fileobj)
     except RuntimeError:
@@ -35,9 +33,7 @@ def find_weighter(fileobj: pd.HDFStore, nfiles: float) -> simweights.Weighter:
 
 
 def main() -> int:
-    """
-    Command line utility to print some basic information about how a file will be weighted
-    """
+    """Command line utility to print some basic information about how a file will be weighted."""
     parser = argparse.ArgumentParser(
         "A simple utility to quickly print basic info about how simweights will weight a simulation file",
     )

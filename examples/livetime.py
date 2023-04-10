@@ -6,9 +6,8 @@
 
 import numpy as np
 import pylab as plt
-import tables
-
 import simweights
+import tables
 
 # load hdf5 table
 f = tables.open_file("Level2_IC86.2016_corsika.021682.N100.hdf5", "r")

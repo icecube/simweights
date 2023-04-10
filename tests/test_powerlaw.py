@@ -9,7 +9,6 @@ import unittest
 import numpy as np
 from scipy import stats
 from scipy.integrate import quad
-
 from simweights import PowerLaw
 
 

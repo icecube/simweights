@@ -8,7 +8,6 @@ import unittest
 
 import numpy as np
 import pandas as pd
-
 from simweights import CircleInjector, NaturalRateCylinder, NuGenWeighter, PowerLaw
 
 base_keys = [

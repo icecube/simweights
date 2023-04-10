@@ -6,7 +6,6 @@
 
 import pandas as pd
 import pylab as plt
-
 import simweights
 
 # load the hdf5 file that we just created using pandas
@@ -17,9 +16,8 @@ weighter = simweights.NuGenWeighter(hdffile, nfiles=10)
 
 
 def northern_track(energy):
-    """
-    this function to represent the IceCube northern track limit.
-    Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
+    """This function to represent the IceCube northern track limit.
+    Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type.
     """
     return 1.44e-18 / 2 * (energy / 1e5) ** -2.2
 

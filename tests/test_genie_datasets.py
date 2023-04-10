@@ -6,13 +6,13 @@
 
 import os
 import unittest
+from pathlib import Path
 
 import h5py
 import numpy as np
 import pandas as pd
 import tables
 import uproot
-
 from simweights import GenieWeighter
 from simweights._utils import get_column, get_table
 
@@ -26,8 +26,8 @@ class TestNugenDatasets(unittest.TestCase):
         cls.datadir = datadir + "/"
 
     def cmp_dataset(self, fname):
-        filename = os.path.join(self.datadir, fname)
-        reffile = h5py.File(filename + ".hdf5", "r")
+        filename = Path(self.datadir) / fname
+        reffile = h5py.File(str(filename) + ".hdf5", "r")
         wd = reffile["I3MCWeightDict"]
 
         solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
@@ -45,9 +45,9 @@ class TestNugenDatasets(unittest.TestCase):
 
         fobjs = [
             reffile,
-            uproot.open(filename + ".root"),
-            tables.open_file(filename + ".hdf5", "r"),
-            pd.HDFStore(filename + ".hdf5", "r"),
+            uproot.open(str(filename) + ".root"),
+            tables.open_file(str(filename) + ".hdf5", "r"),
+            pd.HDFStore(str(filename) + ".hdf5", "r"),
         ]
 
         for fobj in fobjs:

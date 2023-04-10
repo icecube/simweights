@@ -18,17 +18,14 @@ SurfaceTuple = namedtuple("SurfaceTuple", ["pdgid", "nevents", "energy_dist", "s
 
 
 class GenerationSurface:
-    """
-    This class represents a surface on which Monte Carlo simulation was generated on.
+    """This class represents a surface on which Monte Carlo simulation was generated on.
 
     The number of events thrown, the spatial distribution, and the energy distribution are stored in this
     class. Each particle type is stored separately.
     """
 
-    def __init__(self, *spectra: SurfaceTuple):
-        """
-        :param spectra: a collection of GenerationProbabilities.
-        """
+    def __init__(self, *spectra: SurfaceTuple) -> None:
+        """:param spectra: a collection of GenerationProbabilities."""
         self.spectra: dict[int, list[SurfaceTuple]] = {}
         for spec in spectra:
             self._insert(spec)
@@ -54,7 +51,7 @@ class GenerationSurface:
             raise TypeError(mesg)
         for _, ospectra in other.spectra.items():
             for ospec in ospectra:
-                output._insert(ospec)
+                output._insert(ospec)  # noqa: SLF001
         return output
 
     def __radd__(self, other: int | GenerationSurface) -> GenerationSurface:
@@ -71,8 +68,7 @@ class GenerationSurface:
         return self.__mul__(factor)
 
     def get_epdf(self, pdgid: ArrayLike, energy: ArrayLike, cos_zen: ArrayLike) -> NDArray[np.float64]:
-        """
-        Get the extended pdf of an event.
+        """Get the extended pdf of an event.
 
         The pdf is the probability that an event with these parameters is generated. The pdf is multiplied
         by the number of events.
@@ -93,19 +89,12 @@ class GenerationSurface:
         return count
 
     def get_pdgids(self) -> list[int | PDGCode]:
-        """
-        Return a list of pdgids that this surface represents
-        """
+        """Return a list of pdgids that this surface represents."""
         return sorted(self.spectra.keys())
 
     def get_energy_range(self, pdgid: PDGCode | None) -> tuple[float, float]:
-        """
-        Return the energy range for given particle type over all surfaces
-        """
-        if pdgid is None:
-            pdgids = sorted(self.spectra.keys())
-        else:
-            pdgids = [pdgid]
+        """Return the energy range for given particle type over all surfaces."""
+        pdgids = sorted(self.spectra.keys()) if pdgid is None else [pdgid]
 
         assert set(pdgids).issubset(self.spectra.keys())
         emin = np.inf
@@ -119,14 +108,8 @@ class GenerationSurface:
         return emin, emax
 
     def get_cos_zenith_range(self, pdgid: PDGCode | None) -> tuple[float, float]:
-        """
-        Return the cos zenith range for given particle type over all surfaces
-        """
-
-        if pdgid is None:
-            pdgids = sorted(self.spectra.keys())
-        else:
-            pdgids = [pdgid]
+        """Return the cos zenith range for given particle type over all surfaces."""
+        pdgids = sorted(self.spectra.keys()) if pdgid is None else [pdgid]
 
         assert set(pdgids).issubset(self.spectra.keys())
         czmin = np.inf
@@ -184,9 +167,7 @@ def generation_surface(
     energy_dist: PowerLaw,
     spatial_dist: SpatialDist,
 ) -> GenerationSurface:
-    """
-    Convenience function to generate a GenerationSurface for a single particle type
-    """
+    """Convenience function to generate a GenerationSurface for a single particle type."""
     return GenerationSurface(
         SurfaceTuple(pdgid=pdgid, nevents=1.0, energy_dist=energy_dist, spatial_dist=spatial_dist),
     )

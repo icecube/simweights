@@ -19,17 +19,15 @@ weighter.add_weight_column("azimuth", weighter.get_column("PolyplopiaPrimary", "
 
 
 def simple_model(energy):
-    """
-    This function only depends on energy can be used as a flux models
-    Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type
+    """This function only depends on energy can be used as a flux models
+    Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type.
     """
     return 1e-8 * energy**-2
 
 
 def azimuthal_model(energy, azimuth):
-    """
-    this function that takes azimuth as a parameter. get_weights() will use the name
-    of the function parameter to know which weighting column to access
+    """This function that takes azimuth as a parameter. get_weights() will use the name
+    of the function parameter to know which weighting column to access.
     """
     return 1e-8 * plt.cos(azimuth) ** 2 * energy**-2
 

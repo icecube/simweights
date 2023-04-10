@@ -6,9 +6,8 @@ from enum import IntEnum
 
 
 class PDGCode(IntEnum):
-    """
-    Enumeration of the PDG particle numbering scheme by the Particle Data Group (PDG) for cosmic-ray
-    primaries
+    """Enumeration of the PDG particle numbering scheme by the Particle Data Group (PDG) for cosmic-ray
+    primaries.
 
     The PDG assigns a unique code to each type of particle. The numbering includes all known elementary
     particles, composite particles, and atomic nuclei. However this enumeration is only used for cosmic-ray

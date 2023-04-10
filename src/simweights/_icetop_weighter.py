@@ -15,9 +15,7 @@ from ._weighter import Weighter
 
 
 def sframe_icetop_surface(table: Any) -> GenerationSurface:
-    """
-    Inspect the rows of a I3TopInjectorInfo S-Frame table object to generate a surface object.
-    """
+    """Inspect the rows of a I3TopInjectorInfo S-Frame table object to generate a surface object."""
     surfaces = []
 
     for i in range(len(get_column(table, "n_events"))):
@@ -41,12 +39,9 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
     return retval
 
 
-def IceTopWeighter(file_obj: Any) -> Weighter:
+def IceTopWeighter(file_obj: Any) -> Weighter:  # noqa: N802
     # pylint: disable=invalid-name
-    """
-    Weighter for IceTop CORSIKA simulation made with I3TopSimulator.cxx
-    """
-
+    """Weighter for IceTop CORSIKA simulation made with I3TopSimulator.cxx."""
     surface = sframe_icetop_surface(get_table(file_obj, "I3TopInjectorInfo"))
     weighter = Weighter([file_obj], surface)
 

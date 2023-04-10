@@ -6,9 +6,8 @@
 
 import numpy as np
 import pylab as plt
-import tables
-
 import simweights
+import tables
 
 # start-example1
 # load hdf5 file

@@ -6,9 +6,8 @@
 
 import numpy as np
 import pylab as plt
-import tables
-
 import simweights
+import tables
 
 # start-box1
 # load the Medium Energy file
@@ -60,14 +59,14 @@ plt.figure()
 # use get_column() to return the Qtot for each sample
 HE_Qtot = HE_weighter.get_column("Homogenized_QTot", "value")
 ME_Qtot = ME_weighter.get_column("Homogenized_QTot", "value")
-combined_Qtot = combined_weighter.get_column("Homogenized_QTot", "value")
+Combined_Qtot = combined_weighter.get_column("Homogenized_QTot", "value")
 
 # histogram the Qtot
 Qbins = np.geomspace(10, 1e6, 64)
 plt.hist(ME_Qtot, bins=Qbins, weights=ME_weights, histtype="step", label="Medium Energy")
 plt.hist(HE_Qtot, bins=Qbins, weights=HE_weights, histtype="step", label="High Energy")
 plt.hist(
-    combined_Qtot,
+    Combined_Qtot,
     bins=Qbins,
     weights=combined_weights,
     histtype="step",

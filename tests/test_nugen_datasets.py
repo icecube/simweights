@@ -6,13 +6,13 @@
 
 import os
 import unittest
+from pathlib import Path
 
 import h5py
 import numpy as np
 import pandas as pd
 import tables
 import uproot
-
 from simweights import NuGenWeighter
 
 
@@ -25,8 +25,8 @@ class TestNugenDatasets(unittest.TestCase):
         cls.datadir = datadir + "/"
 
     def cmp_dataset(self, fname):
-        filename = os.path.join(self.datadir, fname)
-        reffile = h5py.File(filename + ".hdf5", "r")
+        filename = Path(self.datadir) / fname
+        reffile = h5py.File(str(filename) + ".hdf5", "r")
 
         wd = reffile["I3MCWeightDict"]
         pdgid = wd["PrimaryNeutrinoType"][0]
@@ -45,17 +45,14 @@ class TestNugenDatasets(unittest.TestCase):
         elif "TotalInteractionProbabilityWeight" in wd.dtype.names:
             total_weight = wd["TotalInteractionProbabilityWeight"]
 
-        if "TypeWeight" in wd.dtype.names:
-            type_weight = wd["TypeWeight"]
-        else:
-            type_weight = 0.5
+        type_weight = wd["TypeWeight"] if "TypeWeight" in wd.dtype.names else 0.5
         w0 = wd["OneWeight"] / (wd["NEvents"] * type_weight)
 
         fobjs = [
             reffile,
-            uproot.open(filename + ".root"),
-            tables.open_file(filename + ".hdf5", "r"),
-            pd.HDFStore(filename + ".hdf5", "r"),
+            uproot.open(str(filename) + ".root"),
+            tables.open_file(str(filename) + ".hdf5", "r"),
+            pd.HDFStore(str(filename) + ".hdf5", "r"),
         ]
 
         for fobj in fobjs:

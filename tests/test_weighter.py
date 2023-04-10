@@ -8,7 +8,6 @@ import unittest
 from copy import copy
 
 import numpy as np
-
 from simweights import TIG1996, NaturalRateCylinder, PowerLaw, Weighter, generation_surface
 
 
@@ -16,16 +15,16 @@ def fluxfun1(energy):
     return energy**2
 
 
-def fluxfun2(pdgid, energy):
+def fluxfun2(pdgid, energy):  # noqa: ARG001
     return energy**2
 
 
-def fluxfun3(pdgid, energy, cos_zen):
+def fluxfun3(pdgid, energy, cos_zen):  # noqa: ARG001
     return cos_zen * energy**2
 
 
 class fake_nuflux:
-    def getFlux(self, particle_type, energy, cos_zenith):
+    def getFlux(self, particle_type, energy, cos_zenith):  # noqa: ARG002
         return energy**-3 / cos_zenith
 
 

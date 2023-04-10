@@ -9,13 +9,12 @@ import glob
 import matplotlib.pyplot as plt
 import nuflux
 import numpy as np
-from icecube import dataclasses, dataio, simclasses  # noqa: F401
-
 import simweights
+from icecube import dataclasses, dataio, simclasses  # noqa: F401
 
 
 def get_most_energetic_muon(mmclist):
-    "Loop through the MMC track list and return the muon with the most energy"
+    "Loop through the MMC track list and return the muon with the most energy."
     emax = 0
     for muon in list(mmclist):
         particle = muon.particle
@@ -50,17 +49,16 @@ I3MCWeightDict: dict = {k: [] for k in weight_keys}
 
 for f in filelist:
     print("Reading", f)
-    inFile_nugen = dataio.I3File(f)
-    while inFile_nugen.more():
-        frame = inFile_nugen.pop_physics()
-        if "FilterMask" in frame:
-            if frame["FilterMask"]["MuonFilter_13"].condition_passed:
-                MCmuonEnergy_nugen = np.append(
-                    MCmuonEnergy_nugen,
-                    get_most_energetic_muon(frame["MMCTrackList"]),
-                )
-                for k in weight_keys:
-                    I3MCWeightDict[k].append(frame["I3MCWeightDict"][k])
+    infile_nugen = dataio.I3File(f)
+    while infile_nugen.more():
+        frame = infile_nugen.pop_physics()
+        if "FilterMask" in frame and frame["FilterMask"]["MuonFilter_13"].condition_passed:
+            MCmuonEnergy_nugen = np.append(
+                MCmuonEnergy_nugen,
+                get_most_energetic_muon(frame["MMCTrackList"]),
+            )
+            for k in weight_keys:
+                I3MCWeightDict[k].append(frame["I3MCWeightDict"][k])
 
 nfiles = len(filelist)
 wobj = simweights.NuGenWeighter({"I3MCWeightDict": I3MCWeightDict}, nfiles=nfiles)

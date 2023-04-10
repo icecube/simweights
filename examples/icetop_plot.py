@@ -8,9 +8,8 @@ import glob
 
 import numpy as np
 import pylab as plt
-import tables
-
 import simweights
+import tables
 
 # —- Define which files you want to be part of the dataset ——
 # (This particular example is all low-energy protons)

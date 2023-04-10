@@ -16,8 +16,7 @@ from ._utils import get_column, get_table
 
 
 class Weighter:
-    """
-    Abstract base class from which all weighers derive.
+    """Abstract base class from which all weighers derive.
 
     Weighters will take a file object as input and calculate the weights of the events in the file
     for a given flux. As well as helper functions for all columns in the file. Weighters will keep
@@ -25,7 +24,7 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self, data: Iterable, surface: GenerationSurface):
+    def __init__(self, data: Iterable, surface: GenerationSurface) -> None:
         self.data = list(data)
         self.surface = surface
         self.weight_cols: dict[str, NDArray[np.float64]] = {}
@@ -33,19 +32,14 @@ class Weighter:
         self.size: int | None = None
 
     def get_column(self, table: str, column: str) -> NDArray[np.float64]:
-        """
-        Helper function to get a specific column from the file
-        """
+        """Helper function to get a specific column from the file."""
         retval: NDArray[np.float64] = np.array([])
         for datafile in self.data:
             retval = np.append(retval, get_column(get_table(datafile, table), column))
         return retval
 
     def add_weight_column(self, name: str, column: ArrayLike) -> None:
-        """
-        Add a new column to be passed as parameters to flux models
-        """
-
+        """Add a new column to be passed as parameters to flux models."""
         col = np.array(column)
         if self.size:
             if self.size != col.size:
@@ -58,16 +52,14 @@ class Weighter:
         self.colnames = sorted(self.weight_cols.keys())
 
     def get_weight_column(self, name: str) -> NDArray[np.float64]:
-        """
-        Helper function to get a column needed in the weight calculation
-        """
+        """Helper function to get a column needed in the weight calculation."""
         return self.weight_cols[name]
 
     def get_weights(self, flux: Any) -> NDArray[np.float64]:
-        """
-        Calculate the weights for the sample for the given flux.
+        """Calculate the weights for the sample for the given flux.
 
         Args:
+        ----
           flux: can be any one of several types:
 
             * An instance of :py:class:`nuflux.FluxFunction` from
@@ -79,7 +71,6 @@ class Weighter:
               flux, this can be useful for testing or calculating effective areas. For neutrinos, If the
               value is 1 then the return value will be the well known quantity OneWeight.
         """
-
         event_col = {k: self.get_weight_column(k) for k in ["energy", "pdgid", "cos_zen"]}
 
         # do nothing if everything is empty
@@ -130,6 +121,7 @@ class Weighter:
             warnings.warn(
                 f"simweights :: {np.logical_not(mask).sum()} events out of {mask.size} were found to be "
                 "outside the generation surface. This could indicate a problem with this dataset.",
+                stacklevel=2,
             )
         weights = np.zeros_like(epdf)
         weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
@@ -141,8 +133,7 @@ class Weighter:
         cos_zenith_bins: ArrayLike,
         mask: ArrayLike | None = None,
     ) -> NDArray[np.float64]:
-        r"""
-        Calculate The effective area for the given energy and zenith bins.
+        r"""Calculate The effective area for the given energy and zenith bins.
 
         This is accomplished by histogramming the generation surface the simulation sample
         in energy and zenith bins and dividing by the size of the energy and solid angle of each bin.
@@ -157,17 +148,18 @@ class Weighter:
             should be used to select the particle types individually.
 
         Args:
+        ----
             energy_bins(array_like): A length N+1 array of energy bin edges
             coz_zenith_bins(array_like): A length M+1 array of cos(zenith) bin edges
             mask(array_like): boolean array where 1 indicates to use the event in the calculation.
                 Must have the same length as the simulation sample.
 
         Returns:
+        -------
             array_like: An NxM array of effective areas. Where N is the number of energy bins and
                 M is the number of cos(zenith) bins.
 
         """
-
         energy_bins = np.array(energy_bins)
         cos_zenith_bins = np.array(cos_zenith_bins)
 
@@ -180,10 +172,7 @@ class Weighter:
         cos_zen = self.get_weight_column("cos_zen")
 
         weights = self.get_weights(1e-4)
-        if mask is None:
-            maska = np.full(weights.size, 1, dtype=bool)
-        else:
-            maska = np.asarray(mask, dtype=bool)
+        maska = np.full(weights.size, 1, dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
 
         assert maska.shape == weights.shape
 
@@ -219,8 +208,7 @@ class Weighter:
         return self + other
 
     def tostring(self, flux: None | object | Callable | ArrayLike = None) -> str:
-        """
-        Creates a string with important information about this weighting object:
+        """Creates a string with important information about this weighting object:
         generation surface, event map, number of events, and effective area.
         if optional flux is provided the event rate and livetime are added as well.
 
