@@ -100,5 +100,5 @@ unfixable=["PT"] # flake8-pytest-style
     "PLR",     # max-statements
     ]
 "examples/*" = [
-    "F401",	   # unused-import
+    "F401",    # unused-import
 ]
