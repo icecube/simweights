@@ -99,9 +99,6 @@ unfixable=["PT"] # flake8-pytest-style
     "SLF001",  # private-member-access
     "PLR",     # max-statements
     ]
-"contrib/*" = [
-    "PTH",     # flake8-use-pathlib
-]
 "examples/*" = [
-    "F401",
+    "F401",	   # unused-import
 ]

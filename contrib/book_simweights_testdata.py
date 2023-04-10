@@ -58,11 +58,11 @@ if "notemp" in sys.argv:
     outdir = "/scratch/kmeagher/simweights/"
 else:
     tempdir = tempfile.TemporaryDirectory(prefix="simweights_testdata_")
-    outdir = tempdir.name
+    outdir = Path(tempdir.name)
 
 for filename in filelist:
     basename = Path(filename).name.replace(".i3.zst", "").replace(".i3.bz2", "").replace(".i3.gz", "")
-    assert basename != os.path.basename(filename)
+    assert basename != Path(filename).name
 
     split = False
     if "corsika" in basename:
@@ -85,9 +85,9 @@ for filename in filelist:
         keys = ["I3TopInjectorInfo", "MCPrimary"]
         streams = ["IceTopSplit"]
 
-    outfile = os.path.join(outdir, basename)
+    outfile = outdir / basename
 
-    if os.path.exists(outfile + ".hdf5"):
+    if Path(outfile.name + ".hdf5").exists():
         print(f"Skipping {filename}: {outfile} already exists!")
         continue
 
@@ -109,8 +109,8 @@ for filename in filelist:
     tray.Add(
         tableio.I3TableWriter,
         tableservice=[
-            hdfwriter.I3HDFTableService(outfile + ".hdf5"),
-            rootwriter.I3ROOTTableService(outfile + ".root"),
+            hdfwriter.I3HDFTableService(str(outfile) + ".hdf5"),
+            rootwriter.I3ROOTTableService(str(outfile) + ".root"),
         ],
         SubEventStreams=streams,
         keys=keys,
@@ -126,6 +126,6 @@ print(f"Writing tarfile {tarfilename}")
 with tarfile.open(tarfilename, "w:gz") as tar:
     for f in os.listdir(outdir):
         print(f"Adding {f} to tarball")
-        tar.add(os.path.join(outdir, f), arcname=f)
+        tar.add(outdir / f, arcname=f)
 
 print("Done!")
