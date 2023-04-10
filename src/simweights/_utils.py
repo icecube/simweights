@@ -72,17 +72,17 @@ def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:
     numbering scheme.
 
     Note:
-    ----
+    -----
         This function will only convert codes that correspond to
         nuclei needed for the flux models in this module. That includes PPlus (14)
         and He4Nucleus (402) through Fe56Nucleus (5626).
 
     Args:
-    ----
+    -----
         code (array_like): CORSIKA codes
 
     Returns:
-    -------
+    --------
         array_like: PDG codes
     """
     cid = np.asarray(cid, dtype=int)
@@ -115,8 +115,8 @@ def check_run_counts(table: Any, nfiles: float) -> bool:  # pragma: no cover
 def check_random_state(seed: SeedType = None) -> GeneratorType:
     """Turn `seed` into a `numpy.random.Generator` instance.
 
-    Parameters
-    ----------
+    Parameters:
+    -----------
     seed : {None, int, `numpy.random.Generator`, `numpy.random.RandomState`}, optional
         If `seed` is None the `numpy.random.Generator` singleton is used.
         If `seed` is an int, a new ``Generator`` instance is used,
@@ -125,8 +125,8 @@ def check_random_state(seed: SeedType = None) -> GeneratorType:
         that instance is used.
 
 
-    Returns
-    -------
+    Returns:
+    --------
     seed : {`numpy.random.Generator`, `numpy.random.RandomState`}
         Random number generator.
     """
