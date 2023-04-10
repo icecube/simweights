@@ -102,3 +102,6 @@ unfixable=["PT"] # flake8-pytest-style
 "contrib/*" = [
     "PTH",     # flake8-use-pathlib
 ]
+"examples/*" = [
+    "F401",
+]

@@ -7,7 +7,7 @@
 from glob import glob
 
 from I3Tray import I3Tray
-from icecube import hdfwriter, simclasses  # noqa: F401
+from icecube import hdfwriter, simclasses
 
 FILE_DIR = "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/21217/0000000-0000999/"
 files = sorted(glob(FILE_DIR + "Level2_IC86.2016_NuMu.021217.00000*.i3.zst"))

@@ -7,7 +7,7 @@
 from glob import glob
 
 from I3Tray import I3Tray
-from icecube import hdfwriter, simclasses  # noqa: F401
+from icecube import hdfwriter, simclasses
 
 # The following is an example of some "Level3" files for which S-frames were retrofitted
 # after production.  But the input can be any IceTop simulation files containing S-frames.

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import nuflux
 import numpy as np
 import simweights
-from icecube import dataclasses, dataio, simclasses  # noqa: F401
+from icecube import dataclasses, dataio, simclasses
 
 
 def get_most_energetic_muon(mmclist):
