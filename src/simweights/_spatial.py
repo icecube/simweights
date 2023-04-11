@@ -11,7 +11,13 @@ from numpy.typing import ArrayLike, NDArray
 class CylinderBase:
     """Abstract base class for cylinder pdf classes."""
 
-    def __init__(self, length: float, radius: float, cos_zen_min: float, cos_zen_max: float) -> None:
+    def __init__(
+        self,
+        length: float,
+        radius: float,
+        cos_zen_min: float,
+        cos_zen_max: float,
+    ) -> None:
         if cos_zen_min < -1 or cos_zen_max > 1:
             raise ValueError(
                 self.__class__.__name__ + ": both cos_zen_min and cos_zen_max must be between -1 and +1",

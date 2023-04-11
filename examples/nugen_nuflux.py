@@ -10,6 +10,7 @@ import pylab as plt
 
 # start-box1
 import simweights
+from numpy.typing import ArrayLike
 
 # load the hdf5 file and make the weigher
 hdffile = pd.HDFStore("Level2_IC86.2016_NuMu.021217.hdf5", "r")
@@ -18,7 +19,7 @@ bins = plt.geomspace(1e2, 1e8, 50)
 primary_energy = weighter.get_column("PolyplopiaPrimary", "energy")
 
 
-def northern_track(energy):
+def northern_track(energy: ArrayLike) -> ArrayLike:
     """This function is a flux which represents the IceCube northern track limit
     Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type.
     """

@@ -13,7 +13,7 @@ import simweights
 from icecube import dataclasses, dataio, simclasses
 
 
-def get_most_energetic_muon(mmclist):
+def get_most_energetic_muon(mmclist: simclasses.I3MMCTrackList) -> float:
     "Loop through the MMC track list and return the muon with the most energy."
     emax = 0
     for muon in list(mmclist):

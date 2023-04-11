@@ -14,7 +14,7 @@ from I3Tray import I3Tray
 from icecube import dataclasses, hdfwriter, icetray, rootwriter, simclasses, tableio  # noqa: F401
 
 
-def fake_event_header(frame):
+def fake_event_header(frame: dict) -> None:
     header = dataclasses.I3EventHeader()
     header.run_id = 0
     header.event_id = fake_event_header.event_id

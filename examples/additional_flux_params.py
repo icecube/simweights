@@ -9,6 +9,7 @@ import pylab as plt
 
 # start-box1
 import simweights
+from numpy.typing import ArrayLike
 
 # load the hdf5 file and make the weigher
 hdffile = pd.HDFStore("Level2_IC86.2016_NuMu.021217.N100.hdf5", "r")
@@ -18,14 +19,14 @@ weighter = simweights.NuGenWeighter(hdffile, nfiles=100)
 weighter.add_weight_column("azimuth", weighter.get_column("PolyplopiaPrimary", "azimuth"))
 
 
-def simple_model(energy):
+def simple_model(energy: ArrayLike) -> ArrayLike:
     """This function only depends on energy can be used as a flux models
     Note that the units are GeV^-1 * cm^-2 * sr^-1 * s^-1 per particle type.
     """
     return 1e-8 * energy**-2
 
 
-def azimuthal_model(energy, azimuth):
+def azimuthal_model(energy: ArrayLike, azimuth: ArrayLike) -> ArrayLike:
     """This function that takes azimuth as a parameter. get_weights() will use the name
     of the function parameter to know which weighting column to access.
     """
