@@ -10,7 +10,7 @@ the sum of the weights.
 
 .. math::
 
-    L_{eff} = \frac{\sum{w_i^2}}{\sum{w_i}}
+    L_{eff} = \frac{\sum{w_i}}{\sum{w_i^2}}
 
 
 As shown in the example below it can be calculated for any sample or for any subsample by using histograms.
