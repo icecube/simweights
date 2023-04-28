@@ -57,6 +57,12 @@ class TestCosmicRayModels(unittest.TestCase):
     def test_GlobalFitGST(self):
         self.flux_cmp("GlobalFitGST")
 
+    def test_GlobalSplineFit(self):
+        self.flux_cmp("GlobalSplineFit")
+
+    def test_GlobalSplineFit5Comp(self):
+        self.flux_cmp("GlobalSplineFit5Comp")
+
     def test_FixedFractionFlux(self):
         self.flux_cmp("FixedFractionFlux", {2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4})
         self.flux_cmp(
