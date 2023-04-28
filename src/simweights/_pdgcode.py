@@ -51,5 +51,3 @@ class PDGCode(IntEnum):
     Cr52Nucleus = 1000240520
     Mn55Nucleus = 1000250550
     Fe56Nucleus = 1000260560
-    Co59Nucleus = 1000270590
-    Ni59Nucleus = 1000280590
