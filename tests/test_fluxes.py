@@ -72,5 +72,47 @@ class TestCosmicRayModels(unittest.TestCase):
         )
 
 
+def test_GlobalSplineFit_similar():
+    """
+    Test if GlobalSplineFit is similar to to other models within a factor of 500,
+    mainly to check if the units provided by the GST files match.
+    This can be not transparent in the file and web-interface.
+    If the units mismatch, we should expect at least a deviation of 1000 (one prefix)
+    or most likely a mismatch of 10 000 (cm^2 vs m^2).
+    """
+    gsf = _fluxes.GlobalSplineFit()
+
+    for name in ("GlobalFitGST", "GaisserH3a", "Hoerandel5"):
+        model = getattr(_fluxes, name)()
+
+        same_pdgids = [pdgid for pdgid in gsf.pdgids if pdgid in model.pdgids]
+
+        f_gsf = gsf(*np.meshgrid(E, [int(i) for i in same_pdgids]))
+        f = model(*np.meshgrid(E, [int(i) for i in same_pdgids]))
+
+        assert 0.2 < np.mean(f / f_gsf) < 500
+
+
+def test_GlobalSplineFit5Comp_similar():
+    """
+    Test if GlobalSplineFit is similar to to other models within a factor of 500,
+    mainly to check if the units provided by the GST files match.
+    This can be not transparent in the file and web-interface.
+    If the units mismatch, we should expect at least a deviation of 1000 (one prefix)
+    or most likely a mismatch of 10 000 (cm^2 vs m^2).
+    """
+    gsf = _fluxes.GlobalSplineFit5Comp()
+
+    for name in ("GlobalFitGST", "GaisserH3a", "Hoerandel5"):
+        model = getattr(_fluxes, name)()
+
+        same_pdgids = [pdgid for pdgid in gsf.pdgids if pdgid in model.pdgids]
+
+        f_gsf = gsf(*np.meshgrid(E, [int(i) for i in same_pdgids]))
+        f = model(*np.meshgrid(E, [int(i) for i in same_pdgids]))
+
+        assert 0.2 < np.mean(f / f_gsf) < 500
+
+
 if __name__ == "__main__":
     unittest.main()
