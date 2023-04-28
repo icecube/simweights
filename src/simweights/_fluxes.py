@@ -509,4 +509,7 @@ class _references:
        "Cosmic ray energy spectrum from measurements of air showers,"
        `Frontiers of Physics 8, 748 (2013) <https://doi.org/10.1007/s11467-013-0319-7>`_.
        `arXiv:1303.3565 <https://arxiv.org/abs/1303.3565v1>`_.
+    .. [#GSFDembinski] H. Dembinski et al.,
+       "Data-driven model of the cosmic-ray flux and mass composition from 10 GeV to $10^{11} $ GeV."
+       `arXiv:1711.11432 <https://arxiv.org/abs/1711.11432>`_.
     """
