@@ -17,8 +17,10 @@ However they have been refactored to:
 
 
 from typing import Callable, List, Mapping, Optional, Union
+from pathlib import Path
 
-from numpy import asfarray, bool_, broadcast_arrays, exp, float64, int32, piecewise, sqrt
+from numpy import asfarray, bool_, broadcast_arrays, exp, float64, int32, piecewise, sqrt, genfromtxt
+from numpy import sum as nsum
 from numpy.typing import ArrayLike, NDArray
 
 from ._pdgcode import PDGCode
@@ -335,6 +337,92 @@ class GlobalFitGST(CosmicRayFlux):
         + 0.00023 * E**-2.2 * exp(-E / 4e6 / 26)
         + 0.0000025 * E**-2.2 * exp(-E / 1.3e9 / 26),
     ]
+
+
+class GlobalSplineFit(CosmicRayFlux):
+    r"""
+    Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]
+    """
+    pdgids = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.Li7Nucleus,
+        PDGCode.Be9Nucleus,
+        PDGCode.B11Nucleus,
+        PDGCode.C12Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.O16Nucleus,
+        PDGCode.F19Nucleus,
+        PDGCode.Ne20Nucleus,
+        PDGCode.Na23Nucleus,
+        PDGCode.Mg24Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Si28Nucleus,
+        PDGCode.P31Nucleus,
+        PDGCode.S32Nucleus,
+        PDGCode.Cl35Nucleus,
+        PDGCode.Ar40Nucleus,
+        PDGCode.K39Nucleus,
+        PDGCode.Ca40Nucleus,
+        PDGCode.Sc45Nucleus,
+        PDGCode.Ti48Nucleus,
+        PDGCode.V51Nucleus,
+        PDGCode.Cr52Nucleus,
+        PDGCode.Mn55Nucleus,
+        PDGCode.Fe56Nucleus,
+        PDGCode.Co59Nucleus,
+        PDGCode.Ni59Nucleus,
+    ]
+
+    def __init__(self):
+        try:
+            from scipy.interpolate import CubicSpline  # pylint: disable=import-outside-toplevel
+        except ModuleNotFoundError as exc:
+            raise ModuleNotFoundError(
+                "To use the GlobalSplineFit model the scipy dependency is needed. "
+                "Please install simweights with `pip install '.[gsf]'`"
+            ) from exc
+
+        data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
+        energy = data.T[0]
+        elements = data.T[1:]
+        self._funcs = []
+        for element in elements:
+            self._funcs.append(CubicSpline(energy, element, extrapolate=False, axis=0))
+
+
+class GlobalSplineFit5Comp(CosmicRayFlux):
+    r"""
+    Sum of the flux of the GSF model for the standard 5 components injected by IceCube.
+    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]
+    """
+    pdgids = [
+        PDGCode.PPlus,
+        PDGCode.He4Nucleus,
+        PDGCode.N14Nucleus,
+        PDGCode.Al27Nucleus,
+        PDGCode.Fe56Nucleus,
+    ]
+
+    groups = [(1, 1), (2, 5), (6, 11), (12, 15), (16, 27)]
+
+    def __init__(self):
+        try:
+            from scipy.interpolate import CubicSpline  # pylint: disable=import-outside-toplevel
+        except ModuleNotFoundError as exc:
+            raise ModuleNotFoundError(
+                "To use the GlobalSplineFit model the scipy dependency is needed. "
+                "Please install simweights with `pip install '.[gsf]'`"
+            ) from exc
+
+        data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
+        energy = data.T[0]
+        elements = data.T[1:]
+        self._funcs = []
+        for z_low, z_high in self.groups:
+            self._funcs.append(
+                CubicSpline(energy, nsum(elements[z_low - 1 + z_high], axis=1), extrapolate=False, axis=0)
+            )
 
 
 class FixedFractionFlux(CosmicRayFlux):
