@@ -421,7 +421,7 @@ class GlobalSplineFit5Comp(CosmicRayFlux):
         self._funcs = []
         for z_low, z_high in self.groups:
             self._funcs.append(
-                CubicSpline(energy, nsum(elements[z_low - 1 + z_high], axis=1), extrapolate=False, axis=0)
+                CubicSpline(energy, nsum(elements[z_low - 1 : z_high], axis=1), extrapolate=False, axis=0)
             )
 
 
