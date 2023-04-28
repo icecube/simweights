@@ -35,6 +35,7 @@ dynamic = ["version", "description"]
 test = ["scipy", "h5py", "tables", "pandas", "uproot", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
 dev = ["pytest","pre-commit","reuse","black","ruff","pylint","mypy"]
+gsf = ["scipy"]
 
 [project.scripts]
 simweights = "simweights.cmdline:main"
