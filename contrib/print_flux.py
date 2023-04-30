@@ -11,7 +11,7 @@ from simweights import _fluxes
 
 E = np.logspace(2, 10, 9)
 
-for idx_v, name in enumerate(argv):
+for idx_v, name in enumerate(argv[1:]):
     print(f'"{name}": {{')
     flux = getattr(_fluxes, name)()
 
