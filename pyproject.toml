@@ -28,14 +28,13 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Physics',
     ]
-dependencies = ["numpy>=1.21.2"]
+dependencies = ["numpy>=1.21.2", "scipy"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
 test = ["scipy", "h5py", "tables", "pandas", "uproot", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
 dev = ["pytest","pre-commit","reuse","black","ruff","pylint","mypy"]
-gsf = ["scipy"]
 
 [project.scripts]
 simweights = "simweights.cmdline:main"

@@ -33,7 +33,7 @@ repos:
       - id: pylint
         files: simweights
         exclude: ^contrib/
-        additional_dependencies: [numpy, pandas]
+        additional_dependencies: [numpy, pandas, scipy]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.1.1
     hooks:

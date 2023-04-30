@@ -23,6 +23,8 @@ from numpy import asfarray, bool_, broadcast_arrays, exp, float64, int32, piecew
 from numpy import sum as nsum
 from numpy.typing import ArrayLike, NDArray
 
+from scipy.interpolate import CubicSpline
+
 from ._pdgcode import PDGCode
 
 # pylint: disable=too-few-public-methods
@@ -375,14 +377,6 @@ class GlobalSplineFit(CosmicRayFlux):
     ]
 
     def __init__(self):
-        try:
-            from scipy.interpolate import CubicSpline  # pylint: disable=import-outside-toplevel
-        except ModuleNotFoundError as exc:
-            raise ModuleNotFoundError(
-                "To use the GlobalSplineFit model the scipy dependency is needed. "
-                "Please install simweights with `pip install '.[gsf]'`"
-            ) from exc
-
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
         energy = data.T[0]
         elements = data.T[1:]
@@ -407,14 +401,6 @@ class GlobalSplineFit5Comp(CosmicRayFlux):
     groups = [(1, 1), (2, 5), (6, 11), (12, 15), (16, 27)]
 
     def __init__(self):
-        try:
-            from scipy.interpolate import CubicSpline  # pylint: disable=import-outside-toplevel
-        except ModuleNotFoundError as exc:
-            raise ModuleNotFoundError(
-                "To use the GlobalSplineFit model the scipy dependency is needed. "
-                "Please install simweights with `pip install '.[gsf]'`"
-            ) from exc
-
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
         energy = data.T[0]
         elements = data.T[1:]
