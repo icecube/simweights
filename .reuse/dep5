@@ -10,7 +10,3 @@ License: BSD-2-Clause
 Files: tests/flux_values.json
 Copyright: 2022 the SimWeights contributors
 License: BSD-2-Clause
-
-Files: src/simweights/gsf_data_table.txt
-Copyright: H. Dembinski et al., PoS(ICRC2017)533, 2017
-License: CC-BY-4.0
