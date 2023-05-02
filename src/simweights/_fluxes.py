@@ -23,7 +23,7 @@ from numpy import asfarray, bool_, broadcast_arrays, exp, float64, int32, piecew
 from numpy import sum as nsum
 from numpy.typing import ArrayLike, NDArray
 
-from scipy.interpolate import CubicSpline
+from scipy.interpolate import CubicSpline  # pylint: disable=import-error
 
 from ._pdgcode import PDGCode
 
