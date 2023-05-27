@@ -14,10 +14,10 @@ FILE_DIR = "/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/21889/0000000-
 filelist = sorted(glob(FILE_DIR + "/Level2_IC86.2016_corsika.021889.00000*.i3.zst"))
 assert filelist
 
-# SimWeights iterates over the info table row-wise so to mimic it we need a list
-I3PrimaryInjectorInfo = []
+# create a dictionary that mimics the structure of a pandas/h5py table
+I3PrimaryInjectorInfo = {k: [] for k in dir(simclasses.I3PrimaryInjectorInfo) if k[0] != "_"}
 
-# However, the weight object is iterated column-wise so we need to create a dictionary of lists
+# Same for I3CorsikaWeight but we only need a few columns
 I3CorsikaWeight: dict = {"energy": [], "type": [], "zenith": [], "weight": []}
 
 # loop over all the files we want to read
@@ -36,11 +36,8 @@ for filename in filelist:
             # get the info from the frame
             info = frame["I3PrimaryInjectorInfo"]
 
-            # convert the info object into a dictionary which represents a row
-            inforow = {x: getattr(info, x) for x in dir(info) if x[0] != "_"}
-
-            # add the row to to the list
-            I3PrimaryInjectorInfo.append(inforow)
+            for k in I3PrimaryInjectorInfo:
+                I3PrimaryInjectorInfo[k].append(getattr(info, k))
 
         # if this is a physics event in the right sub-event stream
         elif frame.Stop == frame.Physics and frame["I3EventHeader"].sub_event_stream == "InIceSplit":

@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-import glob
+from glob import glob
 
 import numpy as np
 import pylab as plt
