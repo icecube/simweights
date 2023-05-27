@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: © 2022 the SimWeights contributors
 #
 # SPDX-License-Identifier: BSD-2-Clause
+# mypy: disable-error-code="no-any-return"
 
 """
 A collection of cosmic ray flux parametrizations.
@@ -376,7 +377,7 @@ class GlobalSplineFit(CosmicRayFlux):
         PDGCode.Ni59Nucleus,
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
         energy = data.T[0]
         elements = data.T[1:]
@@ -400,7 +401,7 @@ class GlobalSplineFit5Comp(CosmicRayFlux):
 
     groups = [(1, 1), (2, 5), (6, 11), (12, 15), (16, 27)]
 
-    def __init__(self):
+    def __init__(self) -> None:
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
         energy = data.T[0]
         elements = data.T[1:]

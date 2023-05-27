@@ -36,14 +36,15 @@ files produced with corsika-reader, neutrino-generator, and genie-reader.
 Prerequisites
 =============
 
-| **Required**: `numpy`_
-| **Optional**: `scipy`_, `h5py`_, `pytables`_, `pandas`_, `nuflux`_
+| **Required**: `numpy`_, `scipy`_
+| **Optional**: `h5py`_, `pytables`_, `pandas`_, `uproot`_, `nuflux`_
 
 .. _numpy: https://numpy.org/
 .. _scipy: https://scipy.org/
 .. _h5py: https://www.h5py.org/
 .. _pytables: https://www.pytables.org/
 .. _pandas: https://pandas.pydata.org/
+.. _uproot: https://github.com/scikit-hep/uproot5
 .. _nuflux: https://github.com/icecube/nuflux
 
 Installation

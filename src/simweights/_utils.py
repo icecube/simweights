@@ -47,7 +47,7 @@ def get_column(table: Any, name: str) -> NDArray[np.float64]:
         return np.asfarray(getattr(table.cols, name)[:])
     column = table[name]
     if hasattr(column, "array") and callable(column.array):
-        return column.array(library="np")
+        return np.asfarray(column.array(library="np"))
     return np.asfarray(column)
 
 
@@ -64,7 +64,7 @@ def constcol(table: Any, colname: str, mask: Optional[NDArray[np.bool_]] = None)
     val = col[0]
     assert np.ndim(val) == 0
     assert (val == col).all()
-    return val
+    return float(val)
 
 
 def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:

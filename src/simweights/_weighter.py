@@ -24,7 +24,7 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self, data: Iterable, surface: GenerationSurface) -> None:
+    def __init__(self, data: Iterable[Any], surface: GenerationSurface) -> None:
         self.data = list(data)
         self.surface = surface
         self.weight_cols: dict[str, NDArray[np.float64]] = {}
@@ -95,7 +95,7 @@ class Weighter:
                 arguments = {k: self.get_weight_column(k) for k in keys}
             except KeyError as missing_params:
                 mesg = (
-                    f"get_weights() was passed callable {repr(flux)} which has parameters {list(keys)}. "
+                    f"get_weights() was passed callable {flux!r} which has parameters {list(keys)}. "
                     "The weight columns which are available are {repr(self.colnames)}"
                 )
                 raise ValueError(mesg) from missing_params
@@ -204,7 +204,7 @@ class Weighter:
     def __radd__(self, other: Weighter | int) -> Weighter:
         return self + other
 
-    def tostring(self, flux: None | object | Callable | ArrayLike = None) -> str:
+    def tostring(self, flux: None | object | Callable[[Any], ArrayLike] | ArrayLike = None) -> str:
         """Creates a string with important information about this weighting object:
         generation surface, event map, number of events, and effective area.
         if optional flux is provided the event rate and livetime are added as well.

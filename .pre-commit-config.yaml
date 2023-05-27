@@ -18,15 +18,16 @@ repos:
     rev: 23.3.0
     hooks:
       - id: black
-  - repo: https://github.com/keewis/blackdoc
-    rev: "v0.3.8"
+  - repo: https://github.com/asottile/blacken-docs
+    rev: "1.13.0"
     hooks:
-      - id: blackdoc
+      - id: blacken-docs
+        args: [-l 100]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.264
+    rev: v0.0.270
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [--fix, --show-fixes]
   - repo: https://github.com/pycqa/pylint
     rev: v3.0.0a6
     hooks:
@@ -35,7 +36,7 @@ repos:
         exclude: ^contrib/
         additional_dependencies: [numpy, pandas]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.2.0
+    rev: v1.3.0
     hooks:
       - id: mypy
         files: simweights
