@@ -197,12 +197,21 @@ class SurfaceCorsikaInjector:
         the probability density function for the given zenith angle.
         """
         cosz = np.asfarray(cos_zen)
-        theta = np.arccos(cosz)
-        # print(cosz)
         return np.piecewise(
             cosz,
             [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)],
             [self._pdf],
+        )
+
+    def __repr__(self) -> str:
+        return f"SurfaceCorsikaInjector({self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, SurfaceCorsikaInjector)
+            and self.radius == other.radius
+            and self.cos_zen_min == other.cos_zen_min
+            and self.cos_zen_max == other.cos_zen_max
         )
 
 
