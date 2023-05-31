@@ -64,6 +64,6 @@ from ._icetop_weighter import IceTopWeighter
 from ._nugen_weighter import NuGenWeighter
 from ._pdgcode import PDGCode
 from ._powerlaw import PowerLaw
-from ._spatial import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder, SurfaceCorsikaInjector
+from ._spatial import CircleInjector, NaturalRateCylinder, SurfaceCorsikaInjector, UniformSolidAngleCylinder
 from ._utils import corsika_to_pdg
 from ._weighter import Weighter

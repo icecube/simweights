@@ -137,7 +137,7 @@ class CircleInjector:
         self.radius = radius
         self.cos_zen_min = cos_zen_min
         self.cos_zen_max = cos_zen_max
-        print(cos_zen_min,cos_zen_max)
+        print(cos_zen_min, cos_zen_max)
         self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = 2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
         self._normalization = 1 / self.etendue
@@ -169,6 +169,7 @@ class CircleInjector:
             and self.cos_zen_max == other.cos_zen_max
         )
 
+
 class SurfaceCorsikaInjector:
     """
     The etendue is just the area of the circle times the solid angle.
@@ -188,7 +189,7 @@ class SurfaceCorsikaInjector:
         return self._cap
 
     def _pdf(self, cosz: NDArray[np.float64]) -> NDArray[np.float64]:
-        arr =  2*cosz
+        arr = 2 * cosz
         return arr * self._normalization
 
     def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
@@ -197,7 +198,7 @@ class SurfaceCorsikaInjector:
         """
         cosz = np.asfarray(cos_zen)
         theta = np.arccos(cosz)
-        #print(cosz)
+        # print(cosz)
         return np.piecewise(
             cosz,
             [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)],
@@ -205,4 +206,4 @@ class SurfaceCorsikaInjector:
         )
 
 
-SpatialDist = Union[CylinderBase, CircleInjector,SurfaceCorsikaInjector]
+SpatialDist = Union[CylinderBase, CircleInjector, SurfaceCorsikaInjector]
