@@ -137,7 +137,7 @@ class CircleInjector:
         self.radius = radius
         self.cos_zen_min = cos_zen_min
         self.cos_zen_max = cos_zen_max
-        print(cos_zen_min, cos_zen_max)
+        
         self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = 2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
         self._normalization = 1 / self.etendue
