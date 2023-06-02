@@ -170,9 +170,11 @@ class CircleInjector:
         )
 
 
-class SurfaceCorsikaInjector:
+class SineSquaredThetaCircleInjector:
     """
-    The etendue is just the area of the circle times the solid angle.
+    Similar to the CircleInjector, except assuming a distribution that is flat in a sin^2(theta)
+    (or, equivalently, in sin(theta)*cos(theta)), instead of flat in cos(theta).
+    This is how the IceTop folks generate Corsika simulation.
     """
 
     def __init__(self, radius: float, cos_zen_min: float, cos_zen_max: float) -> None:
@@ -215,4 +217,4 @@ class SurfaceCorsikaInjector:
         )
 
 
-SpatialDist = Union[CylinderBase, CircleInjector, SurfaceCorsikaInjector]
+SpatialDist = Union[CylinderBase, CircleInjector, SineSquaredThetaCircleInjector]

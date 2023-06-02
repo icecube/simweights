@@ -9,7 +9,7 @@ import numpy as np
 
 from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
-from ._spatial import SurfaceCorsikaInjector
+from ._spatial import SineSquaredThetaCircleInjector
 from ._utils import get_column, get_table
 from ._weighter import Weighter
 
@@ -25,7 +25,7 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
             get_column(table, "min_energy")[i],
             get_column(table, "max_energy")[i],
         )
-        spatial = SurfaceCorsikaInjector(
+        spatial = SineSquaredThetaCircleInjector(
             get_column(table, "sampling_radius")[i],
             np.cos(get_column(table, "max_zenith")[i]),
             np.cos(get_column(table, "min_zenith")[i]),
