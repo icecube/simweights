@@ -206,11 +206,11 @@ class SineSquaredThetaCircleInjector:
         )
 
     def __repr__(self) -> str:
-        return f"SurfaceCorsikaInjector({self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
+        return f"SineSquaredThetaCircleInjector({self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, SurfaceCorsikaInjector)
+            isinstance(other, SineSquaredThetaCircleInjector)
             and self.radius == other.radius
             and self.cos_zen_min == other.cos_zen_min
             and self.cos_zen_max == other.cos_zen_max
