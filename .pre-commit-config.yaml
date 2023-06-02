@@ -5,6 +5,7 @@
 ci:
   autoupdate_commit_msg: autoupdate pre-commit hooks
   autoupdate_schedule: quarterly
+  autofix_prs: false
 repos:
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.0.0-alpha.9-for-vscode
