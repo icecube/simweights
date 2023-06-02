@@ -180,7 +180,7 @@ class SurfaceCorsikaInjector:
         self.cos_zen_min = cos_zen_min
         self.cos_zen_max = cos_zen_max
         self._cap = 1e4 * np.pi * self.radius**2
-        self.etendue = 2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
+        self.etendue = 2 * np.pi * (self.cos_zen_max**2 - self.cos_zen_min**2) * self._cap
         self._normalization = 1 / self.etendue
 
     def projected_area(self, cos_zen: float) -> float:  # noqa: ARG002
