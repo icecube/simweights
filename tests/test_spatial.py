@@ -7,7 +7,13 @@
 import unittest
 
 import numpy as np
-from simweights import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
+from scipy.integrate import quad
+from simweights import (
+    CircleInjector,
+    NaturalRateCylinder,
+    SineSquaredThetaCircleInjector,
+    UniformSolidAngleCylinder,
+)
 from simweights._spatial import CylinderBase
 
 
@@ -178,6 +184,19 @@ class TestSpatial(unittest.TestCase):
         x = np.linspace(np.nextafter(c.cos_zen_max, np.inf), 2)
         np.testing.assert_array_equal(c.pdf(x), 0)
 
+    def check_circle_sin2(self, c, etendue):
+        self.assertAlmostEqual(c.etendue, etendue, 4)
+
+        x = np.linspace(c.cos_zen_min, c.cos_zen_max, 10000)
+        np.testing.assert_allclose(c.projected_area(x), np.pi * (1e2 * c.radius) ** 2)
+        self.assertAlmostEqual(quad(c.pdf, c.cos_zen_min, c.cos_zen_max)[0] * c.etendue, 1)
+
+        x = np.linspace(-2, np.nextafter(c.cos_zen_min, -np.inf))
+        np.testing.assert_array_equal(c.pdf(x), 0)
+
+        x = np.linspace(np.nextafter(c.cos_zen_max, np.inf), 2)
+        np.testing.assert_array_equal(c.pdf(x), 0)
+
     def test_circle_injector(self):
         last_c1 = None
         for r in range(100, 1000, 300):
@@ -204,6 +223,28 @@ class TestSpatial(unittest.TestCase):
             x = s[15:-1].split(",")
             self.assertEqual(float(x[0]), r)
             self.assertEqual(float(x[1]), -1)
+            self.assertEqual(float(x[2]), 1)
+
+    def test_sin2_injector(self):
+        last_c1 = None
+        for r in range(100, 1000, 300):
+            coszen_min = 0.5
+            coszen_max = 1.0
+            c1 = SineSquaredThetaCircleInjector(r, 0.5, 1)
+            self.check_circle_sin2(c1, 2e4 * np.pi**2 * r**2 * (coszen_max**2 - coszen_min**2))
+
+            c2 = SineSquaredThetaCircleInjector(r, 0.25, 1)
+            self.assertEqual(c1, c1)
+            self.assertNotEqual(c1, c2)
+
+            self.assertNotEqual(c1, last_c1)
+            last_c1 = c1
+
+            s = str(c1)
+            self.assertEqual(s[:31], "SineSquaredThetaCircleInjector(")
+            x = s[31:-1].split(",")
+            self.assertEqual(float(x[0]), r)
+            self.assertEqual(float(x[1]), 0.5)
             self.assertEqual(float(x[2]), 1)
 
 
