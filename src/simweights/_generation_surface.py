@@ -18,7 +18,7 @@ SurfaceTuple = namedtuple("SurfaceTuple", ["pdgid", "nevents", "energy_dist", "s
 
 
 class GenerationSurface:
-    """This class represents a surface on which Monte Carlo simulation was generated on.
+    """Represents a surface on which Monte Carlo simulation was generated on.
 
     The number of events thrown, the spatial distribution, and the energy distribution are stored in this
     class. Each particle type is stored separately.
@@ -49,9 +49,9 @@ class GenerationSurface:
         if not isinstance(other, GenerationSurface):
             mesg = f"Cannot add {type(self)} to {type(other)}"
             raise TypeError(mesg)
-        for _, ospectra in other.spectra.items():
+        for ospectra in other.spectra.values():
             for ospec in ospectra:
-                output._insert(ospec)  # noqa: SLF001
+                output._insert(ospec)
         return output
 
     def __radd__(self: GenerationSurface, other: int | GenerationSurface) -> GenerationSurface:
@@ -157,12 +157,12 @@ class GenerationSurface:
         for pdgid, specs in self.spectra.items():
             try:
                 ptype = PDGCode(pdgid).name
-            except ValueError:
+            except ValueError:  # noqa: PERF203
                 ptype = str(pdgid)
 
-            collections = []
-            for subspec in specs:
-                collections.append(f"N={subspec.nevents} {subspec.energy_dist} {subspec.spatial_dist}")
+            collections = [
+                f"N={subspec.nevents} {subspec.energy_dist} {subspec.spatial_dist}" for subspec in specs
+            ]
             outstrs.append(f"     {ptype:>11} : " + "\n                   ".join(collections))
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
 

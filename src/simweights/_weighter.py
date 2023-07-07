@@ -59,6 +59,7 @@ class Weighter:
         """Calculate the weights for the sample for the given flux.
 
         Args:
+        ----
           flux: An object representing the flux. It can be one of several types:
 
             * An instance of :py:class:`nuflux.FluxFunction` from
@@ -147,12 +148,14 @@ class Weighter:
             should be used to select the particle types individually.
 
         Args:
+        ----
             energy_bins(array_like): A length N+1 array of energy bin edges
             coz_zenith_bins(array_like): A length M+1 array of cos(zenith) bin edges
             mask(array_like): boolean array where 1 indicates to use the event in the calculation.
               Must have the same length as the simulation sample.
 
         Returns:
+        -------
             array_like: An NxM array of effective areas. Where N is the number of energy bins and M
             is the number of cos(zenith) bins.
 
@@ -205,9 +208,10 @@ class Weighter:
         return self + other
 
     def tostring(self, flux: None | object | Callable[[Any], ArrayLike] | ArrayLike = None) -> str:
-        """Creates a string with important information about this weighting object:
-        generation surface, event map, number of events, and effective area.
-        if optional flux is provided the event rate and livetime are added as well.
+        """Creates a string with important information about this weighting object.
+
+        Generation surface, event map, number of events, and effective area.
+        If optional flux is provided the event rate and livetime are added as well.
 
         """
         output = str(self.surface) + "\n"

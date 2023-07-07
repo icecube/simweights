@@ -9,7 +9,7 @@ from copy import deepcopy
 
 import numpy as np
 from simweights import GenerationSurface, NaturalRateCylinder, PDGCode, PowerLaw, generation_surface
-from simweights._generation_surface import SurfaceTuple  # noqa : F401
+from simweights._generation_surface import SurfaceTuple  # noqa: F401
 
 
 class Testgeneration_surface(unittest.TestCase):

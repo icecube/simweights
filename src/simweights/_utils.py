@@ -52,8 +52,7 @@ def get_column(table: Any, name: str) -> NDArray[np.float64]:
 
 
 def constcol(table: Any, colname: str, mask: Optional[NDArray[np.bool_]] = None) -> float:
-    """Helper function which makes sure that all of the entries in a column are exactly the same,
-    and returns that value.
+    """Helper function which makes sure that all of the entries in a column are exactly the same.
 
     This is necessary because CORSIKA and NuGen store generation surface parameters in every frame and we
     want to verify that they are all the same.
@@ -68,18 +67,20 @@ def constcol(table: Any, colname: str, mask: Optional[NDArray[np.bool_]] = None)
 
 
 def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:
-    """Convert CORSIKA particle code to particle data group (PDG) Monte Carlo
-    numbering scheme.
+    """Convert CORSIKA particle code to particle data group (PDG) Monte Carlo numbering scheme.
 
     Note:
+    ----
         This function will only convert codes that correspond to
         nuclei needed for the flux models in this module. That includes PPlus (14)
         and He4Nucleus (402) through Fe56Nucleus (5626).
 
     Args:
+    ----
         code (array_like): CORSIKA codes
 
     Returns:
+    -------
         array_like: PDG codes
     """
     cid = np.asarray(cid, dtype=int)
@@ -94,7 +95,8 @@ def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:
 
 
 def check_run_counts(table: Any, nfiles: float) -> bool:  # pragma: no cover
-    """Check that the number of jobs in the file is what the user claims they are
+    """Check that the number of jobs in the file is what the user claims they are.
+
     Not Currently used.
     """
     runs, _ = np.unique(table.cols.Run[:], return_counts=True)
@@ -113,6 +115,7 @@ def check_random_state(seed: SeedType = None) -> GeneratorType:
     """Turn `seed` into a `numpy.random.Generator` instance.
 
     Args:
+    ----
         seed : {None, int, `numpy.random.Generator`, `numpy.random.RandomState`}, optional
             If `seed` is None the `numpy.random.Generator` singleton is used.
             If `seed` is an int, a new ``Generator`` instance is used,
@@ -122,6 +125,7 @@ def check_random_state(seed: SeedType = None) -> GeneratorType:
 
 
     Returns:
+    -------
         seed : {`numpy.random.Generator`, `numpy.random.RandomState`}
             Random number generator.
     """

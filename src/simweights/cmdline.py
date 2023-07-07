@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+"""Command line utility to print some basic information about how a file will be weighted."""
+
 import argparse
 import sys
 
@@ -33,7 +35,7 @@ def find_weighter(fileobj: pd.HDFStore, nfiles: float) -> simweights.Weighter:
 
 
 def main() -> int:
-    """Command line utility to print some basic information about how a file will be weighted."""
+    """Main function for command line utility."""
     parser = argparse.ArgumentParser(
         "A simple utility to quickly print basic info about how simweights will weight a simulation file",
     )

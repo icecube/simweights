@@ -15,8 +15,9 @@ from ._weighter import Weighter
 
 
 def nugen_spatial(table: Any) -> SpatialDist:
-    """Inspect the ``I3MCWeightDict`` table object of a nugen file to generate an object to represent
-    the spatial distribution. It will either return a CircleInjector or UniformSolidAngleCylinder
+    """Inspect the ``I3MCWeightDict`` table of a nugen file to generate the spatial distribution.
+
+    It will either return a CircleInjector or UniformSolidAngleCylinder
     depending on how the dataset was generated.
     """
     max_cos = np.cos(constcol(table, "MinZenith"))
@@ -43,9 +44,7 @@ def nugen_spatial(table: Any) -> SpatialDist:
 
 
 def nugen_spectrum(table: Any) -> PowerLaw:
-    """Inspect the `I3MCWeightDict` table object of a nugen file to generate a PowerLaw object to represent
-    the energy spectrum.
-    """
+    """Inspect the ``I3MCWeightDict`` table of a nugen file to generate to represent the energy spectrum."""
     min_energy = 10 ** constcol(table, "MinEnergyLog")
     max_energy = 10 ** constcol(table, "MaxEnergyLog")
     # the energy spectrum is always powerlaw however nugen uses positive value of `PowerLawIndex`

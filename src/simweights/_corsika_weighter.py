@@ -2,9 +2,11 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+from __future__ import annotations
+
 import numbers
 import warnings
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -16,9 +18,10 @@ from ._weighter import Weighter
 
 
 def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
-    """Inspect the rows of a CORSIKA S-Frame table object to generate a surface object. This function works
-    on files generated with either triggered CORSIKA or corsika-reader because `I3PrimaryInjectorInfo` and
-    `I3CorsikaInfo` use exactly the same names for quantities.
+    """Inspect the rows of a CORSIKA S-Frame table object to generate a surface object.
+
+    This function works on files generated with either triggered CORSIKA or corsika-reader because
+    `I3PrimaryInjectorInfo` and `I3CorsikaInfo` use exactly the same names for quantities.
     """
     surfaces = []
 
@@ -74,7 +77,7 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
     return surface
 
 
-def CorsikaWeighter(file_obj: Any, nfiles: Optional[float] = None) -> Weighter:  # noqa: N802
+def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # noqa: N802
     # pylint: disable=invalid-name
     """Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader.
 

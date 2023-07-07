@@ -28,6 +28,7 @@ class PowerLaw:
       pdf(x, \gamma) = A x^{\gamma}\quad\mathrm{for}\quad a \le x \le b.
 
     Args:
+    ----
         g (float): Power-law index
         a (float): Lower bound of the support of the distribution.
         b (float): Upper bound of the support of the distribution.
@@ -65,9 +66,12 @@ class PowerLaw:
         r"""Probability density function.
 
         Args:
+        ----
             x (array_like): quantiles
 
+
         Returns:
+        -------
             array_like: Probability density function evaluated at `x`
         """
         xa = np.asfarray(x)
@@ -77,9 +81,11 @@ class PowerLaw:
         r"""Cumulative distribution function.
 
         Args:
+        ----
             x (array_like): quantiles
 
         Returns:
+        -------
             array_like: Cumulative distribution function evaluated at `x`
         """
         qa = np.asfarray(x)
@@ -89,9 +95,11 @@ class PowerLaw:
         """Percent point function (inverse of `cdf`) at `q`.
 
         Args:
+        ----
             q (array_like): lower tail probability
 
         Returns:
+        -------
             array_like: quantile corresponding to the lower tail probability `q`.
         """
         qa = np.asfarray(q)
@@ -101,6 +109,7 @@ class PowerLaw:
         """Random variates.
 
         Args:
+        ----
             size (int or tuple of ints, optional): Defining number of random variates (Default is 1).
             random_state ({None, int, `~np.random.RandomState`, `~np.random.Generator`}, optional):
                 This parameter defines the object to use for drawing random variates.
