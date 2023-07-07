@@ -17,9 +17,9 @@ class PowerLaw:
     This has a similar interface to the probability distribution classes found in :py:mod:`scipy.stats`.
     However, it has several differences needed for weighting Monte Carlo simulation:
 
-    - The support is defined from a to b rather than from 0 to 1.
-    - Negative values of the power-law index are allowed.
-    - No shape or location parameters are supported.
+    * The support is defined from a to b rather than from 0 to 1.
+    * Negative values of the power-law index are allowed.
+    * No shape or location parameters are supported.
 
     The probability density function for a `PowerLaw` is defined as:
 
@@ -28,7 +28,6 @@ class PowerLaw:
       pdf(x, \gamma) = A x^{\gamma}\quad\mathrm{for}\quad a \le x \le b.
 
     Args:
-    ----
         g (float): Power-law index
         a (float): Lower bound of the support of the distribution.
         b (float): Upper bound of the support of the distribution.
@@ -66,12 +65,10 @@ class PowerLaw:
         r"""Probability density function.
 
         Args:
-        ----
             x (array_like): quantiles
 
 
         Returns:
-        -------
             array_like: Probability density function evaluated at `x`
         """
         xa = np.asfarray(x)
@@ -81,11 +78,9 @@ class PowerLaw:
         r"""Cumulative distribution function.
 
         Args:
-        ----
             x (array_like): quantiles
 
         Returns:
-        -------
             array_like: Cumulative distribution function evaluated at `x`
         """
         qa = np.asfarray(x)
@@ -95,11 +90,9 @@ class PowerLaw:
         """Percent point function (inverse of `cdf`) at `q`.
 
         Args:
-        ----
             q (array_like): lower tail probability
 
         Returns:
-        -------
             array_like: quantile corresponding to the lower tail probability `q`.
         """
         qa = np.asfarray(q)
@@ -109,7 +102,6 @@ class PowerLaw:
         """Random variates.
 
         Args:
-        ----
             size (int or tuple of ints, optional): Defining number of random variates (Default is 1).
             random_state ({None, int, `~np.random.RandomState`, `~np.random.Generator`}, optional):
                 This parameter defines the object to use for drawing random variates.
