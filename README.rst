@@ -2,7 +2,7 @@
 ..
 .. SPDX-License-Identifier: BSD-2-Clause
 
-|pre-commit.ci| |tests| |docs| |codecov| |LICENSE|
+|pre-commit.ci| |tests| |docs| |codecov| |LICENSE| |pypi|
 
 .. |tests| image:: https://github.com/icecube/simweights/actions/workflows/tests.yml/badge.svg?branch=main
   :target: https://github.com/icecube/simweights/actions/workflows/tests.yml
@@ -15,6 +15,9 @@
 .. |pre-commit.ci| image:: https://results.pre-commit.ci/badge/github/icecube/simweights/main.svg
    :target: https://results.pre-commit.ci/latest/github/icecube/simweights/main
    :alt: pre-commit.ci status
+.. |pypi| image:: https://badge.fury.io/py/simweights.svg
+   :target: https://pypi.org/project/simweights/
+   :alt: PyPi
 
 .. badge-break
 
@@ -50,7 +53,13 @@ Prerequisites
 Installation
 ============
 
-To install with pip:
+To install from pypi run: 
+
+.. code-block:: shell-session
+
+  pip install simweights
+
+Alternatively, if you need to install unreleased code from main you can run:
 
 .. code-block:: shell-session
 
