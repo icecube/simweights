@@ -53,7 +53,7 @@ Prerequisites
 Installation
 ============
 
-To install from pypi run: 
+To install from pypi run:
 
 .. code-block:: shell-session
 
