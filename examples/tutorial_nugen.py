@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-import glob
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import nuflux
@@ -42,8 +42,10 @@ weight_keys = [
     "OneWeight",
 ]
 
-DATASET_DIR = "/data/sim/IceCube/2016/filtered/level2/neutrino-generator/21217/"
-filelist = list(glob.glob(DATASET_DIR + "0000000-0000999/Level2_IC86.2016_NuMu.021217.00000*.i3.zst"))
+DATASET_DIR = Path("/data/sim/IceCube/2016/filtered/level2/neutrino-generator/21217")
+filelist = sorted(
+    str(f) for f in DATASET_DIR.glob("0000000-0000999/Level2_IC86.2016_NuMu.021217.00000*.i3.zst")
+)
 MCmuonEnergy_nugen = np.array([])
 I3MCWeightDict: dict = {k: [] for k in weight_keys}
 

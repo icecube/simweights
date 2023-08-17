@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 # mypy: disable-error-code="no-any-return"
 
-"""
-A collection of cosmic ray flux parametrizations.
+"""A collection of cosmic ray flux parametrizations.
 
 This files contains the same Cosmic Ray flux models as :file:`weighting/python/fluxes.py`.
 However they have been refactored to:
@@ -16,14 +15,14 @@ However they have been refactored to:
 
 """
 
+from __future__ import annotations
 
-from typing import Callable, List, Mapping, Optional, Union
 from pathlib import Path
+from typing import Callable, Mapping, Sequence
 
-from numpy import asfarray, bool_, broadcast_arrays, exp, float64, int32, piecewise, sqrt, genfromtxt
+from numpy import asfarray, bool_, broadcast_arrays, exp, float64, genfromtxt, int32, piecewise, sqrt
 from numpy import sum as nsum
 from numpy.typing import ArrayLike, NDArray
-
 from scipy.interpolate import CubicSpline  # pylint: disable=import-error
 
 from ._pdgcode import PDGCode
@@ -33,9 +32,7 @@ from ._pdgcode import PDGCode
 
 
 class CosmicRayFlux:
-    """
-    Base class for cosmic ray fluxes that uses :py:func:`numpy.piecewise` for efficient
-    mathematical evaluation
+    """Base class for cosmic ray fluxes that uses :py:func:`numpy.piecewise` for efficient evaluation.
 
     Derived must set `pdgids` to enumerate the particle types in this model.
     :py:func:`_funcs` must be set to a list of functions to be called for each particle
@@ -43,14 +40,14 @@ class CosmicRayFlux:
     desired.
     """
 
-    pdgids: List[PDGCode] = []
-    _funcs: List[Union[float, Callable[[float], float]]] = []
+    pdgids: Sequence[PDGCode] = ()
+    _funcs: Sequence[float | Callable[[float], float]] = ()
 
     def _condition(
         self,
-        energy: NDArray[float64],
+        energy: NDArray[float64],  # noqa: ARG002
         pdgid: NDArray[int32],
-    ) -> List[NDArray[bool_]]:
+    ) -> list[NDArray[bool_]]:
         # pylint: disable=unused-argument
         return [pdgid == p for p in self.pdgids]
 
@@ -61,12 +58,9 @@ class CosmicRayFlux:
 
 
 class Hoerandel(CosmicRayFlux):
-    r"""
-    All-particle spectrum (up to iron) after Hörandel\ [#Hoerandel]_, as implemented
-    in dCORSIKA.
-    """
+    r"""All-particle spectrum (up to iron) after Hörandel\ [#Hoerandel]_, as implemented in dCORSIKA."""
 
-    pdgids = [
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.Li7Nucleus,
@@ -93,8 +87,8 @@ class Hoerandel(CosmicRayFlux):
         PDGCode.Cr52Nucleus,
         PDGCode.Mn55Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
-    _funcs = [
+    )
+    _funcs = (
         lambda E: 1.1776445965025136 * E**-2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.4749371132996256 * E**-2.64 * (1 + (E / (4.49e6 * 2)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.00867088317618298 * E**-2.54 * (1 + (E / (4.49e6 * 3)) ** 1.9) ** (-2.1 / 1.9),
@@ -121,69 +115,69 @@ class Hoerandel(CosmicRayFlux):
         lambda E: 0.013916784695018254 * E**-2.67 * (1 + (E / (4.49e6 * 24)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.0032384244406763116 * E**-2.46 * (1 + (E / (4.49e6 * 25)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.12012410569254007 * E**-2.59 * (1 + (E / (4.49e6 * 26)) ** 1.9) ** (-2.1 / 1.9),
-    ]
+    )
 
 
 class Hoerandel5(CosmicRayFlux):
-    r"""
-    Hoerandel with only 5 components, after Becherini et al.\ [#Becherini]_
-    (These are the same as used by Arne Schoenwald's version\ [#Schoenwald]_)
+    r"""Hoerandel with only 5 components.
+
+    After Becherini et al.\ [#Becherini]_
+    (These are the same as used by Arne Schoenwald's version\ [#Schoenwald]_).
     """
-    pdgids = [
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
         PDGCode.Al27Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
-    _funcs = [
+    )
+    _funcs = (
         lambda E: 1.1776445965025136 * E**-2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.4749371132996256 * E**-2.64 * (1 + (E / (4.49e6 * 2)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.35525893555039243 * E**-2.68 * (1 + (E / (4.49e6 * 7)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.32336058556071825 * E**-2.67 * (1 + (E / (4.49e6 * 13)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.11979991050096223 * E**-2.58 * (1 + (E / (4.49e6 * 26)) ** 1.9) ** (-2.1 / 1.9),
-    ]
+    )
 
 
 class Hoerandel_IT(CosmicRayFlux):
-    """
-    Modified 5-component Hoerandel spectrum with N and Al replaced by O.
-    """
+    """Modified 5-component Hoerandel spectrum with N and Al replaced by O."""
 
     # pylint: disable=invalid-name
-    pdgids = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
-    _funcs = [
+    pdgids = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus)
+    _funcs = (
         lambda E: 1.1776445965025136 * E**-2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.4749371132996256 * E**-2.64 * (1 + (E / (4.49e6 * 2)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.7017460455316394 * E**-2.68 * (1 + (E / (4.49e6 * 8)) ** 1.9) ** (-2.1 / 1.9),
         lambda E: 0.11979991050096223 * E**-2.58 * (1 + (E / (4.49e6 * 26)) ** 1.9) ** (-2.1 / 1.9),
-    ]
+    )
 
 
 class GaisserHillas(CosmicRayFlux):
-    r"""
-    Spectral fits from an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
+    r"""Spectral fits from Gaisser.
+
+    From an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
     """
-    pdgids = [
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
         PDGCode.Al27Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
-    _funcs = [
+    )
+    _funcs = (
         lambda E: 0.7860 * E ** (-2.66) * exp(-E / (4e6 * 1)),
         lambda E: 0.3550 * E ** (-2.58) * exp(-E / (4e6 * 2)),
         lambda E: 0.2200 * E ** (-2.63) * exp(-E / (4e6 * 7)),
         lambda E: 0.1430 * E ** (-2.67) * exp(-E / (4e6 * 13)),
         lambda E: 0.2120 * E ** (-2.63) * exp(-E / (4e6 * 26)),
-    ]
+    )
 
 
 class GaisserH3a(CosmicRayFlux):
-    r"""
-    Spectral fits from an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
+    r"""Spectral fits from Gaisser.
 
+    Internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
     The model H3a with a mixed extra-galactic population (Fig. 2)
     has all iron at the highest energy and would represent a
     scenario in which the cutoff is not an effect of energy loss
@@ -191,14 +185,14 @@ class GaisserH3a(CosmicRayFlux):
     instead just the extra-galactic accelerators reaching their
     highest energy.
     """
-    pdgids = [
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
         PDGCode.Al27Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
-    _funcs = [
+    )
+    _funcs = (
         lambda E: 0.7860 * E**-2.66 * exp(-E / (4e6 * 1))
         + 0.0020 * E**-2.4 * exp(-E / (3e7 * 1))
         + 0.00017 * E**-2.4 * exp(-E / (2e9 * 1)),
@@ -214,24 +208,24 @@ class GaisserH3a(CosmicRayFlux):
         lambda E: 0.2120 * E**-2.63 * exp(-E / (4e6 * 26))
         + 0.00134 * E**-2.4 * exp(-E / (3e7 * 26))
         + 0.000114 * E**-2.4 * exp(-E / (2e9 * 26)),
-    ]
+    )
 
 
 class GaisserH4a(CosmicRayFlux):
-    r"""
-    Spectral fits from an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
+    r"""Spectral fits from Gaisser.
 
+    Internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
     In the model H4a, on the other hand, the extra-galactic component
     is assumed to be all protons.
     """
-    pdgids = [
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
         PDGCode.Al27Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
-    _funcs = [
+    )
+    _funcs = (
         lambda E: 0.7860 * E**-2.66 * exp(-E / (4e6 * 1))
         + 0.0020 * E**-2.4 * exp(-E / (3e7 * 1))
         + 0.0200 * E**-2.6 * exp(-E / 6e10),
@@ -239,20 +233,19 @@ class GaisserH4a(CosmicRayFlux):
         lambda E: 0.2200 * E**-2.63 * exp(-E / (4e6 * 7)) + 0.00134 * E**-2.4 * exp(-E / (3e7 * 7)),
         lambda E: 0.1430 * E**-2.67 * exp(-E / (4e6 * 13)) + 0.00134 * E**-2.4 * exp(-E / (3e7 * 13)),
         lambda E: 0.2120 * E**-2.63 * exp(-E / (4e6 * 26)) + 0.00134 * E**-2.4 * exp(-E / (3e7 * 26)),
-    ]
+    )
 
 
 class GaisserH4a_IT(CosmicRayFlux):
-    r"""
-    Variation of Gaisser's H4a flux using only four components.
+    r"""Variation of Gaisser's H4a flux using only four components.
 
     *This is not a very physical flux*: The Oxygen group is the sum of H4a's Nitrogen and Aluminum groups.
     This is the flux used as an "a priori" estimate of mass-composition to produce the IceTop-only
     flux\ [#Aartsen]_.
     """
     # pylint: disable=invalid-name
-    pdgids = [PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus]
-    _funcs = [
+    pdgids = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus)
+    _funcs = (
         lambda E: 0.7860 * E**-2.66 * exp(-E / (4e6 * 1))
         + 0.0020 * E**-2.4 * exp(-E / (3e7 * 1))
         + 0.0200 * E**-2.6 * exp(-E / 6e10),
@@ -262,34 +255,34 @@ class GaisserH4a_IT(CosmicRayFlux):
         + 0.1430 * E**-2.67 * exp(-E / (4e6 * 13))
         + 0.00134 * E**-2.4 * exp(-E / (3e7 * 13)),
         lambda E: 0.2120 * E**-2.63 * exp(-E / (4e6 * 26)) + 0.00134 * E**-2.4 * exp(-E / (3e7 * 26)),
-    ]
+    )
 
 
 class Honda2004(CosmicRayFlux):
-    r"""
-    Spectrum used to calculate neutrino fluxes in Honda et al. (2004)\ [#Honda]_.
-    (Table 1, with modification from the text).
+    r"""Spectrum used to calculate neutrino fluxes in Honda et al. (2004).
+
+    Table 1, with modification from the text \ [#Honda]_.
 
     Note:
         the E_k notation means energy per nucleon!
     """
-    pdgids = [
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
         PDGCode.Al27Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
-    _funcs = [
+    )
+    _funcs = (
         lambda E: (1.49) * (E + 2.15 * exp(-0.21 * sqrt(E))) ** (-2.74),
         lambda E: (1.49) * (100 ** (2.71 - 2.74)) * (E + 2.15 * exp(-0.21 * sqrt(E))) ** (-2.71),
         lambda E: (0.06 / 4.02) * (E / 4.02 + 1.25 * exp(-0.14 * sqrt(E / 4.02))) ** (-2.64),
         lambda E: (0.00332 / 14.07) * (E / 14.07 + 0.97 * exp(-0.01 * sqrt(E / 14.07))) ** (-2.60),
         lambda E: (0.00342 / 27.13) * (E / 27.13 + 2.14 * exp(-0.01 * sqrt(E / 27.13))) ** (-2.79),
         lambda E: (0.000445 / 56.26) * (E / 56.26 + 3.07 * exp(-0.41 * sqrt(E / 56.26))) ** (-2.68),
-    ]
+    )
 
-    def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> List[NDArray[bool_]]:
+    def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> list[NDArray[bool_]]:
         energy_break = 100
         return [
             (pdgid == PDGCode.PPlus) * (energy < energy_break),
@@ -302,15 +295,16 @@ class Honda2004(CosmicRayFlux):
 
 
 class TIG1996(CosmicRayFlux):
-    r"""
-    Spectrum used to calculate prompt neutrino fluxes in Enberg et al. (2008)\ [#Enberg]_ (Eq. 30).
+    r"""Spectrum used to calculate prompt neutrino fluxes in Enberg et al.
+
+    Paper: (2008)\ [#Enberg]_ (Eq. 30).
     The parameterization was taken directly from an earlier paper by Thunman et al\ [#Thunman]_.
     Only the nucleon flux was given, so for simplicity we treat it as a proton-only flux.
     """
-    pdgids = [PDGCode.PPlus]
-    _funcs = [lambda E: 1.70 * E**-2.7, lambda E: 1.74e2 * E**-3.0, 0]
+    pdgids = (PDGCode.PPlus,)
+    _funcs = (lambda E: 1.70 * E**-2.7, lambda E: 1.74e2 * E**-3.0, 0)
 
-    def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> List[NDArray[bool_]]:
+    def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> list[NDArray[bool_]]:
         energy_break = 5e6
         return [
             (pdgid == PDGCode.PPlus) * (energy < energy_break),
@@ -319,17 +313,15 @@ class TIG1996(CosmicRayFlux):
 
 
 class GlobalFitGST(CosmicRayFlux):
-    r"""
-    Spectral fits by Gaisser, Stanev and Tilav\ [#GaisserStanevTilav]_.
-    """
-    pdgids = [
+    r"""Spectral fits by Gaisser, Stanev and Tilav\ [#GaisserStanevTilav]_."""
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
         PDGCode.Al27Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
-    _funcs = [
+    )
+    _funcs = (
         lambda E: 0.7 * E**-2.66 * exp(-E / 1.2e5)
         + 0.015 * E**-2.4 * exp(-E / 4e6)
         + 0.0014 * E**-2.4 * exp(-E / 1.3e9),
@@ -339,14 +331,12 @@ class GlobalFitGST(CosmicRayFlux):
         lambda E: 0.006 * E**-2.30 * exp(-E / 1.2e5 / 26)
         + 0.00023 * E**-2.2 * exp(-E / 4e6 / 26)
         + 0.0000025 * E**-2.2 * exp(-E / 1.3e9 / 26),
-    ]
+    )
 
 
 class GlobalSplineFit(CosmicRayFlux):
-    r"""
-    Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]
-    """
-    pdgids = [
+    r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]."""
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.Li7Nucleus,
@@ -375,31 +365,29 @@ class GlobalSplineFit(CosmicRayFlux):
         PDGCode.Fe56Nucleus,
         PDGCode.Co59Nucleus,
         PDGCode.Ni59Nucleus,
-    ]
+    )
 
     def __init__(self) -> None:
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
         energy = data.T[0]
         elements = data.T[1:]
-        self._funcs = []
-        for element in elements:
-            self._funcs.append(CubicSpline(energy, element, extrapolate=False, axis=0))
+        self._funcs = tuple(CubicSpline(energy, element, extrapolate=False, axis=0) for element in elements)
 
 
 class GlobalSplineFit5Comp(CosmicRayFlux):
-    r"""
-    Sum of the flux of the GSF model for the standard 5 components injected by IceCube.
-    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]
+    r"""Sum of the flux of the GSF model for the standard 5 components injected by IceCube.
+
+    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
     """
-    pdgids = [
+    pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
         PDGCode.N14Nucleus,
         PDGCode.Al27Nucleus,
         PDGCode.Fe56Nucleus,
-    ]
+    )
 
-    groups = [(1, 1), (2, 5), (6, 11), (12, 15), (16, 27)]
+    groups = ((1, 1), (2, 5), (6, 11), (12, 15), (16, 27))
 
     def __init__(self) -> None:
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
@@ -408,13 +396,12 @@ class GlobalSplineFit5Comp(CosmicRayFlux):
         self._funcs = []
         for z_low, z_high in self.groups:
             self._funcs.append(
-                CubicSpline(energy, nsum(elements[z_low - 1 : z_high], axis=0), extrapolate=False, axis=0)
+                CubicSpline(energy, nsum(elements[z_low - 1 : z_high], axis=0), extrapolate=False, axis=0),
             )
 
 
 class FixedFractionFlux(CosmicRayFlux):
-    """
-    Total energy per particle flux flux split among mass groups with a constant fraction.
+    """Total energy per particle flux flux split among mass groups with a constant fraction.
 
     By default, this takes as basis the flux from Gaisser H4a summed over all its mass groups,
     then multiplies it by the given fraction. This is a quick way to consider different
@@ -424,10 +411,11 @@ class FixedFractionFlux(CosmicRayFlux):
     def __init__(
         self,
         fractions: Mapping[PDGCode, float],
-        basis: Optional[CosmicRayFlux] = None,
+        basis: CosmicRayFlux | None = None,
         normalized: bool = True,
-    ):
-        """
+    ) -> None:
+        """Flux that is a fixed fraction of another flux.
+
         :param fractions: A dictionary of fractions. They must add up to one and they
         should correspond to the pdgids in basis
 
@@ -439,17 +427,12 @@ class FixedFractionFlux(CosmicRayFlux):
             self.flux = GaisserH4a_IT()
         fluxes = {int(k): 0.0 for k in self.flux.pdgids}
         fluxes.update({int(k): v for k, v in fractions.items()})
-        self.pdgids = [PDGCode(k) for k in fluxes]
+        self.pdgids = tuple(PDGCode(k) for k in fluxes)
         self.fracs = list(fluxes.values())
         if normalized:
-            assert sum(self.fracs) == 1.0
+            assert sum(self.fracs) == 1.0  # noqa: PLR2004
 
     def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
-        """
-        :param E: particle energy in GeV
-        :param pdgid: particle type code
-        :type pdgid: int
-        """
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
         fluxsum = sum(self.flux(energy_arr, p) for p in self.pdgids)
         cond = self._condition(energy_arr, pdgid_arr)
@@ -457,7 +440,8 @@ class FixedFractionFlux(CosmicRayFlux):
 
 
 class _references:
-    """
+    """References.
+
     .. [#Hoerandel] J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
        `Astropart. Phys. 19, 193 (2003)
        <https://doi.org/10.1016/S0927-6505(02)00198-6>`_.

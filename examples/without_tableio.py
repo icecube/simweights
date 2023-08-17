@@ -4,15 +4,14 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-from glob import glob
+from pathlib import Path
 
 import pylab as plt
 import simweights
 from icecube import dataio, simclasses
 
-FILE_DIR = "/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/21889/0000000-0000999"
-filelist = sorted(glob(FILE_DIR + "/Level2_IC86.2016_corsika.021889.00000*.i3.zst"))
-assert filelist
+FILE_DIR = Path("/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/21889/0000000-0000999")
+filelist = sorted(str(f) for f in FILE_DIR.glob("Level2_IC86.2016_corsika.021889.00000*.i3.zst"))
 
 # create a dictionary that mimics the structure of a pandas/h5py table
 I3PrimaryInjectorInfo = {k: [] for k in dir(simclasses.I3PrimaryInjectorInfo) if k[0] != "_"}

@@ -157,7 +157,7 @@ class GenerationSurface:
         for pdgid, specs in self.spectra.items():
             try:
                 ptype = PDGCode(pdgid).name
-            except ValueError:  # noqa: PERF203
+            except ValueError:
                 ptype = str(pdgid)
 
             collections = [

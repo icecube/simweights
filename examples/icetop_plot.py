@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-from glob import glob
+from pathlib import Path
 
 import numpy as np
 import pylab as plt
@@ -13,8 +13,8 @@ import tables
 
 # —- Define which files you want to be part of the dataset ——
 # (This particular example is all low-energy protons)
-FILE_DIR = "/data/ana/CosmicRay/IceTop_level3/sim/IC86.2012/SIBYLL2.1/p/12360_v1s/h5files/"
-bigfilelist = sorted(glob(FILE_DIR + "Level3_IC86.2012_SIBYLL2.1_p_12360_E*.h5"))
+FILE_DIR = Path("/data/ana/CosmicRay/IceTop_level3/sim/IC86.2012/SIBYLL2.1/p/12360_v1s/h5files/")
+bigfilelist = sorted(str(f) for f in FILE_DIR.glob("Level3_IC86.2012_SIBYLL2.1_p_12360_E*.h5"))
 
 # —- Create the “IceTopWeighter” ——
 # In this case, it's from a whole bunch of files strung together using the "+" operator.

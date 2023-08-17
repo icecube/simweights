@@ -2,8 +2,10 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+from __future__ import annotations
+
 import numbers
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import numpy as np
 from numpy.random import Generator, RandomState
@@ -51,7 +53,7 @@ def get_column(table: Any, name: str) -> NDArray[np.float64]:
     return np.asfarray(column)
 
 
-def constcol(table: Any, colname: str, mask: Optional[NDArray[np.bool_]] = None) -> float:
+def constcol(table: Any, colname: str, mask: NDArray[np.bool_] | None = None) -> float:
     """Helper function which makes sure that all of the entries in a column are exactly the same.
 
     This is necessary because CORSIKA and NuGen store generation surface parameters in every frame and we
@@ -75,7 +77,7 @@ def corsika_to_pdg(cid: ArrayLike) -> NDArray[np.float64]:
         and He4Nucleus (402) through Fe56Nucleus (5626).
 
     Args:
-        code (array_like): CORSIKA codes
+        cid(array_like): CORSIKA codes
 
     Returns:
         array_like: PDG codes
