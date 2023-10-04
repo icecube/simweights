@@ -77,7 +77,7 @@ class TestWeighter(unittest.TestCase):
         weights = weighter.get_weights(flux)
         self.assertAlmostEqual(weights.sum(), flux * val, -2)
 
-        flux = list(range(0, N))
+        flux = list(range(N))
         weights = weighter.get_weights(flux)
         np.testing.assert_allclose(weights, np.array(flux) * val / N)
 
