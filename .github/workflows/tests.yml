@@ -17,7 +17,7 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         os: [ubuntu-22.04]
         include:
-          - python-version: 3.12
+          - python-version: "3.12"
             os: macos-12
     steps:
       - uses: actions/checkout@v3
@@ -27,6 +27,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: pyproject.toml
+      - name: Install pytables
+        if: ${{ matrix.python-version == "3.12" }}
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install 
       - name: Install SimWeights
         run: |
           python3 -m pip install --upgrade pip

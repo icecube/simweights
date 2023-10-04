@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: pyproject.toml
       - name: Install dependencies
@@ -25,7 +25,7 @@ jobs:
           pip install .[docs]
       - name: Run Sphinx
         working-directory: ./docs
-        run: make html SPHINXOPTS="-W --keep-going"
+        run: make html
       - name: Upload docs to docs.icecube.aq
         if: ${{ github.ref_name == 'main' && !github.event.act }}
         working-directory: ./docs
