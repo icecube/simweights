@@ -28,7 +28,7 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - name: Install pytables
-        if: ${{ matrix.python-version == "3.12" }}
+        if: ${{ matrix.python-version == 3.12 }}
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install
