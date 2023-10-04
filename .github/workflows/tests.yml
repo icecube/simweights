@@ -31,7 +31,7 @@ jobs:
         if: ${{ matrix.python-version == 3.12 }}
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install
+          python3 -m pip install git+https://github.com/PyTables/PyTables.git
       - name: Install SimWeights
         run: |
           python3 -m pip install --upgrade pip
