@@ -27,9 +27,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Install pytables
-        if: ${{ matrix.python-version == 3.12 }}
+      - name: Install pytables ubuntu
+        if: ${{ startsWith( matrix.os, 'ubuntu') && matrix.python-version == 3.12 }}
         run: |
+          sudo apt-get install libhdf5-dev
+          python3 -m pip install --upgrade pip
+          python3 -m pip install git+https://github.com/PyTables/PyTables.git
+      - name: Install pytables macos
+        if: ${{ startsWith( matrix.os, 'macos') && matrix.python-version == 3.12 }}
+        run: |
+          brew install hdf5
           python3 -m pip install --upgrade pip
           python3 -m pip install git+https://github.com/PyTables/PyTables.git
       - name: Install SimWeights
