@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 [build-system]
-requires = ["flit_core >=2,<4"]
+requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
@@ -24,6 +24,7 @@ classifiers = [
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
     'Topic :: Scientific/Engineering :: Astronomy',
     'Topic :: Scientific/Engineering :: Physics',
     ]
@@ -31,7 +32,7 @@ dependencies = ["numpy>=1.21.2", "scipy"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-test = [ "h5py", "tables", "pandas", "uproot", "pytest-cov"]
+test = ["h5py", "tables < 3.8; python_version < '3.9'", "tables", "pandas", "uproot", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
 dev = ["pytest","pre-commit","reuse","black","ruff","pylint","mypy"]
 

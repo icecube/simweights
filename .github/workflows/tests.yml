@@ -31,11 +31,8 @@ jobs:
         if: ${{ startsWith( matrix.os, 'ubuntu') && matrix.python-version == 3.12 }}
         run: |
           sudo apt-get install libhdf5-dev
-          python3 -m pip install --upgrade pip
-          python3 -m pip install git+https://github.com/PyTables/PyTables.git
       - name: Install SimWeights
         run: |
-          python3 -m pip install --upgrade pip
           python3 -m pip install flit
           python3 -m flit install --symlink --deps=production --extras=test
       - name: Download Test Data
