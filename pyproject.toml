@@ -32,7 +32,7 @@ dependencies = ["numpy>=1.21.2", "scipy"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-test = [ "h5py", "tables", "pandas", "uproot", "pytest-cov"]
+test = ["h5py", "tables", "tables < 3.8; python_version < '3.9'", "pandas", "uproot", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
 dev = ["pytest","pre-commit","reuse","black","ruff","pylint","mypy"]
 
