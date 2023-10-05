@@ -37,6 +37,7 @@ jobs:
         if: ${{ startsWith( matrix.os, 'macos') && matrix.python-version == 3.12 }}
         run: |
           brew install hdf5
+          echo "HDF5_DIR=$(brew --prefix hdf5)" >> $GITHUB_ENV
       - name: Install SimWeights
         run: |
           python3 -m pip install flit
