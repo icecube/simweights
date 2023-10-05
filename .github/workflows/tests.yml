@@ -19,6 +19,8 @@ jobs:
         include:
           - python-version: "3.11"
             os: macos-12
+          - python-version: "3.11"
+            os: macos-12
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -27,6 +29,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: pyproject.toml
+      - name: Install SimWeights
+        run: |
+          python3 -m pip install flit
+          python3 -m flit install --symlink --deps=production --extras=test
       - name: Download Test Data
         run: curl -u icecube:${{secrets.ICECUBE_PASSWORD}} https://convey.icecube.wisc.edu/data/user/kmeagher/simweights_testdata.tar.gz | tar xz
       - name: Run Tests
