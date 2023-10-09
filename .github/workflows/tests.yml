@@ -19,6 +19,8 @@ jobs:
         include:
           - python-version: "3.11"
             os: macos-12
+          - python-version: "3.12"
+            os: macos-12
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -27,10 +29,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Install pytables ubuntu
-        if: ${{ startsWith( matrix.os, 'ubuntu') && matrix.python-version == 3.12 }}
-        run: |
-          sudo apt-get install libhdf5-dev
+      # - name: Install pytables ubuntu
+      #   if: ${{ startsWith( matrix.os, 'ubuntu') && matrix.python-version == 3.12 }}
+      #   run: |
+      #     sudo apt-get install libhdf5-dev
       - name: Install SimWeights
         run: |
           python3 -m pip install flit
