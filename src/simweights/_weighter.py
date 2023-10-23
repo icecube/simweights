@@ -184,32 +184,8 @@ class Weighter:
 
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
-        
-        ## ======= A TEMPORARY HACK, FOR THE ICETOPWEIGHTER ==========
-        ## This is temporary! 
-        ## Until we've got our new SpatialDist stuff working as expected, this will get us through the day:
-        '''
-        e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))   ## the original one
-        return np.asfarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies))  ## the original one
-        '''
-        ## Compute the solid angle (for the denominator)
-        ## === Choose which distribution zeniths are drawn from:
-        ## --- the cos(theta) version: for all other weighters
-        # solidang = 2 * np.pi * np.ediff1d(czbin)
-        ## --- the sin^2(theta) version
-        solidang = 2 * np.pi * np.ediff1d(czbin*czbin)
-        
-        ## === Now, additionally, renormalize all the weights to take into account that the total CDF of our
-        ## distribution is different from the one simweights expects:
-        first_pdgid = self.get_weight_column("pdgid")[maska][0]   ## We'll take the first one and hope they are all the same...?
-        costheta_range = self.surface.get_cos_zenith_range(first_pdgid)
-        cdf_ratio_correction = (costheta_range[1]**2 - costheta_range[0]**2)/(costheta_range[1]-costheta_range[0])  ## Based on the max limits of the sample
-        
-        ## Now, construct the 2-D structure
-        e_width, solidang_width = np.meshgrid(np.ediff1d(enbin), solidang)
-        ## And return the answers
-        return np.asfarray(hist_val * cdf_ratio_correction / (e_width * solidang_width * nspecies))
-        
+        e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
+        return np.asfarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies))
 
     def __add__(self, other: Weighter | int) -> Weighter:
         if other == 0:
