@@ -184,7 +184,6 @@ class SineSquaredThetaCircleInjector:
         self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = 2 * np.pi * (self.cos_zen_max**2 - self.cos_zen_min**2) * self._cap
         self._normalization = 1 / self.etendue
-        self._normalization_pdf = 1 / (self.cos_zen_max**2 - self.cos_zen_min**2)
 
     def projected_area(self, cos_zen: float) -> float:  # noqa: ARG002
         """Returns the cross sectional area of the injection area in cm^2."""
@@ -193,7 +192,7 @@ class SineSquaredThetaCircleInjector:
 
     def _pdf(self, cosz: NDArray[np.float64]) -> NDArray[np.float64]:
         sin2_dist = 2 * cosz
-        return sin2_dist * self._normalization * self._normalization_pdf
+        return sin2_dist * self._normalization
 
     def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
         """Returns
