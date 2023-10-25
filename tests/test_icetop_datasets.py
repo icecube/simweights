@@ -31,7 +31,7 @@ class TestIceTopDatasets(unittest.TestCase):
         assert len(reffile["I3TopInjectorInfo"]) == 1
         si = reffile["I3TopInjectorInfo"][0]
         pri = reffile["MCPrimary"]
-        solid_angle = 2 * np.pi * (np.cos(si["min_zenith"]) - np.cos(si["max_zenith"]))
+        solid_angle = np.pi * (np.cos(si["min_zenith"]) ** 2 - np.cos(si["max_zenith"]) ** 2)
         injection_area = np.pi * (si["sampling_radius"] * 1e2) ** 2
         energy_integral = np.log(si["max_energy"] / si["min_energy"])  # assuming E^-1
         energy_factor = energy_integral * pri["energy"]

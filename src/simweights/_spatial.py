@@ -126,29 +126,6 @@ class NaturalRateCylinder(CylinderBase):
         )
 
 
-class IceTopNaturalRateCylinder(CylinderBase):
-    r"""Angular distribution when zenith distribution matched the natural rate of an isotropic source.
-
-    For a given zenith angle the intensity of particles thrown was proportional to the cross-sectional area
-    perpendicular to the direction of the particle.
-    """
-
-    def __init__(self, length: float, radius: float, cos_zen_min: float, cos_zen_max: float) -> None:
-        super().__init__(length, radius, cos_zen_min, cos_zen_max)
-        self.etendue = (
-            2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
-        )  # This is needed to make the tests work
-        self._normalization = 1 / self.etendue
-
-    def pdf(self, cos_zen: ArrayLike) -> NDArray[np.float64]:
-        cosz = np.asfarray(cos_zen)
-        return np.piecewise(
-            cosz,
-            [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)],
-            [self._normalization],
-        )
-
-
 class CircleInjector:
     """Particles are generated on a circle perpendicular to the direction of the particle.
 

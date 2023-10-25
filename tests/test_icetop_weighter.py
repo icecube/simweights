@@ -27,7 +27,7 @@ class TestIceTopWeighter(unittest.TestCase):
     def test_icetop_corsika(self):
         nevents = 10000
         pdgid = 12
-        c1 = simweights.IceTopNaturalRateCylinder(0, 300, 0, 1)
+        c1 = simweights.NaturalRateCylinder(0, 300, 0, 1)
         p1 = simweights.PowerLaw(0, 1e3, 1e4)
 
         weight = np.zeros(nevents, dtype=particle_dtype)
