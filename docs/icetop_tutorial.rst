@@ -58,3 +58,6 @@ combining low- and high-energy samples from each nuclear type (for instance, dat
 protons), so that it spans the full energy range from 10^5 -> 10^9.6 GeV.
 
 .. figure:: icetop_eprimary_combinedLEHE_2012_H4a.svg
+
+Note that the calculated effective area by simweights is the projected effective area,
+which can be corrected by dividing by cos(zenith).

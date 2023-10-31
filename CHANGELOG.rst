@@ -5,6 +5,14 @@
 Changelog
 =========
 
+main - 2023-10-30
+---------------------
+Update the calculation of IceTop weights to fix an issue with the effective area.
+The fix replaces the CircularInjector with NaturalRateCylinder,
+where the cylinder height is set to zero to mimic the flat surface detector.
+The calculated effective area is the projected area, which can be corrected by
+dividing by cos(zenith).
+
 `0.1.0`_ - 2023-01-24
 ---------------------
 

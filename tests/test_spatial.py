@@ -7,7 +7,11 @@
 import unittest
 
 import numpy as np
-from simweights import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder
+from simweights import (
+    CircleInjector,
+    NaturalRateCylinder,
+    UniformSolidAngleCylinder,
+)
 from simweights._spatial import CylinderBase
 
 
