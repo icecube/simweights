@@ -12,7 +12,7 @@ hdf5 file so there is no need for access to the simulation production database. 
 files produced with corsika-reader, neutrino-generator, and genie-reader.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "CircleInjector",
