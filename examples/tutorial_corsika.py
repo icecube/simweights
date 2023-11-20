@@ -13,8 +13,7 @@ from icecube import dataio
 
 CORSIKA_DATASET_DIR = Path("/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/20789/")
 corsika_filelist = sorted(
-    str(f)
-    for f in CORSIKA_DATASET_DIR.glob("0000000-0000999/Level2_IC86.2016_corsika.020789.00000*.i3.zst")
+    str(f) for f in CORSIKA_DATASET_DIR.glob("0000000-0000999/Level2_IC86.2016_corsika.020789.00000*.i3.zst")
 )
 
 weight_keys = [

@@ -2,13 +2,16 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from ._utils import SeedType, check_random_state
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 
 class PowerLaw:
@@ -35,7 +38,7 @@ class PowerLaw:
 
     # pylint: disable=invalid-name
 
-    def __init__(self, g: float, a: float, b: float) -> None:
+    def __init__(self: PowerLaw, g: float, a: float, b: float) -> None:
         assert b > a
         self.g = float(g)
         self.a = float(a)
@@ -48,20 +51,20 @@ class PowerLaw:
 
         self.span = b - a
 
-    def _pdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _pdf(self: PowerLaw, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.asfarray(x**self.g / self.integral)
 
-    def _cdf(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _cdf(self: PowerLaw, x: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
             return np.asfarray(np.log(x / self.a) / self.integral)
         return np.asfarray((x**self.G - self.a**self.G) / self.G / self.integral)
 
-    def _ppf(self, q: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _ppf(self: PowerLaw, q: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
             return np.asfarray(self.a * np.exp(q * self.integral))
         return np.asfarray((q * self.G * self.integral + self.a**self.G) ** (1 / self.G))
 
-    def pdf(self, x: ArrayLike) -> NDArray[np.float64]:
+    def pdf(self: PowerLaw, x: ArrayLike) -> NDArray[np.float64]:
         r"""Probability density function.
 
         Args:
@@ -74,7 +77,7 @@ class PowerLaw:
         xa = np.asfarray(x)
         return np.piecewise(xa, [(xa >= self.a) & (xa <= self.b)], [self._pdf])
 
-    def cdf(self, x: ArrayLike) -> NDArray[np.float64]:
+    def cdf(self: PowerLaw, x: ArrayLike) -> NDArray[np.float64]:
         r"""Cumulative distribution function.
 
         Args:
@@ -86,7 +89,7 @@ class PowerLaw:
         qa = np.asfarray(x)
         return np.piecewise(qa, [qa < self.a, qa > self.b], [0, 1, self._cdf])
 
-    def ppf(self, q: ArrayLike) -> NDArray[np.float64]:
+    def ppf(self: PowerLaw, q: ArrayLike) -> NDArray[np.float64]:
         """Percent point function (inverse of `cdf`) at `q`.
 
         Args:
@@ -98,7 +101,7 @@ class PowerLaw:
         qa = np.asfarray(q)
         return np.piecewise(qa, [(qa >= 0) & (qa <= 1)], [self._ppf, np.nan])
 
-    def rvs(self, size: Any = None, random_state: SeedType = None) -> NDArray[np.float64]:
+    def rvs(self: PowerLaw, size: Any = None, random_state: SeedType = None) -> NDArray[np.float64]:
         """Random variates.
 
         Args:
@@ -115,10 +118,10 @@ class PowerLaw:
         rand_state = check_random_state(random_state)
         return self._ppf(np.asfarray(rand_state.uniform(0, 1, size)))
 
-    def __repr__(self) -> str:
+    def __repr__(self: PowerLaw) -> str:
         return f"{self.__class__.__name__}({self.g} ,{self.a}, {self.b})"
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self: PowerLaw, other: object) -> bool:
         if not isinstance(other, PowerLaw):
             mesg = f"{self} cannot be compared to {other}"
             raise TypeError(mesg)

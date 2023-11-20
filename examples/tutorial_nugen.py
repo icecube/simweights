@@ -18,10 +18,7 @@ def get_most_energetic_muon(mmclist: simclasses.I3MMCTrackList) -> float:
     emax = 0
     for muon in list(mmclist):
         particle = muon.particle
-        if (
-            particle.type in (dataclasses.I3Particle.MuMinus, dataclasses.I3Particle.MuPlus)
-            and particle.total_energy > emax
-        ):
+        if particle.type in (dataclasses.I3Particle.MuMinus, dataclasses.I3Particle.MuPlus) and particle.total_energy > emax:
             emax = particle.total_energy
     return emax
 
@@ -43,9 +40,7 @@ weight_keys = [
 ]
 
 DATASET_DIR = Path("/data/sim/IceCube/2016/filtered/level2/neutrino-generator/21217")
-filelist = sorted(
-    str(f) for f in DATASET_DIR.glob("0000000-0000999/Level2_IC86.2016_NuMu.021217.00000*.i3.zst")
-)
+filelist = sorted(str(f) for f in DATASET_DIR.glob("0000000-0000999/Level2_IC86.2016_NuMu.021217.00000*.i3.zst"))
 MCmuonEnergy_nugen = np.array([])
 I3MCWeightDict: dict = {k: [] for k in weight_keys}
 

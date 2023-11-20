@@ -33,18 +33,18 @@ class TestSpatial(unittest.TestCase):
         with self.assertRaises(AssertionError):
             c.projected_area(1.01)
 
-        self.assertAlmostEqual(c._diff_etendue(-1), -np.pi**2 * r * (r + 2 * le), 4)
+        self.assertAlmostEqual(c._diff_etendue(-1), -(np.pi**2) * r * (r + 2 * le), 4)
         self.assertAlmostEqual(
             c._diff_etendue(-0.5),
-            -np.pi**2 / 4 * r * (r + 2 / 3 * le * (3**1.5 / np.pi + 8)),
+            -(np.pi**2) / 4 * r * (r + 2 / 3 * le * (3**1.5 / np.pi + 8)),
             4,
         )
         self.assertAlmostEqual(
             c._diff_etendue(-(0.5**0.5)),
-            -np.pi**2 / 2 * r * (r + le * (2 / np.pi + 3)),
+            -(np.pi**2) / 2 * r * (r + le * (2 / np.pi + 3)),
             4,
         )
-        self.assertAlmostEqual(c._diff_etendue(0), -np.pi**2 * le * r)
+        self.assertAlmostEqual(c._diff_etendue(0), -(np.pi**2) * le * r)
         self.assertAlmostEqual(
             c._diff_etendue(0.5**0.5),
             np.pi**2 / 2 * r * (r + le * (2 / np.pi - 1)),

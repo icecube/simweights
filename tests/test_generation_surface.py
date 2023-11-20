@@ -196,9 +196,7 @@ class Testgeneration_surface(unittest.TestCase):
         cz = np.linspace(self.c1.cos_zen_min, self.c1.cos_zen_max, N)
         w = 1 / self.s0.get_epdf(2212, E, cz)
 
-        area = (self.p1.b - self.p1.a) * (
-            2e4 * self.c1.radius * np.pi**2 * (self.c1.radius + self.c1.length)
-        )
+        area = (self.p1.b - self.p1.a) * (2e4 * self.c1.radius * np.pi**2 * (self.c1.radius + self.c1.length))
 
         self.assertAlmostEqual(
             area,
@@ -357,7 +355,6 @@ class Testgeneration_surface(unittest.TestCase):
 
     def test_repr_gsc(self):
         PPlus = PDGCode.PPlus  # noqa: F841
-        print(repr(self.gsc1))
         self.assertEqual(self.gsc1, eval(repr(self.gsc1)))
         self.assertEqual(self.gsc2, eval(repr(self.gsc2)))
         self.assertEqual(self.gsc3, eval(repr(self.gsc3)))

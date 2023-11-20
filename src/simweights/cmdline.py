@@ -63,5 +63,5 @@ def main() -> int:
         else:
             flux_model = None
 
-        print(wobj.tostring(flux_model))
+        print(wobj.tostring(flux_model))  # noqa: T201
     return 0

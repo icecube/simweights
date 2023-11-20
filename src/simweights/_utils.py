@@ -5,13 +5,16 @@
 from __future__ import annotations
 
 import numbers
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
 from numpy.random import Generator, RandomState
-from numpy.typing import ArrayLike, NDArray
 
 from ._pdgcode import PDGCode
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
+
 
 IntNumber = Union[int, np.integer]
 GeneratorType = Union[Generator, RandomState]
@@ -106,7 +109,7 @@ def check_run_counts(table: Any, nfiles: float) -> bool:  # pragma: no cover
     else:
         status = "Fail"
         ret = False
-    print(f"Claimed Runs = {nfiles}, Found Runs = {len(runs)}, {status}")
+    print(f"Claimed Runs = {nfiles}, Found Runs = {len(runs)}, {status}")  # noqa: T201
     return ret
 
 
