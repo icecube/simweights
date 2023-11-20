@@ -27,10 +27,7 @@ def nugen_spatial(table: Any) -> SpatialDist:
     # vector of the primary, this can be determined by checking `InjectionSurfaceR`. It will
     # be > 0 for circle injection and -1 for surface injection. In new versions >V6-00-00 it is not even
     # present indicating surface mode
-    if has_column(table, "InjectionSurfaceR"):
-        injection_radius = constcol(table, "InjectionSurfaceR")
-    else:
-        injection_radius = -1
+    injection_radius = constcol(table, "InjectionSurfaceR") if has_column(table, "InjectionSurfaceR") else -1
 
     if injection_radius > 0:
         return CircleInjector(injection_radius, min_cos, max_cos)

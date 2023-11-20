@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+"""Script to generate the test data used by simweights testing."""
+
 import os.path
 import sys
 import tarfile
@@ -15,6 +17,7 @@ from icecube import dataclasses, hdfwriter, icetray, rootwriter, simclasses, tab
 
 
 def fake_event_header(frame: dict) -> None:
+    """Create a fake event header so the splitter can do its thing."""
     header = dataclasses.I3EventHeader()
     header.run_id = 0
     header.event_id = fake_event_header.event_id

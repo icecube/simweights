@@ -38,14 +38,7 @@ class TestCorsikaDatasets(unittest.TestCase):
             ) / (cwm["PrimarySpectralIndex"] + 1)
 
         energy_weight = cwm["PrimaryEnergy"] ** cwm["PrimarySpectralIndex"]
-        return (
-            1e4
-            * pflux
-            * energy_integral
-            / energy_weight
-            * cwm["AreaSum"]
-            / (cwm["NEvents"] * cwm["OverSampling"])
-        )
+        return 1e4 * pflux * energy_integral / energy_weight * cwm["AreaSum"] / (cwm["NEvents"] * cwm["OverSampling"])
 
     def triggered_weights(self, f):
         i3cw = f["I3CorsikaWeight"]
@@ -70,12 +63,8 @@ class TestCorsikaDatasets(unittest.TestCase):
             cap = 1e4 * np.pi * cylinder_radius**2
             cos_minz = np.cos(min_zenith)
             cos_maxz = np.cos(max_zenith)
-            ET1 = cap * cos_minz * np.abs(cos_minz) + side * (
-                cos_minz * np.sqrt(1 - cos_minz**2) - min_zenith
-            )
-            ET2 = cap * cos_maxz * np.abs(cos_maxz) + side * (
-                cos_maxz * np.sqrt(1 - cos_maxz**2) - max_zenith
-            )
+            ET1 = cap * cos_minz * np.abs(cos_minz) + side * (cos_minz * np.sqrt(1 - cos_minz**2) - min_zenith)
+            ET2 = cap * cos_maxz * np.abs(cos_maxz) + side * (cos_maxz * np.sqrt(1 - cos_maxz**2) - max_zenith)
             etendue = np.pi * (ET1 - ET2)
 
             mask = ptype == i3cw["type"]

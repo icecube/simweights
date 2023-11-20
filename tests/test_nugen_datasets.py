@@ -71,9 +71,7 @@ class TestNugenDatasets(unittest.TestCase):
 
                 power_law = w.surface.spectra[pdgid][0].energy_dist
                 energy_factor = 1 / power_law.pdf(w.get_weight_column("energy"))
-                one_weight = (
-                    w.get_weight_column("event_weight") * energy_factor * solid_angle * injection_area
-                )
+                one_weight = w.get_weight_column("event_weight") * energy_factor * solid_angle * injection_area
                 np.testing.assert_allclose(one_weight, wd["OneWeight"])
 
                 np.testing.assert_allclose(w.get_weights(1), w0, 1e-5)

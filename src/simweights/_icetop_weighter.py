@@ -32,8 +32,7 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
             np.cos(get_column(table, "min_zenith")[i]),
         )
         surfaces.append(
-            get_column(table, "n_events")[i]
-            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial),
+            get_column(table, "n_events")[i] * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)

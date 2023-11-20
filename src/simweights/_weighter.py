@@ -6,13 +6,16 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import Any, Callable, Iterable
+from typing import TYPE_CHECKING, Any, Callable, Iterable
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
-from ._generation_surface import GenerationSurface
 from ._utils import get_column, get_table
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
+
+    from ._generation_surface import GenerationSurface  # pragma: nocover
 
 
 class Weighter:
@@ -24,21 +27,21 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self, data: Iterable[Any], surface: GenerationSurface) -> None:
+    def __init__(self: Weighter, data: Iterable[Any], surface: GenerationSurface) -> None:
         self.data = list(data)
         self.surface = surface
         self.weight_cols: dict[str, NDArray[np.float64]] = {}
         self.colnames = sorted(self.weight_cols.keys())
         self.size: int | None = None
 
-    def get_column(self, table: str, column: str) -> NDArray[np.float64]:
+    def get_column(self: Weighter, table: str, column: str) -> NDArray[np.float64]:
         """Helper function to get a specific column from the file."""
         retval: NDArray[np.float64] = np.array([])
         for datafile in self.data:
             retval = np.append(retval, get_column(get_table(datafile, table), column))
         return retval
 
-    def add_weight_column(self, name: str, column: ArrayLike) -> None:
+    def add_weight_column(self: Weighter, name: str, column: ArrayLike) -> None:
         """Add a new column to be passed as parameters to flux models."""
         col = np.array(column)
         if self.size:
@@ -51,11 +54,11 @@ class Weighter:
         self.weight_cols[name] = col
         self.colnames = sorted(self.weight_cols.keys())
 
-    def get_weight_column(self, name: str) -> NDArray[np.float64]:
+    def get_weight_column(self: Weighter, name: str) -> NDArray[np.float64]:
         """Helper function to get a column needed in the weight calculation."""
         return self.weight_cols[name]
 
-    def get_weights(self, flux: Any) -> NDArray[np.float64]:
+    def get_weights(self: Weighter, flux: Any) -> NDArray[np.float64]:
         """Calculate the weights for the sample for the given flux.
 
         Args:
@@ -128,7 +131,7 @@ class Weighter:
         return weights
 
     def effective_area(
-        self,
+        self: Weighter,
         energy_bins: ArrayLike,
         cos_zenith_bins: ArrayLike,
         mask: ArrayLike | None = None,
@@ -193,7 +196,7 @@ class Weighter:
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
         return np.asfarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies))
 
-    def __add__(self, other: Weighter | int) -> Weighter:
+    def __add__(self: Weighter, other: Weighter | int) -> Weighter:
         if other == 0:
             return self
         if not isinstance(other, Weighter):
@@ -207,10 +210,10 @@ class Weighter:
                 weighter.add_weight_column(colname, np.append(column, other.weight_cols[colname]))
         return weighter
 
-    def __radd__(self, other: Weighter | int) -> Weighter:
+    def __radd__(self: Weighter, other: Weighter | int) -> Weighter:
         return self + other
 
-    def tostring(self, flux: None | object | Callable[[Any], ArrayLike] | ArrayLike = None) -> str:
+    def tostring(self: Weighter, flux: None | object | Callable[[Any], ArrayLike] | ArrayLike = None) -> str:
         """Creates a string with important information about this weighting object.
 
         Generation surface, event map, number of events, and effective area.
@@ -232,5 +235,5 @@ class Weighter:
             output += f"Livetime         : {weights.sum() / (weights ** 2).sum():8.6g} s\n"
         return output
 
-    def __str__(self) -> str:
+    def __str__(self: Weighter) -> str:
         return self.tostring()

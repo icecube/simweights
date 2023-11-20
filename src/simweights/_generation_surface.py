@@ -4,17 +4,27 @@
 
 from __future__ import annotations
 
-from collections import namedtuple
 from copy import deepcopy
+from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from ._pdgcode import PDGCode
-from ._powerlaw import PowerLaw
-from ._spatial import SpatialDist
 
-SurfaceTuple = namedtuple("SurfaceTuple", ["pdgid", "nevents", "energy_dist", "spatial_dist"])
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
+
+    from ._powerlaw import PowerLaw  # pragma: no cover
+    from ._spatial import SpatialDist  # pragma: no cover
+
+
+class SurfaceTuple(NamedTuple):
+    """Container for the components Generation Surfaces."""
+
+    pdgid: int | PDGCode
+    nevents: float
+    energy_dist: PowerLaw
+    spatial_dist: SpatialDist
 
 
 class GenerationSurface:
@@ -145,12 +155,7 @@ class GenerationSurface:
         return True
 
     def __repr__(self: GenerationSurface) -> str:
-        return (
-            self.__class__.__name__
-            + "("
-            + ",".join(repr(y) for x in self.spectra.values() for y in x)
-            + ")"
-        )
+        return self.__class__.__name__ + "(" + ",".join(repr(y) for x in self.spectra.values() for y in x) + ")"
 
     def __str__(self: GenerationSurface) -> str:
         outstrs = []
@@ -160,9 +165,7 @@ class GenerationSurface:
             except ValueError:
                 ptype = str(pdgid)
 
-            collections = [
-                f"N={subspec.nevents} {subspec.energy_dist} {subspec.spatial_dist}" for subspec in specs
-            ]
+            collections = [f"N={subspec.nevents} {subspec.energy_dist} {subspec.spatial_dist}" for subspec in specs]
             outstrs.append(f"     {ptype:>11} : " + "\n                   ".join(collections))
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
 

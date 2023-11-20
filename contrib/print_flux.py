@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+"""Script to print out values of the specified flux."""
+
 from sys import argv
 
 import numpy as np

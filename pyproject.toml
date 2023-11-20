@@ -44,27 +44,6 @@ Source = "https://github.com/icecube/simweights"
 Documentation = "https://docs.icecube.aq/simweights/main"
 Collaboration = "https://icecube.wisc.edu"
 
-[tool.black]
-line-length = 108
-target-version = ['py38']
-
-[tool.coverage.run]
-source = ["simweights"]
-command_line = "-m pytest"
-omit = ["*/simweights/cmdline.py"]
-
-[tool.mypy]
-plugins = "numpy.typing.mypy_plugin"
-show_error_codes = true
-warn_unreachable = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-
-[tool.pylint.format]
-max-line-length = "108"
-
-[tool.pylint.messages_control]
-disable = "C0114"
-
 [tool.pytest.ini_options]
 minversion = 7.0
 testpaths = ["tests"]
@@ -73,32 +52,49 @@ xfail_strict = true
 filterwarnings = ["error"]
 addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights", "-W ignore"]
 
-[tool.doc8]
-max-line-length=108
+[tool.coverage.run]
+source = ["simweights"]
+command_line = "-m pytest"
+omit = ["*/simweights/cmdline.py"]
+
+[tool.coverage.report]
+exclude_also = ["from numpy.typing import"]
+
+[tool.codespell]
+skip = '_build'
+ignore-words-list = 'livetime'
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
+show_error_codes = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
+[tool.pylint.format]
+max-line-length = "128"
+
+[tool.pylint.messages_control]
+disable = "C0114"
 
 [tool.ruff]
 select = ["ALL"]
 fixable = ["I"]
 ignore = [
-    "ANN101", # missing-type-self
     "ANN401", # any-type
     "FBT",    # flake8-boolean-trap
-    "INP",    # flake8-no-pep420
-    "T20",    # flake8-print
-    "TCH",    # flake8-type-checking
     "S101",   # assert-used
-    "N801",
-    "PYI024",
+    "COM812", #confilcts with ruff formatter
+    "ISC001", #confilcts with ruff formatter
     ]
-line-length = 108
+line-length = 128
 target-version = "py38"
+namespace-packages = ["examples", "contrib", "docs"]
 
 [tool.ruff.pydocstyle]
 convention = "google"
 
 [tool.ruff.per-file-ignores]
-"contrib/*" = ["D"]
-"docs/*" = ["D"]
+"contrib/*" = ["T201"]
 "tests/*" = [
     "D",      # pydocstyle
     "N",      # pep8-naming
@@ -113,4 +109,8 @@ convention = "google"
 "examples/*" = [
     "D",      # pydocstyle
     "F401",   # unused-import
+    "T201",    # flake8-print
 ]
+
+[tool.doc8]
+max-line-length=128

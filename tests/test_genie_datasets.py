@@ -35,9 +35,7 @@ class TestNugenDatasets(unittest.TestCase):
         total_prob = wd["TotalInteractionProbabilityWeight"]
 
         pli = -wd["PowerLawIndex"][0]
-        energy_integral = (
-            (10 ** wd["MaxEnergyLog"][0]) ** (pli + 1) - (10 ** wd["MinEnergyLog"][0]) ** (pli + 1)
-        ) / (pli + 1)
+        energy_integral = ((10 ** wd["MaxEnergyLog"][0]) ** (pli + 1) - (10 ** wd["MinEnergyLog"][0]) ** (pli + 1)) / (pli + 1)
         energy_factor = 1 / (wd["PrimaryNeutrinoEnergy"] ** pli / energy_integral)
         one_weight = total_prob * energy_factor * solid_angle * injection_area
         np.testing.assert_allclose(one_weight, wd["OneWeight"])

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 # mypy: disable-error-code="no-any-return"
+# ruff: noqa: N801
 
 """A collection of cosmic ray flux parametrizations.
 
@@ -18,14 +19,17 @@ However they have been refactored to:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable, Mapping, Sequence
+from typing import TYPE_CHECKING, Callable, Mapping, Sequence
 
 from numpy import asfarray, bool_, broadcast_arrays, exp, float64, genfromtxt, int32, piecewise, sqrt
 from numpy import sum as nsum
-from numpy.typing import ArrayLike, NDArray
 from scipy.interpolate import CubicSpline  # pylint: disable=import-error
 
 from ._pdgcode import PDGCode
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
+
 
 # pylint: disable=too-few-public-methods
 # flake8: noqa: N803
@@ -44,14 +48,14 @@ class CosmicRayFlux:
     _funcs: Sequence[float | Callable[[float], float]] = ()
 
     def _condition(
-        self,
+        self: CosmicRayFlux,
         energy: NDArray[float64],  # noqa: ARG002
         pdgid: NDArray[int32],
     ) -> list[NDArray[bool_]]:
         # pylint: disable=unused-argument
         return [pdgid == p for p in self.pdgids]
 
-    def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
+    def __call__(self: CosmicRayFlux, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
         pcond = self._condition(energy_arr, pdgid_arr)
         return piecewise(energy, pcond, self._funcs)
@@ -124,6 +128,7 @@ class Hoerandel5(CosmicRayFlux):
     After Becherini et al.\ [#Becherini]_
     (These are the same as used by Arne Schoenwald's version\ [#Schoenwald]_).
     """
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -158,6 +163,7 @@ class GaisserHillas(CosmicRayFlux):
 
     From an internal report\ [#Gaisser1]_ and in Astropart. Phys\ [#Gaisser2]_ by Tom Gaisser.
     """
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -185,6 +191,7 @@ class GaisserH3a(CosmicRayFlux):
     instead just the extra-galactic accelerators reaching their
     highest energy.
     """
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -218,6 +225,7 @@ class GaisserH4a(CosmicRayFlux):
     In the model H4a, on the other hand, the extra-galactic component
     is assumed to be all protons.
     """
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -243,6 +251,7 @@ class GaisserH4a_IT(CosmicRayFlux):
     This is the flux used as an "a priori" estimate of mass-composition to produce the IceTop-only
     flux\ [#Aartsen]_.
     """
+
     # pylint: disable=invalid-name
     pdgids = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus)
     _funcs = (
@@ -266,6 +275,7 @@ class Honda2004(CosmicRayFlux):
     Note:
         the E_k notation means energy per nucleon!
     """
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -282,7 +292,7 @@ class Honda2004(CosmicRayFlux):
         lambda E: (0.000445 / 56.26) * (E / 56.26 + 3.07 * exp(-0.41 * sqrt(E / 56.26))) ** (-2.68),
     )
 
-    def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> list[NDArray[bool_]]:
+    def _condition(self: Honda2004, energy: NDArray[float64], pdgid: NDArray[int32]) -> list[NDArray[bool_]]:
         energy_break = 100
         return [
             (pdgid == PDGCode.PPlus) * (energy < energy_break),
@@ -301,10 +311,11 @@ class TIG1996(CosmicRayFlux):
     The parameterization was taken directly from an earlier paper by Thunman et al\ [#Thunman]_.
     Only the nucleon flux was given, so for simplicity we treat it as a proton-only flux.
     """
+
     pdgids = (PDGCode.PPlus,)
     _funcs = (lambda E: 1.70 * E**-2.7, lambda E: 1.74e2 * E**-3.0, 0)
 
-    def _condition(self, energy: NDArray[float64], pdgid: NDArray[int32]) -> list[NDArray[bool_]]:
+    def _condition(self: TIG1996, energy: NDArray[float64], pdgid: NDArray[int32]) -> list[NDArray[bool_]]:
         energy_break = 5e6
         return [
             (pdgid == PDGCode.PPlus) * (energy < energy_break),
@@ -314,6 +325,7 @@ class TIG1996(CosmicRayFlux):
 
 class GlobalFitGST(CosmicRayFlux):
     r"""Spectral fits by Gaisser, Stanev and Tilav\ [#GaisserStanevTilav]_."""
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -322,9 +334,7 @@ class GlobalFitGST(CosmicRayFlux):
         PDGCode.Fe56Nucleus,
     )
     _funcs = (
-        lambda E: 0.7 * E**-2.66 * exp(-E / 1.2e5)
-        + 0.015 * E**-2.4 * exp(-E / 4e6)
-        + 0.0014 * E**-2.4 * exp(-E / 1.3e9),
+        lambda E: 0.7 * E**-2.66 * exp(-E / 1.2e5) + 0.015 * E**-2.4 * exp(-E / 4e6) + 0.0014 * E**-2.4 * exp(-E / 1.3e9),
         lambda E: 0.32 * E**-2.58 * exp(-E / 1.2e5 / 2) + 0.0065 * E**-2.3 * exp(-E / 4e6 / 2),
         lambda E: 0.01 * E**-2.40 * exp(-E / 1.2e5 / 7) + 0.0006 * E**-2.3 * exp(-E / 4e6 / 7),
         lambda E: 0.013 * E**-2.40 * exp(-E / 1.2e5 / 13) + 0.0007 * E**-2.3 * exp(-E / 4e6 / 13),
@@ -336,6 +346,7 @@ class GlobalFitGST(CosmicRayFlux):
 
 class GlobalSplineFit(CosmicRayFlux):
     r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]."""
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -367,7 +378,7 @@ class GlobalSplineFit(CosmicRayFlux):
         PDGCode.Ni59Nucleus,
     )
 
-    def __init__(self) -> None:
+    def __init__(self: GlobalSplineFit) -> None:
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
         energy = data.T[0]
         elements = data.T[1:]
@@ -379,6 +390,7 @@ class GlobalSplineFit5Comp(CosmicRayFlux):
 
     GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
     """
+
     pdgids = (
         PDGCode.PPlus,
         PDGCode.He4Nucleus,
@@ -389,7 +401,7 @@ class GlobalSplineFit5Comp(CosmicRayFlux):
 
     groups = ((1, 1), (2, 5), (6, 11), (12, 15), (16, 27))
 
-    def __init__(self) -> None:
+    def __init__(self: GlobalSplineFit5Comp) -> None:
         data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
         energy = data.T[0]
         elements = data.T[1:]
@@ -409,7 +421,7 @@ class FixedFractionFlux(CosmicRayFlux):
     """
 
     def __init__(
-        self,
+        self: FixedFractionFlux,
         fractions: Mapping[PDGCode, float],
         basis: CosmicRayFlux | None = None,
         normalized: bool = True,
@@ -432,7 +444,7 @@ class FixedFractionFlux(CosmicRayFlux):
         if normalized:
             assert sum(self.fracs) == 1.0  # noqa: PLR2004
 
-    def __call__(self, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
+    def __call__(self: FixedFractionFlux, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
         fluxsum = sum(self.flux(energy_arr, p) for p in self.pdgids)
         cond = self._condition(energy_arr, pdgid_arr)
