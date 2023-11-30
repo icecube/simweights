@@ -24,8 +24,10 @@ class TestCosmicRayModels(unittest.TestCase):
         flux = getattr(_fluxes, name)(*args)
         v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name]]))
         v2 = np.array(list(self.flux_values[name].values())) / 1e4
-
         np.testing.assert_allclose(v1, v2, 1e-13)
+
+        # make sure you get zero for non CR primaries
+        np.testing.assert_allclose(flux(E, 22), 0)
 
     def test_Hoerandel(self):
         self.flux_cmp("Hoerandel")
