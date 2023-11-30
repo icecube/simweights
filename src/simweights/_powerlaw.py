@@ -28,7 +28,7 @@ class PowerLaw:
 
     .. math::
 
-      pdf(x, \gamma) = A x^{\gamma}\quad\mathrm{for}\quad a \le x \le b.
+        pdf(x, \gamma) = A x^{\gamma}\quad\mathrm{for}\quad a \le x \le b.
 
     Args:
         g (float): Power-law index

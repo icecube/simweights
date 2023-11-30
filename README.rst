@@ -13,11 +13,11 @@
 .. |LICENSE| image:: https://img.shields.io/badge/License-BSD_2--Clause-orange.svg
   :target: https://opensource.org/licenses/BSD-2-Clause
 .. |pre-commit.ci| image:: https://results.pre-commit.ci/badge/github/icecube/simweights/main.svg
-   :target: https://results.pre-commit.ci/latest/github/icecube/simweights/main
-   :alt: pre-commit.ci status
+  :target: https://results.pre-commit.ci/latest/github/icecube/simweights/main
+  :alt: pre-commit.ci status
 .. |pypi| image:: https://badge.fury.io/py/simweights.svg
-   :target: https://pypi.org/project/simweights/
-   :alt: PyPi
+  :target: https://pypi.org/project/simweights/
+  :alt: PyPi
 
 .. badge-break
 

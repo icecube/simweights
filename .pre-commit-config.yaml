@@ -24,7 +24,7 @@ repos:
       - id: blacken-docs
         args: [-l 100]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.0
+    rev: v1.7.1
     hooks:
       - id: mypy
         files: simweights
@@ -85,3 +85,8 @@ repos:
         args: [--pytest-test-first]
       - id: trailing-whitespace
         exclude: \.svg$
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: "2.7.3"
+    hooks:
+      - id: editorconfig-checker
+        alias: ec

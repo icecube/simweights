@@ -62,17 +62,22 @@ class Weighter:
         """Calculate the weights for the sample for the given flux.
 
         Args:
-          flux : flux
-            An object representing the flux. It can be one of several types:
+            flux (Callable | FluxFunction | ArrayLike ):
+                A model describing the flux of the primaries to weight against
 
-            * An instance of :py:class:`nuflux.FluxFunction` from
-              `nuflux <https://github.com/icecube/nuflux>`_
-            * A callable where the names of the arguments match the weight objects weighting columns.
-            * An iterable with the same length as the data sample. If you have other means of calculating
-              the flux for each event than the above options this can be useful.
-            * A scalar number. This calculates the unrealistic scenario where all events have the same
-              flux, this can be useful for testing or calculating effective areas. For neutrinos, If the
-              value is 1 then the return value will be the well known quantity OneWeight.
+        The Flux argument can be one of several types:
+
+        *   An instance of :py:class:`nuflux.FluxFunction` from
+            `nuflux <https://github.com/icecube/nuflux>`_.
+        *   A callable where the names of the arguments match the weight objects weighting
+            columns.
+        *   An iterable with the same length as the data sample. If you have other means
+            of calculating the flux for each event than the above options this can be
+            useful.
+        *   A scalar number, this calculates the unrealistic scenario where all events
+            have the same flux, this can be useful for testing or calculating effective
+            areas. For neutrinos, If the value is 1 then the return value will be the
+            well known quantity OneWeight.
         """
         event_col = {k: self.get_weight_column(k) for k in ["energy", "pdgid", "cos_zen"]}
 

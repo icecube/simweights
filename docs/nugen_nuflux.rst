@@ -12,8 +12,8 @@ SimWeights will detect that it is a nuflux model and do the correct thing.
 This example creates a number of nuflux models and compares them with a custom
 flux model from the IceCube northern track result.
 
-.. literalinclude:: ../examples/nugen_nuflux.py
-     :start-after: start-box1
-     :end-before: end-box1
+..  literalinclude:: ../examples/nugen_nuflux.py
+    :start-after: start-box1
+    :end-before: end-box1
 
 .. figure:: nugen_nuflux.svg

@@ -394,45 +394,45 @@ class FixedFractionFlux(CosmicRayFlux):
 class _references:
     """References.
 
-    .. [#Hoerandel] J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
-       `Astropart. Phys. 19, 193 (2003)
-       <https://doi.org/10.1016/S0927-6505(02)00198-6>`_.
-       `astro-ph/0210453 <https://arxiv.org/abs/astro-ph/0210453>`_.
-    .. [#Becherini] Y. Becherini et al.,
-       "A parameterisation of single and multiple muons in the deep water or ice,"
-       `Astropart. Phys. 25, 1 (2006)
-       <https://doi.org/10.1016/j.astropartphys.2005.10.005>`_.
-       `hep-ph/0507228 <https://arxiv.org/abs/hep-ph/0507228>`_.
-    .. [#Schoenwald] A. Schoenwald, ``http://www.ifh.de/~arnes/Forever/Hoerandel_Plots/`` [Dead Link]
-    .. [#Gaisser1] T. Gaisser,
-       "Cosmic ray spectrum and composition > 100 TeV," IceCube Internal Report
-       `icecube/201102004-v2
-       <https://internal-apps.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004>`_
-       (2011).
-    .. [#Gaisser2] T. Gaisser,
-       "Spectrum of cosmic-ray nucleons and the atmospheric muon charge ratio,"
-       `Astropart. Phys. 35, 801 (2012)
-       <https://doi.org/10.1016/j.astropartphys.2012.02.010>`_.
-       `arXiv:1111.6675v2 <https://arxiv.org/abs/1111.6675v2>`_.
-    .. [#Aartsen] M. G. Aartsen et al. "Measurement of the cosmic ray energy spectrum with IceTop-73,"
-       `Phys. Rev. D 88, 042004 (2013) <https://doi.org/10.1103/PhysRevD.88.042004>`_.
-       `arXiv:1307.3795v1 <https://arxiv.org/abs/1307.3795v1>`_.
-    .. [#Honda] M. Honda, T. Kajita, K. Kasahara, and S. Midorikawa,
-       "New calculation of the atmospheric neutrino flux in a three-dimensional scheme,"
-       `Phys. Rev. D 70, 043008 (2004) <https://doi.org/10.1103/PhysRevD.70.043008>`_.
-       `astro-ph/0404457v4 <https://arxiv.org/abs/astro-ph/0404457v4>`_.
-    .. [#Enberg] R. Enberg, M. H. Reno, I. Sarcevic, "Prompt neutrino fluxes from atmospheric charm,"
-       `Phys. Rev. D 78, 043005 (2008) <https://doi.org/10.1103/PhysRevD.78.043005>`_.
-       `arXiv:0806.0418 <https://arxiv.org/abs/0806.0418>`_.
-    .. [#Thunman] M. Thunman, G. Ingelman, P. Gondolo,
-       "Charm Production and High Energy Atmospheric Muon and Neutrino Fluxes,"
-       `Astropart. Phys. 5, 309 (1996) <https://doi.org/10.1016/0927-6505(96)00033-3>`_.
-       `hep-ph/9505417 <https://arxiv.org/abs/hep-ph/9505417>`_.
-    .. [#GaisserStanevTilav] T. K. Gaisser, T. Stanev, and S. Tilav,
-       "Cosmic ray energy spectrum from measurements of air showers,"
-       `Frontiers of Physics 8, 748 (2013) <https://doi.org/10.1007/s11467-013-0319-7>`_.
-       `arXiv:1303.3565 <https://arxiv.org/abs/1303.3565v1>`_.
-    .. [#GSFDembinski] H. Dembinski et al.,
-       "Data-driven model of the cosmic-ray flux and mass composition from 10 GeV to $10^{11} $ GeV."
-       `arXiv:1711.11432 <https://arxiv.org/abs/1711.11432>`_.
+    ..  [#Hoerandel] J. R. Hörandel, "On the knee in the energy spectrum of cosmic rays,"
+        `Astropart. Phys. 19, 193 (2003)
+        <https://doi.org/10.1016/S0927-6505(02)00198-6>`_.
+        `astro-ph/0210453 <https://arxiv.org/abs/astro-ph/0210453>`_.
+    ..  [#Becherini] Y. Becherini et al.,
+        "A parameterisation of single and multiple muons in the deep water or ice,"
+        `Astropart. Phys. 25, 1 (2006)
+        <https://doi.org/10.1016/j.astropartphys.2005.10.005>`_.
+        `hep-ph/0507228 <https://arxiv.org/abs/hep-ph/0507228>`_.
+    ..  [#Schoenwald] A. Schoenwald, ``http://www.ifh.de/~arnes/Forever/Hoerandel_Plots/`` [Dead Link]
+    ..  [#Gaisser1] T. Gaisser,
+        "Cosmic ray spectrum and composition > 100 TeV," IceCube Internal Report
+        `icecube/201102004-v2
+        <https://internal-apps.icecube.wisc.edu/reports/details.php?type=report&id=icecube%2F201102004>`_
+        (2011).
+    ..  [#Gaisser2] T. Gaisser,
+        "Spectrum of cosmic-ray nucleons and the atmospheric muon charge ratio,"
+        `Astropart. Phys. 35, 801 (2012)
+        <https://doi.org/10.1016/j.astropartphys.2012.02.010>`_.
+        `arXiv:1111.6675v2 <https://arxiv.org/abs/1111.6675v2>`_.
+    ..  [#Aartsen] M. G. Aartsen et al. "Measurement of the cosmic ray energy spectrum with IceTop-73,"
+        `Phys. Rev. D 88, 042004 (2013) <https://doi.org/10.1103/PhysRevD.88.042004>`_.
+        `arXiv:1307.3795v1 <https://arxiv.org/abs/1307.3795v1>`_.
+    ..  [#Honda] M. Honda, T. Kajita, K. Kasahara, and S. Midorikawa,
+        "New calculation of the atmospheric neutrino flux in a three-dimensional scheme,"
+        `Phys. Rev. D 70, 043008 (2004) <https://doi.org/10.1103/PhysRevD.70.043008>`_.
+        `astro-ph/0404457v4 <https://arxiv.org/abs/astro-ph/0404457v4>`_.
+    ..  [#Enberg] R. Enberg, M. H. Reno, I. Sarcevic, "Prompt neutrino fluxes from atmospheric charm,"
+        `Phys. Rev. D 78, 043005 (2008) <https://doi.org/10.1103/PhysRevD.78.043005>`_.
+        `arXiv:0806.0418 <https://arxiv.org/abs/0806.0418>`_.
+    ..  [#Thunman] M. Thunman, G. Ingelman, P. Gondolo,
+        "Charm Production and High Energy Atmospheric Muon and Neutrino Fluxes,"
+        `Astropart. Phys. 5, 309 (1996) <https://doi.org/10.1016/0927-6505(96)00033-3>`_.
+        `hep-ph/9505417 <https://arxiv.org/abs/hep-ph/9505417>`_.
+    ..  [#GaisserStanevTilav] T. K. Gaisser, T. Stanev, and S. Tilav,
+        "Cosmic ray energy spectrum from measurements of air showers,"
+        `Frontiers of Physics 8, 748 (2013) <https://doi.org/10.1007/s11467-013-0319-7>`_.
+        `arXiv:1303.3565 <https://arxiv.org/abs/1303.3565v1>`_.
+    ..  [#GSFDembinski] H. Dembinski et al.,
+        "Data-driven model of the cosmic-ray flux and mass composition from 10 GeV to $10^{11} $ GeV."
+        `arXiv:1711.11432 <https://arxiv.org/abs/1711.11432>`_.
     """
