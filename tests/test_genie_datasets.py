@@ -32,12 +32,13 @@ class TestNugenDatasets(unittest.TestCase):
 
         solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
         injection_area = np.pi * (wd["InjectionSurfaceR"] * 1e2) ** 2
-        total_prob = wd["TotalInteractionProbabilityWeight"]
+        global_probability_scale = wd["GlobalProbabilityScale"]
+        genie_weight = wd["GENIEWeight"]
 
         pli = -wd["PowerLawIndex"][0]
         energy_integral = ((10 ** wd["MaxEnergyLog"][0]) ** (pli + 1) - (10 ** wd["MinEnergyLog"][0]) ** (pli + 1)) / (pli + 1)
         energy_factor = 1 / (wd["PrimaryNeutrinoEnergy"] ** pli / energy_integral)
-        one_weight = total_prob * energy_factor * solid_angle * injection_area
+        one_weight = global_probability_scale * genie_weight * energy_factor * solid_angle * injection_area
         np.testing.assert_allclose(one_weight, wd["OneWeight"])
         final_weight = wd["OneWeight"] / (get_column(get_table(reffile, "I3GenieInfo"), "n_flux_events")[0])
 
@@ -52,20 +53,16 @@ class TestNugenDatasets(unittest.TestCase):
             with self.subTest(lib=str(fobj)):
                 w = GenieWeighter(fobj)
 
-                np.testing.assert_allclose(w.get_weight_column("event_weight"), total_prob)
+                pdf0 = w.surface.spectra[14][0].dists[0]
+                np.testing.assert_allclose(1 / pdf0.v, global_probability_scale * solid_angle * injection_area, 1e-5)
 
-                cylinder = w.surface.spectra[14][0].spatial_dist
-                proj_area = cylinder.projected_area(0)
-                np.testing.assert_allclose(proj_area, injection_area)
+                np.testing.assert_allclose(w.get_weight_column("wght"), genie_weight)
 
-                sw_etendue = 1 / cylinder.pdf(0)
-                np.testing.assert_allclose(sw_etendue, solid_angle * injection_area, 1e-5)
-
-                power_law = w.surface.spectra[14][0].energy_dist
+                power_law = w.surface.spectra[14][0].dists[2]
                 energy_term = 1 / power_law.pdf(w.get_weight_column("energy"))
                 np.testing.assert_allclose(energy_term, energy_factor)
 
-                one_weight = w.get_weight_column("event_weight") * energy_term / cylinder.pdf(0)
+                one_weight = w.get_weight_column("wght") * energy_term * solid_angle * injection_area * global_probability_scale
                 np.testing.assert_allclose(one_weight, wd["OneWeight"], 1e-5)
 
                 np.testing.assert_allclose(w.get_weights(1), final_weight, 1e-5)

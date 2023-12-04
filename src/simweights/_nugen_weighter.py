@@ -10,7 +10,7 @@ import numpy as np
 from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector, SpatialDist, UniformSolidAngleCylinder
-from ._utils import constcol, get_column, get_table, has_column
+from ._utils import Column, constcol, get_column, get_table, has_column
 from ._weighter import Weighter
 
 
@@ -30,14 +30,14 @@ def nugen_spatial(table: Any) -> SpatialDist:
     injection_radius = constcol(table, "InjectionSurfaceR") if has_column(table, "InjectionSurfaceR") else -1
 
     if injection_radius > 0:
-        return CircleInjector(injection_radius, min_cos, max_cos)
+        return CircleInjector(injection_radius, min_cos, max_cos, "cos_zen")
 
     # Surface mode was added in V04-01-00 but the cylinder size was hard coded, `CylinderHeight` and
     # `CylinderRadius` were added after later V06-00-00. If they are not in the table then use the
     # hardcoded values
     cylinder_height = constcol(table, "CylinderHeight") if has_column(table, "CylinderHeight") else 1900
     cylinder_radius = constcol(table, "CylinderRadius") if has_column(table, "CylinderRadius") else 950
-    return UniformSolidAngleCylinder(cylinder_height, cylinder_radius, min_cos, max_cos)
+    return UniformSolidAngleCylinder(cylinder_height, cylinder_radius, min_cos, max_cos, "cos_zen")
 
 
 def nugen_spectrum(table: Any) -> PowerLaw:
@@ -48,7 +48,7 @@ def nugen_spectrum(table: Any) -> PowerLaw:
     # for negative slopes ie +2 means E**-2 injection spectrum
     power_law_index = -constcol(table, "PowerLawIndex")
     assert power_law_index <= 0
-    return PowerLaw(power_law_index, min_energy, max_energy)
+    return PowerLaw(power_law_index, min_energy, max_energy, "energy")
 
 
 def nugen_surface(table: Any) -> GenerationSurface:
@@ -66,9 +66,9 @@ def nugen_surface(table: Any) -> GenerationSurface:
         # newer version will explicitly put the ratio in `TypeWeight` but for older version we
         # assume it is 0.5
         type_weight = constcol(table, "TypeWeight", mask) if has_column(table, "TypeWeight") else 0.5
-        primary_type = constcol(table, "PrimaryNeutrinoType", mask)
+        primary_type = int(constcol(table, "PrimaryNeutrinoType", mask))
         n_events = type_weight * constcol(table, "NEvents", mask)
-        surfaces.append(n_events * generation_surface(int(primary_type), spectrum, spatial))
+        surfaces.append(n_events * generation_surface(primary_type, Column("event_weight"), spectrum, spatial))
     ret = sum(surfaces)
     assert isinstance(ret, GenerationSurface)
     return ret

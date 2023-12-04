@@ -39,8 +39,8 @@ class TestWeighter(unittest.TestCase):
                 "zenith": np.full(cls.N1, np.pi / 4),
             },
         }
-        cls.c1 = NaturalRateCylinder(100, 200, 0, 1)
-        cls.p1 = PowerLaw(0, 5e5, 5e6)
+        cls.c1 = NaturalRateCylinder(100, 200, 0, 1, "cos_zen")
+        cls.p1 = PowerLaw(0, 5e5, 5e6, "energy")
         cls.s1 = cls.N1 * generation_surface(2212, cls.p1, cls.c1)
         cls.m1 = {
             "pdgid": ("I3Weight", "type"),
@@ -157,7 +157,7 @@ class TestWeighter(unittest.TestCase):
 
     def test_empty(self):
         fake_file = {"I3Weight": {"energy": [], "type": [], "zenith": []}}
-        weighter = Weighter([fake_file], 0)
+        weighter = Weighter([fake_file], self.s1)
         weighter.add_weight_column("energy", np.array([]))
         weighter.add_weight_column("pdgid", np.array([]))
         weighter.add_weight_column("cos_zen", np.array([]))
@@ -289,7 +289,6 @@ class TestWeighter(unittest.TestCase):
         weighter1.add_weight_column("pdgid", data1["I3Weight"]["type"])
         weighter1.add_weight_column("energy", data1["I3Weight"]["energy"])
         weighter1.add_weight_column("cos_zen", np.cos(data1["I3Weight"]["zenith"]))
-        weighter1.add_weight_column("event_weight", np.full(N1, 1))
 
         honda = nuflux.makeFlux("honda2006")
         w = weighter1.get_weights(honda)

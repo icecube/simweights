@@ -20,6 +20,7 @@ class CylinderBase:
         radius: float,
         cos_zen_min: float,
         cos_zen_max: float,
+        colname: str | None = None,
     ) -> None:
         if cos_zen_min < -1 or cos_zen_max > 1:
             raise ValueError(
@@ -34,6 +35,7 @@ class CylinderBase:
         self._side = 2e4 * self.radius * self.length
         self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = float(self._diff_etendue(self.cos_zen_max) - self._diff_etendue(self.cos_zen_min))
+        self.columns = (colname,)
 
     def projected_area(self: CylinderBase, cos_zen: ArrayLike) -> NDArray[np.float64]:
         """Cross sectional area of a cylinder in cm^2.
@@ -109,8 +111,15 @@ class NaturalRateCylinder(CylinderBase):
         I \propto \pi\cdot r^2\cdot\sin\theta\cdot(\cos\theta+2/\pi\cdot l/r\cdot\sin\theta)
     """
 
-    def __init__(self: NaturalRateCylinder, length: float, radius: float, cos_zen_min: float, cos_zen_max: float) -> None:
-        super().__init__(length, radius, cos_zen_min, cos_zen_max)
+    def __init__(
+        self: NaturalRateCylinder,
+        length: float,
+        radius: float,
+        cos_zen_min: float,
+        cos_zen_max: float,
+        colname: str | None = None,
+    ) -> None:
+        super().__init__(length, radius, cos_zen_min, cos_zen_max, colname)
         self._normalization = 1 / self.etendue
 
     def pdf(self: NaturalRateCylinder, cos_zen: ArrayLike) -> NDArray[np.float64]:
@@ -130,13 +139,16 @@ class CircleInjector:
     The etendue is just the area of the circle times the solid angle.
     """
 
-    def __init__(self: CircleInjector, radius: float, cos_zen_min: float, cos_zen_max: float) -> None:
+    def __init__(
+        self: CircleInjector, radius: float, cos_zen_min: float, cos_zen_max: float, colname: str | None = None
+    ) -> None:
         self.radius = radius
         self.cos_zen_min = cos_zen_min
         self.cos_zen_max = cos_zen_max
         self._cap = 1e4 * np.pi * self.radius**2
         self.etendue = 2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self._cap
         self._normalization = 1 / self.etendue
+        self.columns = (colname,)
 
     def projected_area(self: CircleInjector, cos_zen: float) -> float:  # noqa: ARG002
         """Returns the cross sectional area of the injection area in cm^2."""

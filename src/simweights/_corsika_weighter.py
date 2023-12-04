@@ -13,7 +13,7 @@ import numpy as np
 from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import NaturalRateCylinder
-from ._utils import constcol, get_column, get_table, has_table
+from ._utils import Column, constcol, get_column, get_table, has_table
 from ._weighter import Weighter
 
 
@@ -32,17 +32,20 @@ def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
             get_column(table, "cylinder_radius")[i],
             np.cos(get_column(table, "max_zenith")[i]),
             np.cos(get_column(table, "min_zenith")[i]),
+            "cos_zen",
         )
         spectrum = PowerLaw(
             get_column(table, "power_law_index")[i],
             get_column(table, "min_energy")[i],
             get_column(table, "max_energy")[i],
+            "energy",
         )
         oversampling_val = get_column(table, "oversampling")[i] if oversampling else 1
+        pdgid = int(get_column(table, "primary_type")[i])
         surfaces.append(
             get_column(table, "n_events")[i]
             * oversampling_val
-            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial),
+            * generation_surface(pdgid, Column("event_weight"), spectrum, spatial),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)
@@ -61,6 +64,7 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
             constcol(table, "CylinderRadius", mask),
             np.cos(constcol(table, "ThetaMax", mask)),
             np.cos(constcol(table, "ThetaMin", mask)),
+            "cos_zen",
         )
 
         primary_spectral_index = round(constcol(table, "PrimarySpectralIndex", mask), 6)
@@ -70,6 +74,7 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
             primary_spectral_index,
             constcol(table, "EnergyPrimaryMin", mask),
             constcol(table, "EnergyPrimaryMax", mask),
+            "energy",
         )
         nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
         surface += nevents * generation_surface(pdgid, spectrum, spatial)
