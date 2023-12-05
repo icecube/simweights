@@ -62,14 +62,14 @@ class TestNugenDatasets(unittest.TestCase):
                 event_weight = w.get_weight_column("event_weight")
                 np.testing.assert_allclose(event_weight, total_weight)
 
-                cylinder = w.surface.spectra[pdgid][0].spatial_dist
+                cylinder = w.surface.spectra[pdgid][0].dists[2]
                 proj_area = cylinder.projected_area(w.get_weight_column("cos_zen"))
                 np.testing.assert_allclose(proj_area, injection_area)
 
                 sw_etendue = 1 / cylinder.pdf(w.get_weight_column("cos_zen"))
                 np.testing.assert_allclose(sw_etendue, solid_angle * injection_area, 1e-5)
 
-                power_law = w.surface.spectra[pdgid][0].energy_dist
+                power_law = w.surface.spectra[pdgid][0].dists[1]
                 energy_factor = 1 / power_law.pdf(w.get_weight_column("energy"))
                 one_weight = w.get_weight_column("event_weight") * energy_factor * solid_angle * injection_area
                 np.testing.assert_allclose(one_weight, wd["OneWeight"])

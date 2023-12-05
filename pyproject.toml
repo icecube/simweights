@@ -32,7 +32,7 @@ dependencies = ["numpy>=1.21.2", "scipy"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-test = ["h5py", "tables < 3.8; python_version < '3.9'", "tables", "pandas", "uproot", "pytest-cov"]
+test = ["h5py", "tables < 3.8; python_version < '3.9'", "tables <= 3.9.1", "pandas", "uproot", "pytest-cov"]
 docs = ["sphinx","sphinx-rtd-theme","pandas"]
 dev = ["pytest","pre-commit","reuse","black","ruff","pylint","mypy"]
 
@@ -74,7 +74,7 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 max-line-length = "128"
 
 [tool.pylint.messages_control]
-disable = "C0114"
+disable = "C0114,R0902,R0913"
 
 [tool.ruff]
 select = ["ALL"]
@@ -83,8 +83,9 @@ ignore = [
     "ANN401", # any-type
     "FBT",    # flake8-boolean-trap
     "S101",   # assert-used
-    "COM812", #confilcts with ruff formatter
-    "ISC001", #confilcts with ruff formatter
+    "COM812", # confilcts with ruff formatter
+    "ISC001", # confilcts with ruff formatter
+    "PLR0913",# Too many arguments in function definition
     ]
 line-length = 128
 target-version = "py38"

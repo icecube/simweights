@@ -79,14 +79,14 @@ class Weighter:
             areas. For neutrinos, If the value is 1 then the return value will be the
             well known quantity OneWeight.
         """
-        event_col = {k: self.get_weight_column(k) for k in ["energy", "pdgid", "cos_zen"]}
+        # get a dictionary of the columns we need for weighting
+        event_col = {k: self.get_weight_column(k) for k in ["pdgid", *self.surface.get_keys()]}
 
         # do nothing if everything is empty
         if event_col["pdgid"].shape == (0,):
             return np.array([])
 
         epdf = self.surface.get_epdf(**event_col)
-        event_weight = self.get_weight_column("event_weight")
 
         # calculate the flux based on which type of flux it is
         if hasattr(flux, "getFlux"):
@@ -132,7 +132,7 @@ class Weighter:
                 stacklevel=2,
             )
         weights = np.zeros_like(epdf)
-        weights[mask] = (event_weight * flux_val)[mask] / epdf[mask]
+        weights[mask] = flux_val[mask] / epdf[mask]
         return weights
 
     def effective_area(

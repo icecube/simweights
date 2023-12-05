@@ -12,13 +12,51 @@ from numpy.random import Generator, RandomState
 
 from ._pdgcode import PDGCode
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import ArrayLike, NDArray
 
 
 IntNumber = Union[int, np.integer]
 GeneratorType = Union[Generator, RandomState]
 SeedType = Union[GeneratorType, IntNumber, None]
+
+
+class Column:
+    """Simple PDF class for a pdf that just uses a column.
+
+    Usually used for stuff like probability of interaction.
+    """
+
+    def __init__(self: Column, colname: str | None = None) -> None:
+        self.columns = (colname,)
+
+    def pdf(self: Column, value: ArrayLike) -> NDArray[np.float64]:
+        r"""Probability density function."""
+        return 1 / np.asfarray(value)
+
+    def __eq__(self: Column, other: object) -> bool:
+        return isinstance(other, Column) and self.columns == other.columns
+
+    def __str__(self: Column) -> str:
+        return f"Column{self.columns!r}"
+
+
+class Const:
+    """Simple PDF class for a supplied constant."""
+
+    def __init__(self: Const, v: float) -> None:
+        self.columns = ()
+        self.v = v
+
+    def pdf(self: Const) -> NDArray[np.float64]:
+        r"""Probability density function."""
+        return np.asfarray(self.v)
+
+    def __eq__(self: Const, other: object) -> bool:
+        return isinstance(other, Const) and self.v == other.v
+
+    def __str__(self: Const) -> str:
+        return f"Const({self.v})"
 
 
 def has_table(file_obj: Any, name: str) -> bool:

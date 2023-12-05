@@ -8,6 +8,7 @@ import unittest
 from copy import deepcopy
 
 import numpy as np
+from numpy.testing import assert_allclose
 from simweights import GenerationSurface, NaturalRateCylinder, PDGCode, PowerLaw, generation_surface
 from simweights._generation_surface import SurfaceTuple  # noqa: F401
 
@@ -15,10 +16,10 @@ from simweights._generation_surface import SurfaceTuple  # noqa: F401
 class Testgeneration_surface(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.p1 = PowerLaw(-1, 10, 100)
-        cls.p2 = PowerLaw(-2, 50, 500)
-        cls.c1 = NaturalRateCylinder(3, 8, -1, 1)
-        cls.c2 = NaturalRateCylinder(4, 8, -1, 1)
+        cls.p1 = PowerLaw(-1, 10, 100, "energy")
+        cls.p2 = PowerLaw(-2, 50, 500, "energy")
+        cls.c1 = NaturalRateCylinder(3, 8, -1, 1, "cos_zen")
+        cls.c2 = NaturalRateCylinder(4, 8, -1, 1, "cos_zen")
 
         cls.N1 = 10000
         cls.N2 = 20000
@@ -108,9 +109,9 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertNotEqual(s, self.s1)
         self.assertEqual(n0, self.s0.spectra[2212][0].nevents)
         self.assertEqual(n1, self.s1.spectra[2212][0].nevents)
-        self.assertAlmostEqual(
-            s.get_epdf(2212, 50, 0),
-            self.s0.get_epdf(2212, 50, 0) + self.s1.get_epdf(2212, 50, 0),
+        assert_allclose(
+            s.get_epdf(2212, energy=50, cos_zen=0),
+            self.s0.get_epdf(2212, energy=50, cos_zen=0) + self.s1.get_epdf(2212, energy=50, cos_zen=0),
         )
 
         ss = self.s0 + self.s2
@@ -119,9 +120,10 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(len(ss.spectra[2212]), 2)
         self.assertEqual(ss.spectra[2212][0], self.s0.spectra[2212][0])
         self.assertEqual(ss.spectra[2212][1], self.s2.spectra[2212][0])
+
         self.assertAlmostEqual(
-            ss.get_epdf(2212, 50, 0),
-            self.s0.get_epdf(2212, 50, 0) + self.s2.get_epdf(2212, 50, 0),
+            ss.get_epdf(2212, energy=50, cos_zen=0),
+            self.s0.get_epdf(2212, energy=50, cos_zen=0) + self.s2.get_epdf(2212, energy=50, cos_zen=0),
         )
 
         s3 = self.s0 + self.s3
@@ -131,8 +133,8 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(s3.spectra[2212][0], self.s0.spectra[2212][0])
         self.assertEqual(s3.spectra[2212][1], self.s3.spectra[2212][0])
         self.assertAlmostEqual(
-            s3.get_epdf(2212, 50, 0),
-            self.s0.get_epdf(2212, 50, 0) + self.s3.get_epdf(2212, 50, 0),
+            s3.get_epdf(2212, energy=50, cos_zen=0),
+            self.s0.get_epdf(2212, energy=50, cos_zen=0) + self.s3.get_epdf(2212, energy=50, cos_zen=0),
         )
 
         s4 = self.s0 + self.s4
@@ -142,8 +144,8 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(len(s4.spectra[2213]), 1)
         self.assertEqual(s4.spectra[2212][0], self.s0.spectra[2212][0])
         self.assertEqual(s4.spectra[2213][0], self.s4.spectra[2213][0])
-        self.assertAlmostEqual(s4.get_epdf(2212, 50, 0), self.s0.get_epdf(2212, 50, 0))
-        self.assertAlmostEqual(s4.get_epdf(2213, 50, 0), self.s4.get_epdf(2213, 50, 0))
+        self.assertAlmostEqual(s4.get_epdf(2212, energy=50, cos_zen=0), self.s0.get_epdf(2212, energy=50, cos_zen=0))
+        self.assertAlmostEqual(s4.get_epdf(2213, energy=50, cos_zen=0), self.s4.get_epdf(2213, energy=50, cos_zen=0))
 
         with self.assertRaises(TypeError):
             self.s0 + 47
@@ -168,19 +170,19 @@ class Testgeneration_surface(unittest.TestCase):
         sa *= 4.4
         self.assertEqual(sa.spectra[2212][0].nevents, 44000)
         self.assertEqual(self.s0.spectra[2212][0].nevents, 10000)
-        self.assertAlmostEqual(sa.get_epdf(2212, 50, 0), 4.4 * self.s0.get_epdf(2212, 50, 0))
+        assert_allclose(sa.get_epdf(2212, energy=50, cos_zen=0), 4.4 * self.s0.get_epdf(2212, energy=50, cos_zen=0))
 
         sb = self.s0 * 5.5
         self.assertNotEqual(id(sb), id(self.s0))
         self.assertEqual(sb.spectra[2212][0].nevents, 55000)
         self.assertEqual(self.s0.spectra[2212][0].nevents, 10000)
-        self.assertAlmostEqual(sb.get_epdf(2212, 50, 0), 5.5 * self.s0.get_epdf(2212, 50, 0))
+        assert_allclose(sb.get_epdf(2212, energy=50, cos_zen=0), 5.5 * self.s0.get_epdf(2212, energy=50, cos_zen=0))
 
         sc = 6.6 * self.s0
         self.assertNotEqual(id(sc), id(self.s0))
         self.assertEqual(sc.spectra[2212][0].nevents, 66000)
         self.assertEqual(self.s0.spectra[2212][0].nevents, 10000)
-        self.assertAlmostEqual(sc.get_epdf(2212, 50, 0), 6.6 * self.s0.get_epdf(2212, 50, 0))
+        assert_allclose(sc.get_epdf(2212, energy=50, cos_zen=0), 6.6 * self.s0.get_epdf(2212, energy=50, cos_zen=0))
 
     def test_repr(self):
         PPlus = PDGCode.PPlus  # noqa: F841
@@ -194,20 +196,20 @@ class Testgeneration_surface(unittest.TestCase):
         N = int(self.s0.spectra[2212][0].nevents)
         E = np.geomspace(self.p1.a, self.p1.b - 1 / N, N)
         cz = np.linspace(self.c1.cos_zen_min, self.c1.cos_zen_max, N)
-        w = 1 / self.s0.get_epdf(2212, E, cz)
+        w = 1 / self.s0.get_epdf(2212, energy=E, cos_zen=cz)
 
         area = (self.p1.b - self.p1.a) * (2e4 * self.c1.radius * np.pi**2 * (self.c1.radius + self.c1.length))
 
         self.assertAlmostEqual(
             area,
-            self.s0.spectra[2212][0].energy_dist.span * self.s0.spectra[2212][0].spatial_dist.etendue,
+            self.s0.spectra[2212][0].dists[0].span * self.s0.spectra[2212][0].dists[1].etendue,
         )
         self.assertAlmostEqual(w.sum() / area, 1, 4)
 
-        self.assertEqual(self.s0.spectra[2212][0].spatial_dist, self.c1)
-        self.assertIsNot(self.s0.spectra[2212][0].spatial_dist, self.c1)
-        self.assertEqual(self.s0.spectra[2212][0].energy_dist, self.p1)
-        self.assertIsNot(self.s0.spectra[2212][0].energy_dist, self.p1)
+        self.assertEqual(self.s0.spectra[2212][0].dists[1], self.c1)
+        self.assertIsNot(self.s0.spectra[2212][0].dists[1], self.c1)
+        self.assertEqual(self.s0.spectra[2212][0].dists[0], self.p1)
+        self.assertIsNot(self.s0.spectra[2212][0].dists[0], self.p1)
 
     def test_two_surfaces(self):
         N = int(self.s0.spectra[2212][0].nevents)
@@ -219,36 +221,36 @@ class Testgeneration_surface(unittest.TestCase):
         surf = self.s0 + self.s2
         E = np.r_[E1, E2]
         czc = np.r_[cz, cz]
-        wc = 1 / surf.get_epdf(2212, E, czc)
+        wc = 1 / surf.get_epdf(2212, energy=E, cos_zen=czc)
 
         self.assertAlmostEqual(wc.sum() / (self.p2.b - self.p1.a) / self.c1.etendue, 1, 3)
 
-        self.assertEqual(self.s0.spectra[2212][0].spatial_dist, self.c1)
-        self.assertIsNot(self.s0.spectra[2212][0].spatial_dist, self.c1)
-        self.assertEqual(self.s0.spectra[2212][0].energy_dist, self.p1)
-        self.assertIsNot(self.s0.spectra[2212][0].energy_dist, self.p1)
+        self.assertEqual(self.s0.spectra[2212][0].dists[1], self.c1)
+        self.assertIsNot(self.s0.spectra[2212][0].dists[1], self.c1)
+        self.assertEqual(self.s0.spectra[2212][0].dists[0], self.p1)
+        self.assertIsNot(self.s0.spectra[2212][0].dists[0], self.p1)
 
-        self.assertEqual(self.s2.spectra[2212][0].spatial_dist, self.c1)
-        self.assertIsNot(self.s2.spectra[2212][0].spatial_dist, self.c1)
-        self.assertEqual(self.s2.spectra[2212][0].energy_dist, self.p2)
-        self.assertIsNot(self.s2.spectra[2212][0].energy_dist, self.p2)
+        self.assertEqual(self.s2.spectra[2212][0].dists[1], self.c1)
+        self.assertIsNot(self.s2.spectra[2212][0].dists[1], self.c1)
+        self.assertEqual(self.s2.spectra[2212][0].dists[0], self.p2)
+        self.assertIsNot(self.s2.spectra[2212][0].dists[0], self.p2)
 
         self.assertEqual(len(surf.spectra), 1)
         np.testing.assert_array_equal(list(surf.spectra.keys()), [2212])
 
         self.assertEqual(surf.spectra[2212][0], self.s0.spectra[2212][0])
         self.assertIsNot(surf.spectra[2212][0], self.s0.spectra[2212][0])
-        self.assertEqual(surf.spectra[2212][0].spatial_dist, self.s0.spectra[2212][0].spatial_dist)
-        self.assertIsNot(surf.spectra[2212][0].spatial_dist, self.s0.spectra[2212][0].spatial_dist)
-        self.assertEqual(surf.spectra[2212][0].energy_dist, self.s0.spectra[2212][0].energy_dist)
-        self.assertIsNot(surf.spectra[2212][0].energy_dist, self.s0.spectra[2212][0].energy_dist)
+        self.assertEqual(surf.spectra[2212][0].dists[1], self.s0.spectra[2212][0].dists[1])
+        self.assertIsNot(surf.spectra[2212][0].dists[1], self.s0.spectra[2212][0].dists[1])
+        self.assertEqual(surf.spectra[2212][0].dists[0], self.s0.spectra[2212][0].dists[0])
+        self.assertIsNot(surf.spectra[2212][0].dists[0], self.s0.spectra[2212][0].dists[0])
 
         self.assertEqual(surf.spectra[2212][1], self.s2.spectra[2212][0])
         self.assertIsNot(surf.spectra[2212][1], self.s2.spectra[2212][0])
-        self.assertEqual(surf.spectra[2212][1].spatial_dist, self.s2.spectra[2212][0].spatial_dist)
-        self.assertIsNot(surf.spectra[2212][1].spatial_dist, self.s2.spectra[2212][0].spatial_dist)
-        self.assertEqual(surf.spectra[2212][1].energy_dist, self.s2.spectra[2212][0].energy_dist)
-        self.assertIsNot(surf.spectra[2212][1].energy_dist, self.s2.spectra[2212][0].energy_dist)
+        self.assertEqual(surf.spectra[2212][1].dists[1], self.s2.spectra[2212][0].dists[1])
+        self.assertIsNot(surf.spectra[2212][1].dists[1], self.s2.spectra[2212][0].dists[1])
+        self.assertEqual(surf.spectra[2212][1].dists[0], self.s2.spectra[2212][0].dists[0])
+        self.assertIsNot(surf.spectra[2212][1].dists[0], self.s2.spectra[2212][0].dists[0])
 
     def test_addition_gsc(self):
         sa = self.gsc1 + 0

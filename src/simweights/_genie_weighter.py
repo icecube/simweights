@@ -10,7 +10,7 @@ import numpy as np
 from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector
-from ._utils import constcol, get_column, get_table
+from ._utils import Column, Const, get_column, get_table
 from ._weighter import Weighter
 
 
@@ -29,10 +29,14 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
             -get_column(table, "power_law_index")[i],
             get_column(table, "min_energy")[i],
             get_column(table, "max_energy")[i],
+            "energy",
         )
+        pdgid = int(get_column(table, "primary_type")[i])
+        nevents = get_column(table, "n_flux_events")[i]
+        global_probability_scale = get_column(table, "global_probability_scale")[i]
         surfaces.append(
-            get_column(table, "n_flux_events")[i]
-            * generation_surface(int(get_column(table, "primary_type")[i]), spectrum, spatial),
+            nevents
+            * generation_surface(pdgid, Const(1 / spatial.etendue / global_probability_scale), Column("wght"), spectrum),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)
@@ -47,15 +51,10 @@ def GenieWeighter(file_obj: Any) -> Weighter:  # noqa: N802
     """
     weight_table = get_table(file_obj, "I3GenieInfo")
     surface = genie_surface(weight_table)
-    global_probability_scale = constcol(weight_table, "global_probability_scale")
 
     weighter = Weighter([file_obj], surface)
-    weighter.add_weight_column("energy", weighter.get_column("I3GenieResult", "Ev"))
     weighter.add_weight_column("pdgid", weighter.get_column("I3GenieResult", "neu").astype(np.int32))
-    weighter.add_weight_column("cos_zen", np.full(len(weighter.get_column("I3GenieResult", "Ev")), 1))
-    weighter.add_weight_column(
-        "event_weight",
-        global_probability_scale * weighter.get_column("I3GenieResult", "wght"),
-    )
+    weighter.add_weight_column("energy", weighter.get_column("I3GenieResult", "Ev"))
+    weighter.add_weight_column("wght", weighter.get_column("I3GenieResult", "wght"))
 
     return weighter

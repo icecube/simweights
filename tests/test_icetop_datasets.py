@@ -47,7 +47,7 @@ class TestIceTopDatasets(unittest.TestCase):
         for fobj in fobjs:
             with self.subTest(lib=str(fobj)):
                 w = IceTopWeighter(fobj)
-                spatial = w.surface.spectra[2212][0].spatial_dist
+                spatial = w.surface.spectra[2212][0].dists[1]
                 proj_area = spatial.projected_area(1)
                 np.testing.assert_allclose(proj_area, injection_area)
                 sw_etendue = 1 / spatial.pdf(1)
