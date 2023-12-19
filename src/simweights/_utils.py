@@ -34,7 +34,7 @@ class Column:
     def __eq__(self: Column, other: object) -> bool:
         return isinstance(other, Column) and self.columns == other.columns
 
-    def __str__(self: Column) -> str:
+    def __repr__(self: Column) -> str:
         return f"Column{self.columns!r}"
 
 
@@ -72,23 +72,30 @@ def get_table(file_obj: Any, name: str) -> Any:
 
 def has_column(table: Any, name: str) -> bool:
     """Helper function for determining if a table has a column, works with h5py, pytables, and pandas."""
-    if hasattr(table, "cols"):
-        return hasattr(table.cols, name)
     try:
-        table[name]  # pylint: disable=pointless-statement
-        return True  # noqa: TRY300
-    except (ValueError, KeyError):
+        get_column(table, name)
+    except (AttributeError, KeyError, ValueError):
         return False
+    return True
 
 
-def get_column(table: Any, name: str) -> NDArray[np.float64]:
+def get_column(table: Any, name: str) -> NDArray[np.float64]:  # noqa: PLR0911
     """Helper function getting a column from a table, works with h5py, pytables, and pandas."""
     if hasattr(table, "cols"):
-        return np.asarray(getattr(table.cols, name)[:], dtype=np.float64)
+        return np.asfarray(getattr(table.cols, name)[:])
+    if hasattr(table, name):
+        return np.atleast_1d(getattr(table, name))
+    if hasattr(table, "dir") and hasattr(table.dir, name):
+        return np.atleast_1d(getattr(table.dir, name))
+    if hasattr(table, "primary"):
+        if hasattr(table.primary, name):
+            return np.atleast_1d(getattr(table.primary, name))
+        if hasattr(table.primary.dir, name):
+            return np.atleast_1d(getattr(table.primary.dir, name))
     column = table[name]
     if hasattr(column, "array") and callable(column.array):
-        return np.asarray(column.array(library="np"), dtype=np.float64)
-    return np.asarray(column, dtype=np.float64)
+        return np.asfarray(column.array(library="np"))
+    return np.atleast_1d(column)
 
 
 def constcol(table: Any, colname: str, mask: NDArray[np.bool_] | None = None) -> float:

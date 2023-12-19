@@ -45,7 +45,7 @@ def sframe_corsika_surface(table: Any) -> GenerationSurface:
         surfaces.append(
             get_column(table, "n_events")[i]
             * oversampling_val
-            * generation_surface(pdgid, Column("event_weight"), spectrum, spatial),
+            * generation_surface(pdgid, Column("weight"), spectrum, spatial),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)
@@ -77,7 +77,7 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
             "energy",
         )
         nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
-        surface += nevents * generation_surface(pdgid, spectrum, spatial)
+        surface += nevents * generation_surface(pdgid, Column("weight"), spectrum, spatial)
     assert isinstance(surface, GenerationSurface)
     return surface
 
@@ -145,12 +145,12 @@ def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # 
         weighter.add_weight_column("pdgid", weighter.get_column("I3CorsikaWeight", "type"))
         weighter.add_weight_column("energy", weighter.get_column("I3CorsikaWeight", "energy"))
         weighter.add_weight_column("cos_zen", np.cos(weighter.get_column("I3CorsikaWeight", "zenith")))
-        weighter.add_weight_column("event_weight", weighter.get_column("I3CorsikaWeight", "weight"))
+        weighter.add_weight_column("weight", weighter.get_column("I3CorsikaWeight", "weight"))
     else:
         energy = weighter.get_column("PolyplopiaPrimary", "energy")
         weighter.add_weight_column("energy", energy)
         weighter.add_weight_column("pdgid", weighter.get_column("PolyplopiaPrimary", "type"))
         weighter.add_weight_column("cos_zen", np.cos(weighter.get_column("PolyplopiaPrimary", "zenith")))
-        weighter.add_weight_column("event_weight", np.full(len(energy), 1))
+        weighter.add_weight_column("weight", np.full(len(energy), 1))
 
     return weighter
