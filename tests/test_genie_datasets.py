@@ -53,12 +53,12 @@ class TestNugenDatasets(unittest.TestCase):
             with self.subTest(lib=str(fobj)):
                 w = GenieWeighter(fobj)
 
-                pdf0 = w.surface.spectra[14][0].dists[0]
+                pdf0 = next(iter(w.surface.spectra.values()))[0].dists[0]
                 np.testing.assert_allclose(1 / pdf0.v, global_probability_scale * solid_angle * injection_area, 1e-5)
 
                 np.testing.assert_allclose(w.get_weight_column("wght"), genie_weight)
 
-                power_law = w.surface.spectra[14][0].dists[2]
+                power_law = next(iter(w.surface.spectra.values()))[0].dists[2]
                 energy_term = 1 / power_law.pdf(w.get_weight_column("energy"))
                 np.testing.assert_allclose(energy_term, energy_factor)
 
@@ -70,8 +70,14 @@ class TestNugenDatasets(unittest.TestCase):
         for fobj in fobjs:
             fobj.close()
 
-    def test_NuE(self):
+    def test_140021(self):
         self.cmp_dataset("upgrade_genie_step3_140021_000000")
+
+    def test_141828(self):
+        self.cmp_dataset("upgrade_genie_step3_141828_000000")
+
+    def test_22590(self):
+        self.cmp_dataset("GENIE_NuMu_IceCubeUpgrade_v58.22590.000000")
 
 
 if __name__ == "__main__":
