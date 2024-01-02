@@ -9,7 +9,7 @@ import pandas as pd
 
 import simweights
 
-simfile = pd.HDFStore("genie_reader_NuE_C_corr.hdf5")
+simfile = pd.HDFStore("upgrade_genie_step3_140021_000000.hdf5", "r")
 flux_model = nuflux.makeFlux("IPhonda2014_spl_solmax")
 weight_obj = simweights.GenieWeighter(simfile)
 weights = weight_obj.get_weights(flux_model)

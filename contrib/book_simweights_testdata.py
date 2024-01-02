@@ -77,13 +77,6 @@ keys = {
     "genie": ["I3GenieInfo", "I3GenieResult", "I3MCWeightDict"],
     "icetop": ["I3TopInjectorInfo", "MCPrimary"],
 }
-streams = {
-    "corsika": ["InIceSplit"],
-    "nugen": ["InIceSplit", "in_ice"],
-    "genie": ["NullSplit"],
-    "icetop": ["IceTopSplit"],
-}
-
 
 if "notemp" in sys.argv:
     outdir = Path("/scratch/kmeagher/simweights/")
@@ -105,25 +98,22 @@ for simtype, filename in ((i, x) for i in filelist for x in filelist[i]):
     print(f"Booking  : {filename}")
     print(f"  outfile: {outfile}")
     print(f"  keys   : {keys[simtype]}")
-    print(f"  streams: {streams[simtype]}")
 
     tray = icetray.I3Tray()
     tray.Add("I3Reader", FileNameList=[filename])
-
-    if split:
-        tray.Add(
-            fake_event_header,
-            Streams=[icetray.I3Frame.DAQ],
-            If=lambda f: "I3EventHeader" not in f,
-        )
-        tray.Add("I3NullSplitter", SubEventStreamName="NullSplit")
+    tray.Add(
+        fake_event_header,
+        Streams=[icetray.I3Frame.DAQ],
+        If=lambda f: "I3EventHeader" not in f,
+    )
+    tray.Add("I3NullSplitter", SubEventStreamName="weight")
     tray.Add(
         tableio.I3TableWriter,
         tableservice=[
             hdfwriter.I3HDFTableService(str(outfile) + ".hdf5"),
             rootwriter.I3ROOTTableService(str(outfile) + ".root"),
         ],
-        SubEventStreams=streams[simtype],
+        SubEventStreams=["weight"],
         keys=keys[simtype],
     )
     tray.Add("Keep", keys=keys[simtype])
@@ -131,10 +121,9 @@ for simtype, filename in ((i, x) for i in filelist for x in filelist[i]):
         "I3Writer",
         Filename=str(outfile) + ".i3.zst",
         Streams=[icetray.I3Frame.Simulation, icetray.I3Frame.DAQ],
-        DropOrphanStreams=[icetray.I3Frame.Physics],
     )
-
     tray.Execute()
+    tray.Finish()
     del tray
 
 tarfilename = "/data/user/kmeagher/simweights_testdata_test.tar.gz"
@@ -148,4 +137,4 @@ with tarfile.open(tarfilename, "w:gz") as tar:
         print(f"Adding {f} to tarball")
         tar.add(outdir / f, arcname=f)
 
-print("Finished writing tarfile {tarfilename}")
+print(f"Finished writing tarfile {tarfilename}")
