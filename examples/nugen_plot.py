@@ -24,7 +24,7 @@ def northern_track(energy: ArrayLike) -> ArrayLike:
 
 
 # get the weights by passing the flux to the weighter
-weights = weights = weighter.get_weights(northern_track)
+weights = weighter.get_weights(northern_track)
 
 # print some info about the weighting object
 print(weighter.tostring(northern_track))
