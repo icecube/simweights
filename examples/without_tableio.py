@@ -60,7 +60,7 @@ weighter = simweights.CorsikaWeighter(fileobj)
 flux = simweights.GaisserH4a()
 
 # get the weights by passing the flux to the weighter
-weights = weights = weighter.get_weights(flux)
+weights = weighter.get_weights(flux)
 
 # print some info about the weighting object
 print(weighter.tostring(flux))
