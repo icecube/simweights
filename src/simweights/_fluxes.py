@@ -318,9 +318,15 @@ class GlobalFitGST_IT(CosmicRayFlux):
     _funcs = (
         lambda E: 0.7 * E**-2.66 * exp(-E / 1.2e5) + 0.015 * E**-2.4 * exp(-E / 4e6) + 0.0014 * E**-2.4 * exp(-E / 1.3e9),
         lambda E: 0.32 * E**-2.58 * exp(-E / 1.2e5 / 2) + 0.0065 * E**-2.3 * exp(-E / 4e6 / 2),
-        lambda E: 0.01 * E**-2.40 * exp(-E / 1.2e5 / 7) + 0.0006 * E**-2.3 * exp(-E / 4e6 / 7) +0.013 * E**-2.40 * exp(-E / 1.2e5 / 13) + 0.0007 * E**-2.3 * exp(-E / 4e6 / 13),
-        lambda E: 0.006 * E**-2.30 * exp(-E / 1.2e5 / 26)+ 0.00023 * E**-2.2 * exp(-E / 4e6 / 26) + 0.0000025 * E**-2.2 * exp(-E / 1.3e9 / 26),
+        lambda E: 0.01 * E**-2.40 * exp(-E / 1.2e5 / 7)
+        + 0.0006 * E**-2.3 * exp(-E / 4e6 / 7)
+        + 0.013 * E**-2.40 * exp(-E / 1.2e5 / 13)
+        + 0.0007 * E**-2.3 * exp(-E / 4e6 / 13),
+        lambda E: 0.006 * E**-2.30 * exp(-E / 1.2e5 / 26)
+        + 0.00023 * E**-2.2 * exp(-E / 4e6 / 26)
+        + 0.0000025 * E**-2.2 * exp(-E / 1.3e9 / 26),
     )
+
 
 class GlobalSplineFitBase(CosmicRayFlux):
     r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
