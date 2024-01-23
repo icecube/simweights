@@ -373,7 +373,7 @@ class GlobalSplineFit_IT(GlobalSplineFitBase):
     pdgids = PDGID_4COMP
     groups = ((1, 1), (2, 2), (3, 10), (11, 28))
 
-    def __init__(self: GlobalSplineFit4Comp_IT) -> None:
+    def __init__(self: GlobalSplineFit_IT) -> None:
         super().__init__()
 
 
