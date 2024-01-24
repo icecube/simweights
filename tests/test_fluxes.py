@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+
 from simweights import _fluxes
 
 E = np.logspace(2, 10, 9)

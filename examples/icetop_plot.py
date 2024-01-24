@@ -8,8 +8,9 @@ from pathlib import Path
 
 import numpy as np
 import pylab as plt
-import simweights
 import tables
+
+import simweights
 
 # —- Define which files you want to be part of the dataset ——
 # (This particular example is all low-energy protons)

@@ -7,6 +7,7 @@
 import unittest
 
 import numpy as np
+
 from simweights import (
     CircleInjector,
     NaturalRateCylinder,

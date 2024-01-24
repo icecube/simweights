@@ -6,6 +6,7 @@
 
 import pandas as pd
 import pylab as plt
+
 import simweights
 
 # load the hdf5 file that we just created using pandas

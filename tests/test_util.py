@@ -11,6 +11,7 @@ from types import SimpleNamespace
 import numpy as np
 import uproot
 from numpy.testing import assert_array_equal
+
 from simweights import Hoerandel
 from simweights._utils import (
     Column,

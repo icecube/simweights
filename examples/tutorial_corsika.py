@@ -8,8 +8,9 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import simweights
 from icecube import dataio
+
+import simweights
 
 CORSIKA_DATASET_DIR = Path("/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/20789/")
 corsika_filelist = sorted(
