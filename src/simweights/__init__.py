@@ -27,7 +27,9 @@ __all__ = [
     "GaisserH4a_IT",
     "GaisserHillas",
     "GlobalFitGST",
+    "GlobalFitGST_IT",
     "GlobalSplineFit5Comp",
+    "GlobalSplineFit_IT",
     "Hoerandel",
     "Hoerandel5",
     "Hoerandel_IT",
@@ -58,8 +60,6 @@ from ._fluxes import (
     Hoerandel5,
     Hoerandel_IT,
     Honda2004,
-    GlobalFitGST_IT,
-    GlobalSplineFit_IT,
 )
 from ._generation_surface import GenerationSurface, generation_surface
 from ._genie_weighter import GenieWeighter
