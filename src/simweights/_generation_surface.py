@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, NamedTuple, Sequence
+from typing import TYPE_CHECKING, Any, NamedTuple, Sequence
 
 import numpy as np
 
@@ -26,7 +26,7 @@ class SurfaceTuple(NamedTuple):
 
     pdgid: int | PDGCode
     nevents: float
-    dists: Sequence
+    dists: Sequence[Any]
 
 
 class GenerationSurface:

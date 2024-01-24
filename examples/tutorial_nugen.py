@@ -9,8 +9,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import nuflux
 import numpy as np
-import simweights
 from icecube import dataclasses, dataio, simclasses
+
+import simweights
 
 
 def get_most_energetic_muon(mmclist: simclasses.I3MMCTrackList) -> float:

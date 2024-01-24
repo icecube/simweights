@@ -7,8 +7,9 @@
 import unittest
 
 import numpy as np
-import simweights
 from scipy.interpolate import interp1d
+
+import simweights
 from simweights import CorsikaWeighter
 
 info_dtype = [

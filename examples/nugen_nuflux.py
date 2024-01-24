@@ -7,10 +7,10 @@
 import nuflux
 import pandas as pd
 import pylab as plt
+from numpy.typing import ArrayLike
 
 # start-box1
 import simweights
-from numpy.typing import ArrayLike
 
 # load the hdf5 file and make the weigher
 hdffile = pd.HDFStore("Level2_IC86.2016_NuMu.021217.hdf5", "r")

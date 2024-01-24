@@ -6,8 +6,9 @@
 
 import numpy as np
 import pylab as plt
-import simweights
 import tables
+
+import simweights
 
 # start-box1
 # load the Medium Energy file

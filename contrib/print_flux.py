@@ -9,6 +9,7 @@
 from sys import argv
 
 import numpy as np
+
 from simweights import _fluxes
 
 E = np.logspace(2, 10, 9)

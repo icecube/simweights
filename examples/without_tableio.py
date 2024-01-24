@@ -7,8 +7,9 @@
 from pathlib import Path
 
 import pylab as plt
-import simweights
 from icecube import dataio, simclasses
+
+import simweights
 
 FILE_DIR = Path("/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/21889/0000000-0000999")
 filelist = sorted(str(f) for f in FILE_DIR.glob("Level2_IC86.2016_corsika.021889.00000*.i3.zst"))

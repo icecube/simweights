@@ -6,8 +6,9 @@
 
 import pandas as pd
 import pylab as plt
-import simweights
 from numpy.typing import ArrayLike
+
+import simweights
 
 # load the hdf5 file that we just created using pandas
 hdffile = pd.HDFStore("Level2_IC86.2016_NuMu.021217.hdf5", "r")

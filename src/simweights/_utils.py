@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import numbers
 from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
@@ -15,10 +14,8 @@ from ._pdgcode import PDGCode
 if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import ArrayLike, NDArray
 
-
-IntNumber = Union[int, np.integer]
 GeneratorType = Union[Generator, RandomState]
-SeedType = Union[GeneratorType, IntNumber, None]
+SeedType = Union[GeneratorType, int, None]
 
 
 class Column:
@@ -167,9 +164,9 @@ def check_random_state(seed: SeedType = None) -> GeneratorType:
         seed : {`numpy.random.Generator`, `numpy.random.RandomState`}
             Random number generator.
     """
-    if seed is None or isinstance(seed, (numbers.Integral, np.integer)):
+    if seed is None or isinstance(seed, (int, np.integer)):
         return np.random.default_rng(seed)
     if isinstance(seed, (RandomState, Generator)):
         return seed
-    mesg = f"{seed!r} cannot be used to seed a numpy.random.Generator instance"
+    mesg = f"{seed!r} cannot be used to seed a numpy.random.Generator instance"  # type: ignore[unreachable]
     raise ValueError(mesg)

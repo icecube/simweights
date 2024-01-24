@@ -8,6 +8,7 @@ import unittest
 from copy import copy
 
 import numpy as np
+
 from simweights import TIG1996, NaturalRateCylinder, PowerLaw, Weighter, generation_surface
 
 
