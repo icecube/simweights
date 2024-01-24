@@ -310,7 +310,7 @@ class GlobalFitGST(CosmicRayFlux):
     )
 
 
-class GlobalFitGST_IT(CosmicRayFlux):
+class GlobalFitGST_IT(CosmicRayFlux): #pylint: disable=invalid-name
     r"""GlobalFitGST for four components [p, He, O, Fe].
 
     The Oxygen group is the sum of Nitrogen and Aluminum groups of GlobalFitGST.
@@ -372,7 +372,7 @@ class GlobalSplineFit5Comp(GlobalSplineFitBase):
         super().__init__()
 
 
-class GlobalSplineFit_IT(GlobalSplineFitBase):
+class GlobalSplineFit_IT(GlobalSplineFitBase): #pylint: disable=invalid-name
     r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
 
     [(H),  (He),  (Li, Be, B, C, N, O, F, Ne),  (Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]

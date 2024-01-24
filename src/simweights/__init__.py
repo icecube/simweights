@@ -56,6 +56,8 @@ from ._fluxes import (
     Hoerandel5,
     Hoerandel_IT,
     Honda2004,
+    GlobalFitGST_IT,
+    GlobalSplineFit_IT,
 )
 from ._generation_surface import GenerationSurface, generation_surface
 from ._genie_weighter import GenieWeighter
