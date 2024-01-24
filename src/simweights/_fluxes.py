@@ -312,7 +312,9 @@ class GlobalFitGST(CosmicRayFlux):
 
 class GlobalFitGST_IT(CosmicRayFlux):
     r"""GlobalFitGST for four components [p, He, O, Fe].
-    The Oxygen group is the sum of Nitrogen and Aluminum groups of GlobalFitGST."""
+
+    The Oxygen group is the sum of Nitrogen and Aluminum groups of GlobalFitGST.
+    """
 
     pdgids = PDGID_4COMP
     _funcs = (
@@ -372,6 +374,7 @@ class GlobalSplineFit5Comp(GlobalSplineFitBase):
 
 class GlobalSplineFit_IT(GlobalSplineFitBase):
     r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
+
     [(H),  (He),  (Li, Be, B, C, N, O, F, Ne),  (Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]
     GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
     """
