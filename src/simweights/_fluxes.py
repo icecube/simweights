@@ -310,6 +310,26 @@ class GlobalFitGST(CosmicRayFlux):
     )
 
 
+class GlobalFitGST_IT(CosmicRayFlux):  # pylint: disable=invalid-name
+    r"""GlobalFitGST for four components [p, He, O, Fe].
+
+    The Oxygen group is the sum of Nitrogen and Aluminum groups of GlobalFitGST.
+    """
+
+    pdgids = PDGID_4COMP
+    _funcs = (
+        lambda E: 0.7 * E**-2.66 * exp(-E / 1.2e5) + 0.015 * E**-2.4 * exp(-E / 4e6) + 0.0014 * E**-2.4 * exp(-E / 1.3e9),
+        lambda E: 0.32 * E**-2.58 * exp(-E / 1.2e5 / 2) + 0.0065 * E**-2.3 * exp(-E / 4e6 / 2),
+        lambda E: 0.01 * E**-2.40 * exp(-E / 1.2e5 / 7)
+        + 0.0006 * E**-2.3 * exp(-E / 4e6 / 7)
+        + 0.013 * E**-2.40 * exp(-E / 1.2e5 / 13)
+        + 0.0007 * E**-2.3 * exp(-E / 4e6 / 13),
+        lambda E: 0.006 * E**-2.30 * exp(-E / 1.2e5 / 26)
+        + 0.00023 * E**-2.2 * exp(-E / 4e6 / 26)
+        + 0.0000025 * E**-2.2 * exp(-E / 1.3e9 / 26),
+    )
+
+
 class GlobalSplineFitBase(CosmicRayFlux):
     r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
 
@@ -349,6 +369,20 @@ class GlobalSplineFit5Comp(GlobalSplineFitBase):
     groups = ((1, 1), (2, 5), (6, 11), (12, 15), (16, 27))
 
     def __init__(self: GlobalSplineFit5Comp) -> None:
+        super().__init__()
+
+
+class GlobalSplineFit_IT(GlobalSplineFitBase):  # pylint: disable=invalid-name
+    r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
+
+    [(H),  (He),  (Li, Be, B, C, N, O, F, Ne),  (Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]
+    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
+    """
+
+    pdgids = PDGID_4COMP
+    groups = ((1, 1), (2, 2), (3, 10), (11, 28))
+
+    def __init__(self: GlobalSplineFit_IT) -> None:
         super().__init__()
 
 
