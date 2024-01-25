@@ -3,73 +3,67 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 [build-system]
-requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
 
 [project]
+authors = [{name = "Kevin Meagher"}]
+classifiers = [
+  'Development Status :: 4 - Beta',
+  'Intended Audience :: Science/Research',
+  'License :: OSI Approved :: BSD License',
+  'Operating System :: MacOS :: MacOS X',
+  'Operating System :: POSIX :: Linux',
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Topic :: Scientific/Engineering :: Astronomy',
+  'Topic :: Scientific/Engineering :: Physics'
+]
+dependencies = ["numpy>=1.21.2", "scipy"]
+dynamic = ["version", "description"]
+keywords = ["python", "science", "astronomy", "astrophysics", "IceCube", "neutrino", "simulation"]
+license = {file = "LICENSES/BSD-2-Clause.txt"}
 name = "simweights"
 readme = "README.rst"
 requires-python = "~=3.7"
-license = {file = "LICENSES/BSD-2-Clause.txt"}
-authors = [{name = "Kevin Meagher"}]
-keywords = ["python", "science", "astronomy", "astrophysics", "IceCube", "neutrino", "simulation"]
-classifiers = [
-    'Development Status :: 4 - Beta',
-    'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: BSD License',
-    'Operating System :: MacOS :: MacOS X',
-    'Operating System :: POSIX :: Linux',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Topic :: Scientific/Engineering :: Astronomy',
-    'Topic :: Scientific/Engineering :: Physics',
-    ]
-dependencies = ["numpy>=1.21.2", "scipy"]
-dynamic = ["version", "description"]
 
 [project.optional-dependencies]
+dev = ["pytest", "pre-commit", "reuse", "black", "ruff", "pylint", "mypy"]
+docs = ["sphinx", "sphinx-rtd-theme", "pandas"]
 test = ["h5py", "tables < 3.8; python_version < '3.9'", "tables <= 3.9.2", "pandas", "uproot", "pytest-cov"]
-docs = ["sphinx","sphinx-rtd-theme","pandas"]
-dev = ["pytest","pre-commit","reuse","black","ruff","pylint","mypy"]
 
 [project.scripts]
 simweights = "simweights.cmdline:main"
 
 [project.urls]
-Source = "https://github.com/icecube/simweights"
-Documentation = "https://docs.icecube.aq/simweights/main"
 Collaboration = "https://icecube.wisc.edu"
+Documentation = "https://docs.icecube.aq/simweights/main"
+Source = "https://github.com/icecube/simweights"
 
-[tool.pytest.ini_options]
-minversion = 7.0
-testpaths = ["tests"]
-log_cli_level = "INFO"
-xfail_strict = true
-filterwarnings = ["error"]
-addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights", "-W ignore"]
-
-[tool.coverage.run]
-source = ["simweights"]
-command_line = "-m pytest"
-omit = ["*/simweights/cmdline.py"]
+[tool.codespell]
+ignore-words-list = 'livetime'
+skip = '_build'
 
 [tool.coverage.report]
 exclude_also = ["from numpy.typing import"]
 
-[tool.codespell]
-skip = '_build'
-ignore-words-list = 'livetime'
+[tool.coverage.run]
+command_line = "-m pytest"
+omit = ["*/simweights/cmdline.py"]
+source = ["simweights"]
+
+[tool.doc8]
+max-line-length = 128
 
 [tool.mypy]
-plugins = "numpy.typing.mypy_plugin"
-# show_error_codes = true
-warn_unreachable = true
-strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+plugins = "numpy.typing.mypy_plugin"
+strict = true
+warn_unreachable = true
 
 [tool.pylint.format]
 max-line-length = "128"
@@ -77,45 +71,50 @@ max-line-length = "128"
 [tool.pylint.messages_control]
 disable = "C0114,R0902,R0913"
 
+[tool.pytest.ini_options]
+addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights", "-W ignore"]
+filterwarnings = ["error"]
+log_cli_level = "INFO"
+minversion = 7.0
+testpaths = ["tests"]
+xfail_strict = true
+
 [tool.ruff]
-src = ["src"]
 line-length = 128
-target-version = "py38"
 namespace-packages = ["examples", "contrib", "docs"]
+src = ["src"]
+target-version = "py38"
 
 [tool.ruff.lint]
-select = ["ALL"]
 fixable = ["I"]
 ignore = [
-    "ANN401", # any-type
-    "FBT",    # flake8-boolean-trap
-    "S101",   # assert-used
-    "COM812", # confilcts with ruff formatter
-    "ISC001", # confilcts with ruff formatter
-    "PLR0913",# Too many arguments in function definition
-    ]
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
+  "ANN401",  # any-type
+  "FBT",  # flake8-boolean-trap
+  "S101",  # assert-used
+  "COM812",  # confilcts with ruff formatter
+  "ISC001",  # confilcts with ruff formatter
+  "PLR0913"  # Too many arguments in function definition
+]
+select = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
 "contrib/*" = ["T201"]
-"tests/*" = [
-    "D",      # pydocstyle
-    "N",      # pep8-naming
-    "ANN",    # flake8-annotations
-    "PT",     # flake8-pytest-style
-    "PGH001", # eval
-    "SLF001", # private-member-access
-    "PLR2004",# magic-value-comparison
-    "PLR0915",# too-many-statements
-    "S307",   # suspicious-eval-usage
-    ]
 "examples/*" = [
-    "D",      # pydocstyle
-    "F401",   # unused-import
-    "T201",    # flake8-print
+  "D",  # pydocstyle
+  "F401",  # unused-import
+  "T201"  # flake8-print
+]
+"tests/*" = [
+  "D",  # pydocstyle
+  "N",  # pep8-naming
+  "ANN",  # flake8-annotations
+  "PT",  # flake8-pytest-style
+  "PGH001",  # eval
+  "SLF001",  # private-member-access
+  "PLR2004",  # magic-value-comparison
+  "PLR0915",  # too-many-statements
+  "S307"  # suspicious-eval-usage
 ]
 
-[tool.doc8]
-max-line-length=128
+[tool.ruff.lint.pydocstyle]
+convention = "google"

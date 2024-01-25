@@ -11,6 +11,11 @@ repos:
     hooks:
       - id: prettier
         files: \.ya?ml$
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.12.0
+    hooks:
+      - id: pretty-format-toml
+        args: [--autofix]
   - repo: https://github.com/fsfe/reuse-tool
     rev: v3.0.1
     hooks:
