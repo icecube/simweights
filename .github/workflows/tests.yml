@@ -20,10 +20,10 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         os: [ubuntu-22.04]
         include:
-          - python-version: "3.11"
-            os: macos-12
           - python-version: "3.12"
             os: macos-12
+          - python-version: "3.12"
+            os: macos-14
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -41,10 +41,38 @@ jobs:
       - name: Run Tests
         env:
           SIMWEIGHTS_TESTDATA: .
-        run: python3 -m pytest  --cov-report=xml
+        run: python3 -m pytest  --cov-report=xml --junit-xml=test-results-${{matrix.os}}-${{matrix.python-version}}.junit.xml
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          if-no-files-found: error
+          name: test-results-${{matrix.os}}-${{matrix.python-version}}
+          path: test-results-${{matrix.os}}-${{matrix.python-version}}.junit.xml
       - name: Upload Coverage to Codecov
         if: ${{ !github.event.act }}
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: false
           verbose: true
+publish-test-results:
+  name: "Publish Tests Results"
+  needs: Tests
+  runs-on: ubuntu-latest
+  permissions:
+    checks: write
+    pull-requests: write
+    contents: read
+  if: always()
+  steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: .
+        pattern: test-results-*
+        merge-multiple: true
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: "*.xml"
+        deduplicate_classes_by_file_name: true
