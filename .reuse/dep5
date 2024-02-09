@@ -3,10 +3,10 @@ Upstream-Name: SimWeights
 Upstream-Contact: the SimWeights contributors
 Source: https://github.com/icecube/simweights
 
-Files: docs/*.svg
+Files: docs/*.svg tests/flux_values.json
 Copyright: 2022 the SimWeights contributors
 License: BSD-2-Clause
 
-Files: tests/flux_values.json
-Copyright: 2022 the SimWeights contributors
+Files: tests/test_fluxes/*.npz
+Copyright: 2024 the SimWeights contributors
 License: BSD-2-Clause

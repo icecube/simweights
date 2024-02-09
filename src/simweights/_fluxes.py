@@ -398,7 +398,7 @@ class FixedFractionFlux(CosmicRayFlux):
         self: FixedFractionFlux,
         fractions: Mapping[PDGCode, float],
         basis: CosmicRayFlux | None = None,
-        normalized: bool = True,
+        normalized: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
         """Flux that is a fixed fraction of another flux.
 

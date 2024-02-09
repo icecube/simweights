@@ -13,11 +13,11 @@ import numpy as np
 from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import NaturalRateCylinder
-from ._utils import Column, constcol, get_column, get_table, has_table
+from ._utils import Column, constcol, get_column, get_table, has_column, has_table
 from ._weighter import Weighter
 
 
-def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
+def sframe_corsika_surface(table: Any) -> GenerationSurface:
     """Inspect the rows of a CORSIKA S-Frame table object to generate a surface object.
 
     This function works on files generated with either triggered CORSIKA or corsika-reader because
@@ -40,7 +40,7 @@ def sframe_corsika_surface(table: Any, oversampling: bool) -> GenerationSurface:
             get_column(table, "max_energy")[i],
             "energy",
         )
-        oversampling_val = get_column(table, "oversampling")[i] if oversampling else 1
+        oversampling_val = get_column(table, "oversampling")[i] if has_column(table, "oversampling") else 1
         pdgid = int(get_column(table, "primary_type")[i])
         surfaces.append(
             get_column(table, "n_events")[i]
@@ -108,7 +108,7 @@ def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # 
             )
             raise RuntimeError(mesg)
 
-        surface = sframe_corsika_surface(get_table(file_obj, info_obj), oversampling=False)
+        surface = sframe_corsika_surface(get_table(file_obj, info_obj))
         triggered = True
 
     elif nfiles is None:
@@ -119,7 +119,7 @@ def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # 
                 "nfiles and no I3CorsikaInfo table was found."
             )
             raise RuntimeError(msg)
-        surface = sframe_corsika_surface(get_table(file_obj, info_obj), oversampling=True)
+        surface = sframe_corsika_surface(get_table(file_obj, info_obj))
         triggered = False
 
     else:
