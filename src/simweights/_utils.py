@@ -29,7 +29,7 @@ class Column:
 
     def pdf(self: Column, value: ArrayLike) -> NDArray[np.float64]:
         r"""Probability density function."""
-        return 1 / np.asfarray(value)
+        return 1 / np.asarray(value, dtype=np.float64)
 
     def __eq__(self: Column, other: object) -> bool:
         return isinstance(other, Column) and self.columns == other.columns
@@ -47,7 +47,7 @@ class Const:
 
     def pdf(self: Const) -> NDArray[np.float64]:
         r"""Probability density function."""
-        return np.asfarray(self.v)
+        return np.asarray(self.v, dtype=np.float64)
 
     def __eq__(self: Const, other: object) -> bool:
         return isinstance(other, Const) and self.v == other.v
@@ -84,11 +84,11 @@ def has_column(table: Any, name: str) -> bool:
 def get_column(table: Any, name: str) -> NDArray[np.float64]:
     """Helper function getting a column from a table, works with h5py, pytables, and pandas."""
     if hasattr(table, "cols"):
-        return np.asfarray(getattr(table.cols, name)[:])
+        return np.asarray(getattr(table.cols, name)[:], dtype=np.float64)
     column = table[name]
     if hasattr(column, "array") and callable(column.array):
-        return np.asfarray(column.array(library="np"))
-    return np.asfarray(column)
+        return np.asarray(column.array(library="np"), dtype=np.float64)
+    return np.asarray(column, dtype=np.float64)
 
 
 def constcol(table: Any, colname: str, mask: NDArray[np.bool_] | None = None) -> float:

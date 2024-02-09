@@ -52,17 +52,17 @@ class PowerLaw:
         self.columns = (colname,)
 
     def _pdf(self: PowerLaw, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        return np.asfarray(x**self.g / self.integral)
+        return np.asarray(x**self.g / self.integral, dtype=np.float64)
 
     def _cdf(self: PowerLaw, x: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
-            return np.asfarray(np.log(x / self.a) / self.integral)
-        return np.asfarray((x**self.G - self.a**self.G) / self.G / self.integral)
+            return np.asarray(np.log(x / self.a) / self.integral, dtype=np.float64)
+        return np.asarray((x**self.G - self.a**self.G) / self.G / self.integral, dtype=np.float64)
 
     def _ppf(self: PowerLaw, q: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.G == 0:
-            return np.asfarray(self.a * np.exp(q * self.integral))
-        return np.asfarray((q * self.G * self.integral + self.a**self.G) ** (1 / self.G))
+            return np.asarray(self.a * np.exp(q * self.integral), dtype=np.float64)
+        return np.asarray((q * self.G * self.integral + self.a**self.G) ** (1 / self.G), np.float64)
 
     def pdf(self: PowerLaw, x: ArrayLike) -> NDArray[np.float64]:
         r"""Probability density function.
@@ -74,7 +74,7 @@ class PowerLaw:
         Returns:
             array_like: Probability density function evaluated at `x`
         """
-        xa = np.asfarray(x)
+        xa = np.asarray(x, dtype=np.float64)
         return np.piecewise(xa, [(xa >= self.a) & (xa <= self.b)], [self._pdf])
 
     def cdf(self: PowerLaw, x: ArrayLike) -> NDArray[np.float64]:
@@ -86,7 +86,7 @@ class PowerLaw:
         Returns:
             array_like: Cumulative distribution function evaluated at `x`
         """
-        qa = np.asfarray(x)
+        qa = np.asarray(x, dtype=np.float64)
         return np.piecewise(qa, [qa < self.a, qa > self.b], [0, 1, self._cdf])
 
     def ppf(self: PowerLaw, q: ArrayLike) -> NDArray[np.float64]:
@@ -98,7 +98,7 @@ class PowerLaw:
         Returns:
             array_like: quantile corresponding to the lower tail probability `q`.
         """
-        qa = np.asfarray(q)
+        qa = np.asarray(q, dtype=np.float64)
         return np.piecewise(qa, [(qa >= 0) & (qa <= 1)], [self._ppf, np.nan])
 
     def rvs(self: PowerLaw, size: Any = None, random_state: SeedType = None) -> NDArray[np.float64]:
@@ -116,7 +116,7 @@ class PowerLaw:
                 Default is None.
         """
         rand_state = check_random_state(random_state)
-        return self._ppf(np.asfarray(rand_state.uniform(0, 1, size)))
+        return self._ppf(np.asarray(rand_state.uniform(0, 1, size), dtype=np.float64))
 
     def __repr__(self: PowerLaw) -> str:
         return f"{self.__class__.__name__}({self.g} ,{self.a}, {self.b})"

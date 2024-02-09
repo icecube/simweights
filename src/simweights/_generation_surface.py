@@ -101,13 +101,13 @@ class GenerationSurface:
         cols = {}
         shape = None
         for key, value in kwargs.items():
-            cols[key] = np.asfarray(value)
+            cols[key] = np.asarray(value, dtype=np.float64)
             if shape is None:
                 shape = cols[key].shape
             else:
                 assert shape == cols[key].shape  # type: ignore[unreachable]
         assert shape is not None
-        count = np.zeros(shape, dtype=np.float_)
+        count = np.zeros(shape, dtype=np.float64)
         # loop over particle type
         for ptype in np.unique(pdgid):
             mask = ptype == pdgid

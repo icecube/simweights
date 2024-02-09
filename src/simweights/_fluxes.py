@@ -21,7 +21,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Mapping, Sequence
 
-from numpy import asfarray, bool_, broadcast_arrays, exp, float64, genfromtxt, int32, piecewise, sqrt
+from numpy import asarray, bool_, broadcast_arrays, exp, float64, genfromtxt, int32, piecewise, sqrt
 from numpy import sum as nsum
 from scipy.interpolate import CubicSpline  # pylint: disable=import-error
 
@@ -422,7 +422,7 @@ class FixedFractionFlux(CosmicRayFlux):
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
         fluxsum = sum(self.flux(energy_arr, p) for p in self.pdgids)
         cond = self._condition(energy_arr, pdgid_arr)
-        return asfarray(fluxsum * piecewise(energy, cond, self.fracs))
+        return asarray(fluxsum * piecewise(energy, cond, self.fracs), dtype=float64)
 
 
 class _references:
