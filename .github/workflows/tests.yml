@@ -55,24 +55,24 @@ jobs:
         with:
           fail_ci_if_error: false
           verbose: true
-publish-test-results:
-  name: "Publish Tests Results"
-  needs: Tests
-  runs-on: ubuntu-latest
-  permissions:
-    checks: write
-    pull-requests: write
-    contents: read
-  if: always()
-  steps:
-    - name: Download Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: .
-        pattern: test-results-*
-        merge-multiple: true
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      with:
-        files: "*.xml"
-        deduplicate_classes_by_file_name: true
+  publish-test-results:
+    name: "Publish Tests Results"
+    needs: Tests
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+    if: always()
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: .
+          pattern: test-results-*
+          merge-multiple: true
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: "*.xml"
+          deduplicate_classes_by_file_name: true
