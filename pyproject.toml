@@ -37,7 +37,7 @@ docs = ["sphinx", "sphinx-rtd-theme", "pandas"]
 test = [
   "h5py",
   "tables < 3.8; python_version < '3.9'",
-  "tables <= 3.9.2",
+  "tables",
   "pandas",
   "uproot",
   "pytest-cov",
