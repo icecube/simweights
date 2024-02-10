@@ -84,18 +84,17 @@ def get_column(table: Any, name: str) -> NDArray[np.float64]:  # noqa: PLR0911
     if hasattr(table, "cols"):
         return np.asarray(getattr(table.cols, name)[:], dtype=np.float64)
     if hasattr(table, name):
-        return np.asarray(getattr(table, name), dtype=np.float64)
+        return np.asarray(np.atleast_1d(getattr(table, name)), dtype=np.float64)
     if hasattr(table, "dir") and hasattr(table.dir, name):
-        return np.asarray(getattr(table.dir, name), dtype=np.float64)
-    if hasattr(table, "primary"):
-        if hasattr(table.primary, name):
-            return np.asarray(getattr(table.primary, name), dtype=np.float64)
-        if hasattr(table.primary.dir, name):
-            return np.asarray(getattr(table.primary.dir, name), dtype=np.float64)
+        return np.asarray(np.atleast_1d(getattr(table.dir, name)), dtype=np.float64)
+    if hasattr(table, "primary") and hasattr(table.primary, name):
+        return np.asarray(np.atleast_1d(getattr(table.primary, name)), dtype=np.float64)
+    if hasattr(table, "primary") and hasattr(table.primary.dir, name):
+        return np.asarray(np.atleast_1d(getattr(table.primary.dir, name)), dtype=np.float64)
     column = table[name]
     if hasattr(column, "array") and callable(column.array):
         return np.asarray(column.array(library="np"), dtype=np.float64)
-    return np.asarray(column, dtype=np.float64)
+    return np.asarray(np.atleast_1d(column), dtype=np.float64)
 
 
 def constcol(table: Any, colname: str, mask: NDArray[np.bool_] | None = None) -> float:
