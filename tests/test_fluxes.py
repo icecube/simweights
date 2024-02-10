@@ -5,123 +5,74 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import json
-import unittest
+import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 
-from simweights import _fluxes
+import simweights
 
+with (Path(__file__).parent / "flux_values.json").open() as f:
+    flux_values = json.load(f)
 E = np.logspace(2, 10, 9)
 
-
-class TestCosmicRayModels(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with (Path(__file__).parent / "flux_values.json").open() as f:
-            cls.flux_values = json.load(f)
-
-    def flux_cmp(self, name, *args):
-        flux = getattr(_fluxes, name)(*args)
-        v1 = flux(*np.meshgrid(E, [int(i) for i in self.flux_values[name]]))
-        v2 = np.array(list(self.flux_values[name].values())) / 1e4
-        np.testing.assert_allclose(v1, v2, 1e-13)
-
-        # make sure you get zero for non CR primaries
-        np.testing.assert_allclose(flux(E, 22), 0)
-
-    def test_Hoerandel(self):
-        self.flux_cmp("Hoerandel")
-
-    def test_Hoerandel5(self):
-        self.flux_cmp("Hoerandel5")
-
-    def test_Hoerandel_IT(self):
-        self.flux_cmp("Hoerandel_IT")
-
-    def test_GaisserHillas(self):
-        self.flux_cmp("GaisserHillas")
-
-    def test_GaisserH3a(self):
-        self.flux_cmp("GaisserH3a")
-
-    def test_GaisserH4a(self):
-        self.flux_cmp("GaisserH4a")
-
-    def test_GaisserH4a_IT(self):
-        self.flux_cmp("GaisserH4a_IT")
-
-    def test_Honda2004(self):
-        self.flux_cmp("Honda2004")
-
-    def test_TIG1996(self):
-        self.flux_cmp("TIG1996")
-
-    def test_GlobalFitGST(self):
-        self.flux_cmp("GlobalFitGST")
-
-    def test_GlobalFitGST_IT(self):
-        self.flux_cmp("GlobalFitGST_IT")
-
-    def test_GlobalSplineFit(self):
-        self.flux_cmp("GlobalSplineFit")
-
-    def test_GlobalSplineFit5Comp(self):
-        self.flux_cmp("GlobalSplineFit5Comp")
-
-    def test_GlobalSplineFit_IT(self):
-        self.flux_cmp("GlobalSplineFit_IT")
-
-    def test_FixedFractionFlux(self):
-        self.flux_cmp("FixedFractionFlux", {2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4})
-        self.flux_cmp(
-            "FixedFractionFlux",
-            {2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4},
-            _fluxes.GaisserH4a_IT(),
-        )
+flux_models = [
+    simweights.Hoerandel(),
+    simweights.Hoerandel5(),
+    simweights.Hoerandel_IT(),
+    simweights.GaisserHillas(),
+    simweights.GaisserH3a(),
+    simweights.GaisserH4a(),
+    simweights.GaisserH4a_IT(),
+    simweights.Honda2004(),
+    simweights.TIG1996(),
+    simweights.GlobalFitGST(),
+    simweights.GlobalFitGST_IT(),
+    simweights.GlobalSplineFit(),
+    simweights.GlobalSplineFit5Comp(),
+    simweights.GlobalSplineFit_IT(),
+    simweights.FixedFractionFlux({2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4}),
+    simweights.FixedFractionFlux({2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4}, simweights.GaisserH4a_IT()),
+]
 
 
-def test_GlobalSplineFit_similar():
+@pytest.mark.parametrize("flux", flux_models, ids=[x.__class__.__name__ for x in flux_models])
+def test_flux_model(flux, ndarrays_regression):
+    # this is the old regression test it can stick around for a bit but will be deleted at a certain point
+    for pdgid in flux.pdgids:
+        v1 = flux(E, pdgid)
+        v2 = np.array(flux_values[flux.__class__.__name__][str(int(pdgid))]) / 1e4
+    assert v1 == pytest.approx(v2, rel=1e-13)
+
+    ndarrays_regression.check({pdgid.name: flux(E, pdgid) for pdgid in flux.pdgids}, default_tolerance={"rtol": 1e-13})
+    # make sure you get zero for non CR primaries
+    assert flux(E, 22) == pytest.approx(0)
+
+
+gsfmodels = [
+    simweights.GlobalSplineFit(),
+    simweights.GlobalSplineFit5Comp(),
+    simweights.GlobalSplineFit_IT(),
+]
+
+
+@pytest.mark.parametrize("gsf", gsfmodels)
+def test_GlobalSplineFit_similar(gsf):
     """
-    Test if GlobalSplineFit is similar to to other models within a factor of 500,
+    Test if GlobalSplineFit is similar to to other models within a factor of 0.4,
     mainly to check if the units provided by the GST files match.
+    Sum all species before check because different models use different particles.
     This can be not transparent in the file and web-interface.
     If the units mismatch, we should expect at least a deviation of 1000 (one prefix)
     or most likely a mismatch of 10 000 (cm^2 vs m^2).
     """
-    gsf = _fluxes.GlobalSplineFit()
-
     for name in ("GlobalFitGST", "GaisserH3a", "Hoerandel5"):
-        model = getattr(_fluxes, name)()
-
-        same_pdgids = [pdgid for pdgid in gsf.pdgids if pdgid in model.pdgids]
-
-        f_gsf = gsf(*np.meshgrid(E, [int(i) for i in same_pdgids]))
-        f = model(*np.meshgrid(E, [int(i) for i in same_pdgids]))
-
-        assert 0.2 < np.mean(f / f_gsf) < 500
-
-
-def test_GlobalSplineFit5Comp_similar():
-    """
-    Test if GlobalSplineFit is similar to to other models within a factor of 500,
-    mainly to check if the units provided by the GST files match.
-    This can be not transparent in the file and web-interface.
-    If the units mismatch, we should expect at least a deviation of 1000 (one prefix)
-    or most likely a mismatch of 10 000 (cm^2 vs m^2).
-    """
-    gsf = _fluxes.GlobalSplineFit5Comp()
-
-    for name in ("GlobalFitGST", "GaisserH3a", "Hoerandel5"):
-        model = getattr(_fluxes, name)()
-
-        same_pdgids = [pdgid for pdgid in gsf.pdgids if pdgid in model.pdgids]
-
-        f_gsf = gsf(*np.meshgrid(E, [int(i) for i in same_pdgids]))
-        f = model(*np.meshgrid(E, [int(i) for i in same_pdgids]))
-
-        assert 0.2 < np.mean(f / f_gsf) < 500
+        model = getattr(simweights, name)()
+        f_gsf = gsf(*np.meshgrid(E, gsf.pdgids)).sum(axis=0)
+        f = model(*np.meshgrid(E, model.pdgids)).sum(axis=0)
+        assert f == pytest.approx(f_gsf, rel=0.4)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    sys.exit(pytest.main(["-v", __file__, *sys.argv[1:]]))

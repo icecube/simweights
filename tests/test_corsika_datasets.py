@@ -5,135 +5,119 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import os
-import unittest
+import sys
+from pathlib import Path
 
 import h5py
 import numpy as np
 import pandas as pd
+import pytest
 import tables
 import uproot
 
 from simweights import CorsikaWeighter, GaisserH4a
 from simweights._utils import constcol
 
+flux = GaisserH4a()
+datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
+if datadir:
+    datadir = Path(datadir)
 
-class TestCorsikaDatasets(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.flux = GaisserH4a()
-        datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
-        if not datadir:
-            cls.skipTest(None, "environment variable SIMWEIGHTS_TESTDATA not set")
-        cls.datadir = datadir + "/"
+datasets = [
+    (False, "Level2_IC86.2015_corsika.012602.000000", 102.01712611701736),
+    (False, "Level2_IC86.2015_corsika.020014.000000", 23.015500214424705),
+    (False, "Level2_IC86.2015_corsika.020021.000000", 69.75465614509928),
+    (False, "Level2_IC86.2016_corsika.020208.000001", 22.622983704306385),
+    (False, "Level2_IC86.2016_corsika.020243.000001", 4.590586137762489),
+    (False, "Level2_IC86.2016_corsika.020263.000000", 10.183937153798436),
+    (False, "Level2_IC86.2016_corsika.020777.000000", 362.94284441826704),
+    (False, "Level2_IC86.2016_corsika.020778.000000", 6.2654796956603),
+    (False, "Level2_IC86.2016_corsika.020780.000000", 14.215947086098588),
+    (True, "Level2_IC86.2016_corsika.021889.000000", 122.83809329321922),
+]
 
-    def untriggered_weights(self, f):
-        cwm = f["CorsikaWeightMap"]
-        pflux = self.flux(cwm["PrimaryEnergy"], cwm["PrimaryType"])
-        if (cwm["PrimarySpectralIndex"] == -1).any():
-            assert (cwm["PrimarySpectralIndex"] == -1).all()
-            energy_integral = np.log(cwm["EnergyPrimaryMax"] / cwm["EnergyPrimaryMin"])
-        else:
-            energy_integral = (
-                cwm["EnergyPrimaryMax"] ** (cwm["PrimarySpectralIndex"] + 1)
-                - cwm["EnergyPrimaryMin"] ** (cwm["PrimarySpectralIndex"] + 1)
-            ) / (cwm["PrimarySpectralIndex"] + 1)
 
-        energy_weight = cwm["PrimaryEnergy"] ** cwm["PrimarySpectralIndex"]
-        return 1e4 * pflux * energy_integral / energy_weight * cwm["AreaSum"] / (cwm["NEvents"] * cwm["OverSampling"])
+def untriggered_weights(f):
+    cwm = f["CorsikaWeightMap"]
+    pflux = flux(cwm["PrimaryEnergy"], cwm["PrimaryType"])
+    if (cwm["PrimarySpectralIndex"] == -1).any():
+        assert (cwm["PrimarySpectralIndex"] == -1).all()
+        energy_integral = np.log(cwm["EnergyPrimaryMax"] / cwm["EnergyPrimaryMin"])
+    else:
+        energy_integral = (
+            cwm["EnergyPrimaryMax"] ** (cwm["PrimarySpectralIndex"] + 1)
+            - cwm["EnergyPrimaryMin"] ** (cwm["PrimarySpectralIndex"] + 1)
+        ) / (cwm["PrimarySpectralIndex"] + 1)
 
-    def triggered_weights(self, f):
-        i3cw = f["I3CorsikaWeight"]
-        flux_val = self.flux(i3cw["energy"], i3cw["type"])
-        info = f["I3PrimaryInjectorInfo"]
-        energy = i3cw["energy"]
-        epdf = np.zeros_like(energy, dtype=float)
+    energy_weight = cwm["PrimaryEnergy"] ** cwm["PrimarySpectralIndex"]
+    return 1e4 * pflux * energy_integral / energy_weight * cwm["AreaSum"] / (cwm["NEvents"] * cwm["OverSampling"])
 
-        for ptype in np.unique(info["primary_type"]):
-            info_mask = info["primary_type"] == ptype
-            n_events = info["n_events"][info_mask].sum()
-            min_energy = constcol(info, "min_energy", info_mask)
-            max_energy = constcol(info, "max_energy", info_mask)
-            min_zenith = constcol(info, "min_zenith", info_mask)
-            max_zenith = constcol(info, "max_zenith", info_mask)
-            cylinder_height = constcol(info, "cylinder_height", info_mask)
-            cylinder_radius = constcol(info, "cylinder_radius", info_mask)
-            power_law_index = constcol(info, "power_law_index", info_mask)
 
-            G = power_law_index + 1
-            side = 2e4 * cylinder_radius * cylinder_height
-            cap = 1e4 * np.pi * cylinder_radius**2
-            cos_minz = np.cos(min_zenith)
-            cos_maxz = np.cos(max_zenith)
-            ET1 = cap * cos_minz * np.abs(cos_minz) + side * (cos_minz * np.sqrt(1 - cos_minz**2) - min_zenith)
-            ET2 = cap * cos_maxz * np.abs(cos_maxz) + side * (cos_maxz * np.sqrt(1 - cos_maxz**2) - max_zenith)
-            etendue = np.pi * (ET1 - ET2)
+def triggered_weights(f):
+    i3cw = f["I3CorsikaWeight"]
+    flux_val = flux(i3cw["energy"], i3cw["type"])
+    info = f["I3PrimaryInjectorInfo"]
+    energy = i3cw["energy"]
+    epdf = np.zeros_like(energy, dtype=float)
 
-            mask = ptype == i3cw["type"]
-            energy_term = energy[mask] ** power_law_index * G / (max_energy**G - min_energy**G)
-            epdf[mask] += n_events * energy_term / etendue
+    for ptype in np.unique(info["primary_type"]):
+        info_mask = info["primary_type"] == ptype
+        n_events = info["n_events"][info_mask].sum()
+        min_energy = constcol(info, "min_energy", info_mask)
+        max_energy = constcol(info, "max_energy", info_mask)
+        min_zenith = constcol(info, "min_zenith", info_mask)
+        max_zenith = constcol(info, "max_zenith", info_mask)
+        cylinder_height = constcol(info, "cylinder_height", info_mask)
+        cylinder_radius = constcol(info, "cylinder_radius", info_mask)
+        power_law_index = constcol(info, "power_law_index", info_mask)
 
-        return i3cw["weight"] * flux_val / epdf
+        G = power_law_index + 1
+        side = 2e4 * cylinder_radius * cylinder_height
+        cap = 1e4 * np.pi * cylinder_radius**2
+        cos_minz = np.cos(min_zenith)
+        cos_maxz = np.cos(max_zenith)
+        ET1 = cap * cos_minz * np.abs(cos_minz) + side * (cos_minz * np.sqrt(1 - cos_minz**2) - min_zenith)
+        ET2 = cap * cos_maxz * np.abs(cos_maxz) + side * (cos_maxz * np.sqrt(1 - cos_maxz**2) - max_zenith)
+        etendue = np.pi * (ET1 - ET2)
 
-    def cmp_dataset(self, triggered, fname, rate):
-        fname = self.datadir + fname
+        mask = ptype == i3cw["type"]
+        energy_term = energy[mask] ** power_law_index * G / (max_energy**G - min_energy**G)
+        epdf[mask] += n_events * energy_term / etendue
 
-        if triggered:
-            nfiles = None
-            refweight = self.triggered_weights
-        else:
-            nfiles = 1
-            refweight = self.untriggered_weights
+    return i3cw["weight"] * flux_val / epdf
 
-        reffile = h5py.File(fname + ".hdf5", "r")
-        w0 = refweight(reffile)
 
-        inputfiles = [
-            ("h5py", reffile),
-            ("uproot", uproot.open(fname + ".root")),
-            ("tables", tables.open_file(fname + ".hdf5", "r")),
-            ("pandas", pd.HDFStore(fname + ".hdf5", "r")),
-        ]
+@pytest.mark.parametrize(("triggered", "fname", "rate"), datasets)
+@pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
+def test_dataset(triggered, fname, rate):
+    fname = datadir / fname
 
-        for name, infile in inputfiles:
-            with self.subTest(name):
-                wobj = CorsikaWeighter(infile, nfiles)
-                w = wobj.get_weights(self.flux)
-                self.assertAlmostEqual(w.sum(), rate)
-                np.testing.assert_allclose(w0, w, 1e-6)
+    if triggered:
+        nfiles = None
+        refweight = triggered_weights
+    else:
+        nfiles = 1
+        refweight = untriggered_weights
 
-        for _, infile in inputfiles:
-            infile.close()
+    reffile = h5py.File(str(fname) + ".hdf5", "r")
+    w0 = refweight(reffile)
 
-    def test_012602(self):
-        self.cmp_dataset(False, "Level2_IC86.2015_corsika.012602.000000", 102.01712611701736)
+    inputfiles = [
+        ("h5py", reffile),
+        ("uproot", uproot.open(str(fname) + ".root")),
+        ("tables", tables.open_file(str(fname) + ".hdf5", "r")),
+        ("pandas", pd.HDFStore(str(fname) + ".hdf5", "r")),
+    ]
 
-    def test_020014(self):
-        self.cmp_dataset(False, "Level2_IC86.2015_corsika.020014.000000", 23.015500214424705)
+    for _, infile in inputfiles:
+        wobj = CorsikaWeighter(infile, nfiles)
+        w = wobj.get_weights(flux)
+        assert w.sum() == pytest.approx(rate)
+        assert w0 == pytest.approx(w, 1e-6)
 
-    def test_020021(self):
-        self.cmp_dataset(False, "Level2_IC86.2015_corsika.020021.000000", 69.75465614509928)
-
-    def test_020208(self):
-        self.cmp_dataset(False, "Level2_IC86.2016_corsika.020208.000001", 22.622983704306385)
-
-    def test_020243(self):
-        self.cmp_dataset(False, "Level2_IC86.2016_corsika.020243.000001", 4.590586137762489)
-
-    def test_020263(self):
-        self.cmp_dataset(False, "Level2_IC86.2016_corsika.020263.000000", 10.183937153798436)
-
-    def test_020777(self):
-        self.cmp_dataset(False, "Level2_IC86.2016_corsika.020777.000000", 362.94284441826704)
-
-    def test_020778(self):
-        self.cmp_dataset(False, "Level2_IC86.2016_corsika.020778.000000", 6.2654796956603)
-
-    def test_020780(self):
-        self.cmp_dataset(False, "Level2_IC86.2016_corsika.020780.000000", 14.215947086098588)
-
-    def test_21889(self):
-        self.cmp_dataset(True, "Level2_IC86.2016_corsika.021889.000000", 122.83809329321922)
+    for _, infile in inputfiles:
+        infile.close()
 
 
 if __name__ == "__main__":
-    unittest.main()
+    sys.exit(pytest.main(["-v", __file__, *sys.argv[1:]]))

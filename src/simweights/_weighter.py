@@ -199,7 +199,7 @@ class Weighter:
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
         e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
-        return np.asfarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies))
+        return np.asarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies), dtype=np.float64)
 
     def __add__(self: Weighter, other: Weighter | int) -> Weighter:
         if other == 0:

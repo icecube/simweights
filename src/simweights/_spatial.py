@@ -42,17 +42,18 @@ class CylinderBase:
 
         As seen from the angle described by cos_zen.
         """
-        cosz = np.asfarray(cos_zen)
+        cosz = np.asarray(cos_zen, dtype=np.float64)
         assert np.all(cosz >= -1)
         assert np.all(cosz <= +1)
-        return np.asfarray(self._cap * np.abs(cosz) + self._side * np.sqrt(1 - cosz**2))
+        return np.asarray(self._cap * np.abs(cosz) + self._side * np.sqrt(1 - cosz**2), dtype=np.float64)
 
     def _diff_etendue(self: CylinderBase, cos_zen: ArrayLike) -> NDArray[np.float64]:
-        cosz = np.asfarray(cos_zen)
+        cosz = np.asarray(cos_zen, dtype=np.float64)
         assert np.all(cosz >= -1)
         assert np.all(cosz <= +1)
-        return np.asfarray(
+        return np.asarray(
             np.pi * (self._cap * cosz * np.abs(cosz) + self._side * (cosz * np.sqrt(1 - cosz**2) - np.arccos(cosz))),
+            dtype=np.float64,
         )
 
     def pdf(self: CylinderBase, cos_zen: ArrayLike) -> NDArray[np.float64]:
@@ -91,7 +92,7 @@ class UniformSolidAngleCylinder(CylinderBase):
         return 1 / (2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self.projected_area(cos_zen))
 
     def pdf(self: UniformSolidAngleCylinder, cos_zen: ArrayLike) -> NDArray[np.float64]:
-        cosz = np.asfarray(cos_zen)
+        cosz = np.asarray(cos_zen, dtype=np.float64)
         return np.piecewise(cosz, [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)], [self._pdf])
 
 
@@ -123,7 +124,7 @@ class NaturalRateCylinder(CylinderBase):
         self._normalization = 1 / self.etendue
 
     def pdf(self: NaturalRateCylinder, cos_zen: ArrayLike) -> NDArray[np.float64]:
-        cosz = np.asfarray(cos_zen)
+        cosz = np.asarray(cos_zen, dtype=np.float64)
         return np.piecewise(
             cosz,
             [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)],
@@ -157,7 +158,7 @@ class CircleInjector:
 
     def pdf(self: CircleInjector, cos_zen: ArrayLike) -> NDArray[np.float64]:
         """The probability density function for the given zenith angle."""
-        cosz = np.asfarray(cos_zen)
+        cosz = np.asarray(cos_zen, dtype=np.float64)
         return np.piecewise(
             cosz,
             [(cosz >= self.cos_zen_min) & (cosz <= self.cos_zen_max)],
