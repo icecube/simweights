@@ -416,7 +416,7 @@ class FixedFractionFlux(CosmicRayFlux):
         self.pdgids = tuple(PDGCode(k) for k in fluxes)
         self.fracs = list(fluxes.values())
         if normalized:
-            assert sum(self.fracs) == 1.0  # noqa: PLR2004
+            assert sum(self.fracs) == 1.0
 
     def __call__(self: FixedFractionFlux, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
