@@ -53,10 +53,14 @@ def nugen_spectrum(table: Any) -> PowerLaw:
 
 def nugen_surface(table: Any) -> GenerationSurface:
     """Inspect the `I3MCWeightDict` table object of a nugen file to generate a surface object."""
-    spatial = nugen_spatial(table)
-    spectrum = nugen_spectrum(table)
     pdgid = get_column(table, "PrimaryNeutrinoType")
     unique_pdgids = np.unique(pdgid)
+    if len(unique_pdgids) == 0:
+        msg = "`I3MCWeightDict` is empty. SimWeights cannot process this file"
+        raise RuntimeError(msg)
+
+    spatial = nugen_spatial(table)
+    spectrum = nugen_spectrum(table)
 
     surfaces = []
     for pid in unique_pdgids:

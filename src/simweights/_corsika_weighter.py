@@ -55,6 +55,10 @@ def sframe_corsika_surface(table: Any) -> GenerationSurface:
 def weight_map_corsika_surface(table: Any) -> GenerationSurface:
     """Inspect the `CorsikaWeightMap` table object of a corsika file to generate a surface object."""
     pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
+
+    if len(pdgids) == 0:
+        msg = "`CorsikaWeightMap` is empty. SimWeights cannot process this file"
+        raise RuntimeError(msg)
     surface: int | GenerationSurface = 0
     for pdgid in pdgids:
         mask = pdgid == get_column(table, "ParticleType")

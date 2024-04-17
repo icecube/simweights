@@ -109,6 +109,11 @@ class TestNugenWeighter(unittest.TestCase):
                     Ewidth = np.ediff1d(x)
                     np.testing.assert_allclose(y, 2 * weight * flux * Ewidth * c1.etendue / nfiles, 6e-3)
 
+    def test_empty(self):
+        with self.assertRaises(RuntimeError):
+            x = {"I3MCWeightDict": {"PrimaryNeutrinoType": []}}
+            NuGenWeighter(x, nfiles=1)
+
 
 if __name__ == "__main__":
     unittest.main()

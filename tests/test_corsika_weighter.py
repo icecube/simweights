@@ -102,6 +102,10 @@ class TestCorsikaWeighter(unittest.TestCase):
         with self.assertRaises(TypeError):
             CorsikaWeighter(d, nfiles=object())
 
+        with self.assertRaises(RuntimeError):
+            x = {"CorsikaWeightMap": {"ParticleType": []}, "PolyplopiaPrimary": {}}
+            CorsikaWeighter(x, nfiles=1)
+
     def test_sframe_corsika(self):
         c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
         p1 = simweights.PowerLaw(0, 1e3, 1e4)
