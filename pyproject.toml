@@ -34,6 +34,7 @@ requires-python = "~=3.7"
 [project.optional-dependencies]
 dev = ["pytest", "pre-commit", "reuse", "black", "ruff", "pylint", "mypy"]
 docs = ["sphinx", "sphinx-rtd-theme", "pandas"]
+examples = ['matplotlib']
 test = [
   "h5py",
   "tables < 3.8; python_version < '3.9'",
@@ -53,7 +54,7 @@ Documentation = "https://docs.icecube.aq/simweights/main"
 Source = "https://github.com/icecube/simweights"
 
 [tool.codespell]
-ignore-words-list = 'livetime'
+ignore-words-list = 'livetime,assertIn'
 skip = '_build'
 
 [tool.coverage.report]
@@ -98,8 +99,8 @@ fixable = ["I"]
 ignore = [
   "ANN401",  # any-type
   "S101",  # assert-used
-  "COM812",  # confilcts with ruff formatter
-  "ISC001",  # confilcts with ruff formatter
+  "COM812",  # conflicts with ruff formatter
+  "ISC001",  # conflicts with ruff formatter
   "PLR0913"  # Too many arguments in function definition
 ]
 select = ["ALL"]

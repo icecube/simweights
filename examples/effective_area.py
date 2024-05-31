@@ -17,10 +17,10 @@ f = tables.open_file("Level2_IC86.2016_NuMu.021217.N100.hdf5", "r")
 w = simweights.NuGenWeighter(f, nfiles=10)
 # create the energy and zenith bins
 energy_bins = np.geomspace(1e2, 1e8, 25)
-zenith_bins = [-1, -0.5, 0, 0.5, 1]
+cos_zenith_bins = [-1, -0.5, 0, 0.5, 1]
 
 # calculate the effective area in energy and zenith bins with all of the events in the sample
-effective_area = w.effective_area(energy_bins, zenith_bins)
+effective_area = w.effective_area(energy_bins, cos_zenith_bins)
 
 # make some labels for the different zenith bins
 zenith_labels = [
