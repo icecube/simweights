@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
-from numpy.random import Generator, RandomState
+from numpy.random import Generator, RandomState  # pylint: disable=no-name-in-module
 
 from ._pdgcode import PDGCode
 
