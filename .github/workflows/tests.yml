@@ -32,7 +32,7 @@ jobs:
           cache-dependency-path: pyproject.toml
       - name: Install SimWeights
         run: |
-          python3 -m pip install flit 'numpy<2'
+          python3 -m pip install flit
           python3 -m flit install --symlink --deps=production --extras=test
           if [ "$RUNNER_OS" == "Linux" ]; then
               python3 -m pip install nuflux
