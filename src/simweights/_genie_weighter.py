@@ -10,8 +10,9 @@ import numpy as np
 from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector
-from ._utils import Column, Const, has_column, get_column, get_table
+from ._utils import Column, Const, get_column, get_table, has_column
 from ._weighter import Weighter
+
 
 def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
     """Inspect the rows of a GENIE S-Frame table object to generate a surface object."""
@@ -35,7 +36,9 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
         global_probability_scale = get_column(table, "global_probability_scale")[i]
         surfaces.append(
             nevents
-            * generation_surface(pdgid, Const(1 / spatial.etendue / global_probability_scale), Column("wght"), Column("volscale"), spectrum),
+            * generation_surface(
+                pdgid, Const(1 / spatial.etendue / global_probability_scale), Column("wght"), Column("volscale"), spectrum
+            ),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)
@@ -64,5 +67,5 @@ def GenieWeighter(file_obj: Any) -> Weighter:  # noqa: N802
     else:
         volscale = np.ones_like(get_column(result_table, "wght"))
     weighter.add_weight_column("volscale", volscale)
-    
+
     return weighter
