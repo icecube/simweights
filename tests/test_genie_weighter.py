@@ -22,7 +22,7 @@ info_dtype = [
     ("power_law_index", np.float64),
 ]
 
-result_dtype = [("neu", np.int32), ('pzv', np.float64), ("Ev", np.float64), ("wght", np.float64)]
+result_dtype = [("neu", np.int32), ("pzv", np.float64), ("Ev", np.float64), ("wght", np.float64)]
 
 
 class TestGenieWeighter(unittest.TestCase):
