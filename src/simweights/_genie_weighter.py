@@ -10,7 +10,7 @@ import numpy as np
 from ._generation_surface import GenerationSurface, generation_surface
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector
-from ._utils import Column, Const, get_column, get_table
+from ._utils import Column, Const, get_column, get_table, has_column
 from ._weighter import Weighter
 
 
@@ -36,7 +36,9 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
         global_probability_scale = get_column(table, "global_probability_scale")[i]
         surfaces.append(
             nevents
-            * generation_surface(pdgid, Const(1 / spatial.etendue / global_probability_scale), Column("wght"), spectrum),
+            * generation_surface(
+                pdgid, Const(1 / spatial.etendue / global_probability_scale), Column("wght"), Column("volscale"), spectrum
+            ),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)
@@ -49,12 +51,21 @@ def GenieWeighter(file_obj: Any) -> Weighter:  # noqa: N802
 
     Reads ``I3GenieInfo`` from S-Frames and ``I3GenieResult`` from Q-Frames.
     """
-    weight_table = get_table(file_obj, "I3GenieInfo")
-    surface = genie_surface(weight_table)
+    info_table = get_table(file_obj, "I3GenieInfo")
+    result_table = get_table(file_obj, "I3GenieResult")
+    surface = genie_surface(info_table)
 
     weighter = Weighter([file_obj], surface)
-    weighter.add_weight_column("pdgid", weighter.get_column("I3GenieResult", "neu").astype(np.int32))
-    weighter.add_weight_column("energy", weighter.get_column("I3GenieResult", "Ev"))
-    weighter.add_weight_column("wght", weighter.get_column("I3GenieResult", "wght"))
+    weighter.add_weight_column("pdgid", get_column(result_table, "neu").astype(np.int32))
+    weighter.add_weight_column("energy", get_column(result_table, "Ev"))
+    weighter.add_weight_column("cos_zen", get_column(result_table, "pzv"))
+    weighter.add_weight_column("wght", get_column(result_table, "wght"))
+
+    # Include the effect of the muon scaling introduced in icecube/icetray#3607, if present.
+    if has_column(result_table, "volscale"):
+        volscale = get_column(result_table, "volscale")
+    else:
+        volscale = np.ones_like(get_column(result_table, "wght"))
+    weighter.add_weight_column("volscale", volscale)
 
     return weighter
