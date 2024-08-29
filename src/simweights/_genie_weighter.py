@@ -55,6 +55,7 @@ def GenieWeighter(file_obj: Any) -> Weighter:  # noqa: N802
     weighter = Weighter([file_obj], surface)
     weighter.add_weight_column("pdgid", weighter.get_column("I3GenieResult", "neu").astype(np.int32))
     weighter.add_weight_column("energy", weighter.get_column("I3GenieResult", "Ev"))
+    weighter.add_weight_column("cos_zen", weighter.get_column("I3GenieResult", "pzv"))
     weighter.add_weight_column("wght", weighter.get_column("I3GenieResult", "wght"))
 
     return weighter
