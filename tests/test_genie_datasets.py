@@ -63,7 +63,7 @@ def test_dataset(fname):
 
         power_law = next(iter(w.surface.spectra.values()))[0].dists[-1]
         energy_term = 1 / power_law.pdf(w.get_weight_column("energy"))
-        
+
         print(energy_term / energy_factor)
         assert energy_term == approx(energy_factor)
 
