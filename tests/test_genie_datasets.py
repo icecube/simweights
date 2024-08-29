@@ -61,8 +61,10 @@ def test_dataset(fname):
 
         assert w.get_weight_column("wght") == approx(genie_weight)
 
-        power_law = next(iter(w.surface.spectra.values()))[0].dists[2]
+        power_law = next(iter(w.surface.spectra.values()))[0].dists[-1]
         energy_term = 1 / power_law.pdf(w.get_weight_column("energy"))
+        
+        print(energy_term / energy_factor)
         assert energy_term == approx(energy_factor)
 
         one_weight = w.get_weight_column("wght") * energy_term * solid_angle * injection_area * global_probability_scale
