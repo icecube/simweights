@@ -22,18 +22,20 @@ info_dtype = [
     ("power_law_index", np.float64),
 ]
 
-result_dtype = [("neu", np.int32), ("Ev", np.float64), ("wght", np.float64)]
+result_dtype = [("neu", np.int32), ('pzv', np.float64), ("Ev", np.float64), ("wght", np.float64)]
 
 
-class TestCorsikaWeighter(unittest.TestCase):
-    def test_triggered_corsika(self):
+class TestGenieWeighter(unittest.TestCase):
+    def test_genie(self):
         nevents = 10000
+        coszen = 0.7
         pdgid = 12
         c1 = simweights.CircleInjector(300, 0, 1)
         p1 = simweights.PowerLaw(0, 1e3, 1e4)
 
         weight = np.zeros(nevents, dtype=result_dtype)
         weight["neu"] = pdgid
+        weight["pzv"] = coszen
         weight["Ev"] = p1.ppf(np.linspace(0, 1, nevents))
 
         for event_weight in [1e-6, 1e-3, 1]:
