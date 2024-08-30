@@ -34,11 +34,10 @@ def genie_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
         pdgid = int(get_column(table, "primary_type")[i])
         nevents = get_column(table, "n_flux_events")[i]
         global_probability_scale = get_column(table, "global_probability_scale")[i]
+
+        const_factor = 1 / spatial.etendue / global_probability_scale
         surfaces.append(
-            nevents
-            * generation_surface(
-                pdgid, Const(1 / spatial.etendue / global_probability_scale), Column("wght"), Column("volscale"), spectrum
-            ),
+            nevents * generation_surface(pdgid, Const(const_factor), Column("wght"), Column("volscale"), spectrum),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)

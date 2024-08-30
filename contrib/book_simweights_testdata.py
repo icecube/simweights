@@ -7,7 +7,6 @@
 """Script to generate the test data used by simweights testing."""
 
 import os.path
-import shutil
 import sys
 import tarfile
 import tempfile
@@ -63,6 +62,7 @@ filelist = {
     "genie": [
         "/data/sim/IceCubeUpgrade/genie/step3/141828/upgrade_genie_step3_141828_000000.i3.zst",
         "/data/sim/IceCube/2023/generated/GENIE/22590/0000000-0000999/GENIE_NuMu_IceCubeUpgrade_v58.22590.000000.i3.zst",
+        "/data/user/mlarson/icetray/src/genie-reader/resources/scripts/genie_numu_volume_scaling.i3.zst",
     ],
 }
 keys = {
@@ -97,10 +97,6 @@ for simtype, filename in ((i, x) for i in filelist for x in filelist[i]):
 
     split = simtype == "genie"
     outfile = outdir / basename
-
-    if Path(outfile.name + ".hdf5").exists():
-        print(f"Skipping {filename}: {outfile} already exists!")
-        continue
 
     print(f"Booking  : {filename}")
     print(f"  outfile: {outfile}")
@@ -140,12 +136,9 @@ for simtype, filename in ((i, x) for i in filelist for x in filelist[i]):
 tarfilename = "/data/user/kmeagher/simweights_testdata_test.tar.gz"
 print(f"Writing tarfile {tarfilename}")
 
-shutil.copy("upgrade_genie_step3_140021_000000.root", outdir)
-shutil.copy("upgrade_genie_step3_140021_000000.hdf5", outdir)
-
 with tarfile.open(tarfilename, "w:gz") as tar:
     for f in os.listdir(outdir):
         print(f"Adding {f} to tarball")
         tar.add(outdir / f, arcname=f)
 
-print("Finished writing tarfile {tarfilename}")
+print(f"Finished writing tarfile {tarfilename}")
