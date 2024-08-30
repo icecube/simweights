@@ -33,8 +33,8 @@ jobs:
         run: |
           tar -czvf simweights_docs.tar.gz -C_build/html .
           curl -XPUT -i --data-binary @simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${{ secrets.ICECUBE_PASSWORD }}
-      # - name: Check Links
-      #   working-directory: ./docs
-      #   env:
-      #     ICECUBE_PASSWORD: ${{ secrets.ICECUBE_PASSWORD }}
-      #   run: make linkcheck SPHINXOPTS="-W --keep-going"
+    # - name: Check Links
+    #   working-directory: ./docs
+    #   env:
+    #     ICECUBE_PASSWORD: ${{ secrets.ICECUBE_PASSWORD }}
+    #   run: make linkcheck SPHINXOPTS="-W --keep-going"
