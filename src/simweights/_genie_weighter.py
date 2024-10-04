@@ -16,9 +16,9 @@ from ._utils import Column, Const, constcol, get_column, get_table, has_column, 
 from ._weighter import Weighter
 
 
-def genie_icetray_surface(mcweightdict: Iterable[Mapping[str, float]],
-                          geniedict: Iterable[Mapping[str, float]],
-                          nufraction: float = 0.7) -> GenerationSurface:
+def genie_icetray_surface(
+    mcweightdict: Iterable[Mapping[str, float]], geniedict: Iterable[Mapping[str, float]], nufraction: float = 0.7
+) -> GenerationSurface:
     """Inspect the rows of a GENIE-icetray"s I3MCWeightDict table object to generate a surface object.
 
     This is a bit of a pain: the oscillations group historically produced 4-5 energy bands with varying
@@ -41,18 +41,19 @@ def genie_icetray_surface(mcweightdict: Iterable[Mapping[str, float]],
     surfaces = []
     for row in unique_schemes:
         (pid, vol, idx, emin, emax) = row
-        mask = np.all(gen_schemes == row[None,:], axis=1)
+        mask = np.all(gen_schemes == row[None, :], axis=1)
 
         spatial = nugen_spatial(mcweightdict[mask])
         spectrum = nugen_spectrum(mcweightdict[mask])
 
-        type_weight = nufraction if pid>0 else 1-nufraction
+        type_weight = nufraction if pid > 0 else 1 - nufraction
         n_events = type_weight * constcol(mcweightdict, "NEvents", mask)
 
         surfaces.append(n_events * generation_surface(pid, Column("wght"), spectrum, spatial))
     ret = sum(surfaces)
     assert isinstance(ret, GenerationSurface)
     return ret
+
 
 def genie_reader_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
     """Inspect the rows of a GENIE S-Frame table object to generate a surface object."""
@@ -84,7 +85,7 @@ def genie_reader_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurf
     return retval
 
 
-def GenieWeighter(file_obj: Any, nfiles:float | None = None) -> Weighter:  # noqa: N802
+def GenieWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # noqa: N802
     # pylint: disable=invalid-name
     """Weighter for GENIE simulation.
 
@@ -94,10 +95,12 @@ def GenieWeighter(file_obj: Any, nfiles:float | None = None) -> Weighter:  # noq
     if has_table(file_obj, "I3GenieInfo"):
         # Branch for newer genie-reader files
         if nfiles is not None:
-            msg = (f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, "filename", "<NONE>")}` "
-                   "was produced with genie-reader instead of genie-icetray. We expect to read the number of "
-                   "files from the number of observed S-frames in the file, so this is unnecessary. Do not pass "
-                   "in a value for nfiles for genie-reader files.")
+            msg = (
+                f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, "filename", "<NONE>")}` "
+                "was produced with genie-reader instead of genie-icetray. We expect to read the number of "
+                "files from the number of observed S-frames in the file, so this is unnecessary. Do not pass "
+                "in a value for nfiles for genie-reader files."
+            )
             raise RuntimeError(msg)
 
         info_table = get_table(file_obj, "I3GenieInfo")
@@ -120,10 +123,12 @@ def GenieWeighter(file_obj: Any, nfiles:float | None = None) -> Weighter:  # noq
     else:
         # Branch for older genie-icetray files
         if nfiles is None:
-            msg = (f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, "filename", "<NONE>")}` "
-                   "was produced with genie-reader instead of genie-icetray. We expect to read the number of "
-                   "files from the number of observed S-frames in the file, so this is unnecessary. Do not pass "
-                   "in a value for nfiles for genie-reader files.")
+            msg = (
+                f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, "filename", "<NONE>")}` "
+                "was produced with genie-reader instead of genie-icetray. We expect to read the number of "
+                "files from the number of observed S-frames in the file, so this is unnecessary. Do not pass "
+                "in a value for nfiles for genie-reader files."
+            )
             raise RuntimeError(msg)
 
         weight_table = get_table(file_obj, "I3MCWeightDict")
@@ -131,14 +136,14 @@ def GenieWeighter(file_obj: Any, nfiles:float | None = None) -> Weighter:  # noq
 
         surface = nfiles * genie_icetray_surface(weight_table, result_table)
 
-        momentum_vec = np.array([get_column(result_table, "pxv"),
-                                 get_column(result_table, "pyv"),
-                                 get_column(result_table, "pzv")])
-        cos_zen = -1 * get_column(result_table, "pzv") / np.sum(momentum_vec**2, axis=0)**0.5
+        momentum_vec = np.array(
+            [get_column(result_table, "pxv"), get_column(result_table, "pyv"), get_column(result_table, "pzv")]
+        )
+        cos_zen = -1 * get_column(result_table, "pzv") / np.sum(momentum_vec**2, axis=0) ** 0.5
 
         weighter = Weighter([file_obj], surface)
         weighter.add_weight_column("pdgid", get_column(result_table, "neu").astype(np.int32))
         weighter.add_weight_column("energy", get_column(result_table, "Ev"))
         weighter.add_weight_column("cos_zen", cos_zen)
-        weighter.add_weight_column("wght", get_column(result_table, "wght")*get_column(result_table, "_glbprbscale"))
+        weighter.add_weight_column("wght", get_column(result_table, "wght") * get_column(result_table, "_glbprbscale"))
     return weighter

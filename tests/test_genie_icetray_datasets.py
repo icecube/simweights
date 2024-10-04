@@ -25,6 +25,7 @@ datasets = [
 approx = pytest.approx
 datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
 
+
 @pytest.mark.parametrize("fname", datasets)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
 def test_dataset(fname):
@@ -34,15 +35,15 @@ def test_dataset(fname):
     wd = reffile["I3MCWeightDict"]
     grd = reffile["I3GENIEResultDict"]
     pdgid = grd["neu"]
-    emin, emax = 10**wd["MinEnergyLog"], 10**wd["MaxEnergyLog"]
+    emin, emax = 10 ** wd["MinEnergyLog"], 10 ** wd["MaxEnergyLog"]
 
     solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
-    injection_area_cm = 1e4 * np.pi * wd["InjectionSurfaceR"]**2
+    injection_area_cm = 1e4 * np.pi * wd["InjectionSurfaceR"] ** 2
     total_weight = wd["TotalInteractionProbabilityWeight"]
 
     type_weight = np.empty_like(wd["OneWeight"])
-    type_weight[pdgid>0] = 0.7
-    type_weight[pdgid<0] = 0.3
+    type_weight[pdgid > 0] = 0.7
+    type_weight[pdgid < 0] = 0.3
     w0 = wd["OneWeight"] / (wd["NEvents"] * type_weight)
 
     fobjs = [
@@ -64,10 +65,12 @@ def test_dataset(fname):
                 power_law = spectrum.dists[1]
                 energy_factor = 1 / power_law.pdf(w.get_weight_column("energy"))
 
-                one_weight = (w.get_weight_column("wght")[event_mask]
-                              * energy_factor[event_mask]
-                              * solid_angle[event_mask]
-                              * injection_area_cm[event_mask])
+                one_weight = (
+                    w.get_weight_column("wght")[event_mask]
+                    * energy_factor[event_mask]
+                    * solid_angle[event_mask]
+                    * injection_area_cm[event_mask]
+                )
 
                 assert one_weight == approx(wd["OneWeight"][event_mask])
 
