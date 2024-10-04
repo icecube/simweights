@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Iterable, Mapping
+from typing import Any, Iterable, List, Mapping
 
 import numpy as np
 
@@ -17,7 +17,7 @@ from ._weighter import Weighter
 
 
 def genie_icetray_surface(
-    mcweightdict: Iterable[Mapping[str, float]], geniedict: Iterable[Mapping[str, float]], nufraction: float = 0.7
+    mcweightdict: List[Mapping[str, float]], geniedict: Iterable[Mapping[str, float]], nufraction: float = 0.7
 ) -> GenerationSurface:
     """Inspect the rows of a GENIE-icetray"s I3MCWeightDict table object to generate a surface object.
 
@@ -26,12 +26,11 @@ def genie_icetray_surface(
     neutrino type, volume, and spectrum to get the correct surfaces. The type weight also isn"t stored
     in the files: this was fixed to 70/30 for oscillation-produced genie-icetray files.
     """
-    pdgid = get_column(geniedict, "neu")
-    volume = get_column(mcweightdict, "GeneratorVolume")
-    index = get_column(mcweightdict, "PowerLawIndex")
-    minenergylog = get_column(mcweightdict, "MinEnergyLog")
-    maxenergylog = get_column(mcweightdict, "MaxEnergyLog")
-    gen_schemes = np.array([pdgid, volume, index, minenergylog, maxenergylog]).T
+    gen_schemes = np.array([get_column(geniedict, "neu"),
+                            get_column(mcweightdict, "GeneratorVolume"),
+                            get_column(mcweightdict, "PowerLawIndex"),
+                            get_column(mcweightdict, "MinEnergyLog"),
+                            get_column(mcweightdict, "MaxEnergyLog")]).T
     unique_schemes = np.unique(gen_schemes, axis=0)
 
     if len(unique_schemes) == 0:
@@ -40,7 +39,7 @@ def genie_icetray_surface(
 
     surfaces = []
     for row in unique_schemes:
-        (pid, vol, idx, emin, emax) = row
+        (pid, _, _, _, _) = row
         mask = np.all(gen_schemes == row[None, :], axis=1)
 
         spatial = nugen_spatial(mcweightdict[mask])
