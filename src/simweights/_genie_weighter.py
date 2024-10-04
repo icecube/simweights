@@ -96,7 +96,7 @@ def GenieWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # no
         # Branch for newer genie-reader files
         if nfiles is not None:
             msg = (
-                f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, "filename", "<NONE>")}` "
+                f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, 'filename', '<NONE>')}` "
                 "was produced with genie-reader instead of genie-icetray. We expect to read the number of "
                 "files from the number of observed S-frames in the file, so this is unnecessary. Do not pass "
                 "in a value for nfiles for genie-reader files."
@@ -124,7 +124,7 @@ def GenieWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # no
         # Branch for older genie-icetray files
         if nfiles is None:
             msg = (
-                f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, "filename", "<NONE>")}` "
+                f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, 'filename', '<NONE>')}` "
                 "was produced with genie-reader instead of genie-icetray. We expect to read the number of "
                 "files from the number of observed S-frames in the file, so this is unnecessary. Do not pass "
                 "in a value for nfiles for genie-reader files."
