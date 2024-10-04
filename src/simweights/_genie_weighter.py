@@ -26,11 +26,15 @@ def genie_icetray_surface(
     neutrino type, volume, and spectrum to get the correct surfaces. The type weight also isn"t stored
     in the files: this was fixed to 70/30 for oscillation-produced genie-icetray files.
     """
-    gen_schemes = np.array([get_column(geniedict, "neu"),
-                            get_column(mcweightdict, "GeneratorVolume"),
-                            get_column(mcweightdict, "PowerLawIndex"),
-                            get_column(mcweightdict, "MinEnergyLog"),
-                            get_column(mcweightdict, "MaxEnergyLog")]).T
+    gen_schemes = np.array(
+        [
+            get_column(geniedict, "neu"),
+            get_column(mcweightdict, "GeneratorVolume"),
+            get_column(mcweightdict, "PowerLawIndex"),
+            get_column(mcweightdict, "MinEnergyLog"),
+            get_column(mcweightdict, "MaxEnergyLog"),
+        ]
+    ).T
     unique_schemes = np.unique(gen_schemes, axis=0)
 
     if len(unique_schemes) == 0:
