@@ -29,7 +29,7 @@ keywords = ["python", "science", "astronomy", "astrophysics", "IceCube", "neutri
 license = {file = "LICENSES/BSD-2-Clause.txt"}
 name = "simweights"
 readme = "README.rst"
-requires-python = "~=3.7"
+requires-python = "~=3.8"
 
 [project.optional-dependencies]
 dev = ["pytest", "pre-commit", "reuse", "black", "ruff", "pylint", "mypy"]
@@ -37,7 +37,6 @@ docs = ["sphinx", "sphinx-rtd-theme", "pandas"]
 examples = ['matplotlib']
 test = [
   "h5py",
-  "tables < 3.8; python_version < '3.9'",
   "tables",
   "pandas",
   "uproot",
@@ -78,7 +77,7 @@ warn_unreachable = true
 max-line-length = "128"
 
 [tool.pylint.messages_control]
-disable = "C0114,R0902,R0913"
+disable = "C0114,R0902,R0913,R0917"
 
 [tool.pytest.ini_options]
 addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights", "-W ignore"]
@@ -91,8 +90,6 @@ xfail_strict = true
 [tool.ruff]
 line-length = 128
 namespace-packages = ["examples", "contrib", "docs"]
-src = ["src"]
-target-version = "py38"
 
 [tool.ruff.lint]
 fixable = ["I"]
@@ -130,7 +127,7 @@ convention = "google"
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py3{8,9,10,11,12}
+envlist = py3{9,10,11,12,13}
 isolated_build = True
 
 [testenv]
