@@ -79,11 +79,12 @@ keys = {
         "I3CorsikaWeight",
     ],
     "nugen": ["I3MCWeightDict"],
-    "genie": ["I3GenieInfo", 
-              "I3GenieResult", 
-              "I3GENIEResultDict",
-              "I3MCWeightDict",
-              ],
+    "genie": [
+        "I3GenieInfo",
+        "I3GenieResult",
+        "I3GENIEResultDict",
+        "I3MCWeightDict",
+    ],
     "icetop": ["I3TopInjectorInfo", "MCPrimary"],
 }
 streams = {
