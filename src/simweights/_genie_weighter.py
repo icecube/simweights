@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Iterable, List, Mapping
+from typing import Any, Iterable, Mapping
 
 import numpy as np
 
@@ -17,7 +17,7 @@ from ._weighter import Weighter
 
 
 def genie_icetray_surface(
-    mcweightdict: List[Mapping[str, float]], geniedict: Iterable[Mapping[str, float]], nufraction: float = 0.7
+    mcweightdict: list[Mapping[str, float]], geniedict: Iterable[Mapping[str, float]], nufraction: float = 0.7
 ) -> GenerationSurface:
     """Inspect the rows of a GENIE-icetray"s I3MCWeightDict table object to generate a surface object.
 
