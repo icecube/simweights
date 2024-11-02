@@ -62,7 +62,12 @@ filelist = {
     "genie": [
         "/data/sim/IceCubeUpgrade/genie/step3/141828/upgrade_genie_step3_141828_000000.i3.zst",
         "/data/sim/IceCube/2023/generated/GENIE/22590/0000000-0000999/GENIE_NuMu_IceCubeUpgrade_v58.22590.000000.i3.zst",
-        "/data/user/mlarson/icetray/src/genie-reader/resources/scripts/genie_numu_volume_scaling.i3.zst",
+        "/data/ana/Software/simweights/test-data/genie_numu_volume_scaling.i3.zst",
+        "/data/ana/Software/simweights/test-data/genie-icetray.140000A_000000.i3.zst",
+        "/data/ana/Software/simweights/test-data/genie-icetray.140000B_000000.i3.zst",
+        "/data/ana/Software/simweights/test-data/genie-icetray.140000C_000000.i3.zst",
+        "/data/ana/Software/simweights/test-data/genie-icetray.140000D_000000.i3.zst",
+        "/data/ana/Software/simweights/test-data/level2_genie-icetray.140000_000000.i3.zst",
     ],
 }
 keys = {
@@ -74,7 +79,11 @@ keys = {
         "I3CorsikaWeight",
     ],
     "nugen": ["I3MCWeightDict"],
-    "genie": ["I3GenieInfo", "I3GenieResult", "I3MCWeightDict"],
+    "genie": ["I3GenieInfo", 
+              "I3GenieResult", 
+              "I3GENIEResultDict",
+              "I3MCWeightDict",
+              ],
     "icetop": ["I3TopInjectorInfo", "MCPrimary"],
 }
 streams = {
@@ -133,7 +142,7 @@ for simtype, filename in ((i, x) for i in filelist for x in filelist[i]):
     tray.Execute()
     del tray
 
-tarfilename = "/data/user/kmeagher/simweights_testdata_test.tar.gz"
+tarfilename = "/data/ana/Software/simweights/test-data/simweights_testdata_test.tar.gz"
 print(f"Writing tarfile {tarfilename}")
 
 with tarfile.open(tarfilename, "w:gz") as tar:
