@@ -83,6 +83,11 @@ class TestGenieIcetrayWeighter(unittest.TestCase):
             x = {"I3MCWeightDict": {key: [] for key in mcwd_keys}, "I3GENIEResultDict": {key: [] for key in grd_keys}}
             GenieWeighter(x, nfiles=1)
 
+        with self.assertRaises(RuntimeError):
+            x = {"I3MCWeightDict": {key: [1] for key in mcwd_keys}, "I3GENIEResultDict": {key: [1] for key in grd_keys}}
+            GenieWeighter(x)
+
+
 
 if __name__ == "__main__":
     unittest.main()
