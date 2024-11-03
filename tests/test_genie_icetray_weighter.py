@@ -88,6 +88,5 @@ class TestGenieIcetrayWeighter(unittest.TestCase):
             GenieWeighter(x)
 
 
-
 if __name__ == "__main__":
     unittest.main()
