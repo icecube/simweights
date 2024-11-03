@@ -95,7 +95,13 @@ def GenieWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # no
     Reads ``I3GenieInfo`` from S-Frames and ``I3GenieResult`` from Q-Frames for genie-reader files
     and ``I3MCWeightDict`` and "I3GENIEResultDict" from Q-Frames for older legacy genie-icetray files.
     """
-    if has_table(file_obj, "I3GenieInfo"):
+    if not any(has_table(file_obj, colname) for colname in ["I3GenieInfo", "I3GenieResult", "I3GENIEResultDict"]):
+        msg = (
+            f"The file `{getattr(file_obj, 'filename', '<NONE>')}` does not contain at least one of I3GenieInfo, "
+            "I3GenieResult, or I3GENIEResultDict, so this is unlikely to be a GENIE file."
+        )
+        raise TypeError(msg)
+    if has_table(file_obj, "I3GenieInfo") and has_table(file_obj, "I3GenieResult"):
         # Branch for newer genie-reader files
         if nfiles is not None:
             msg = (
@@ -123,14 +129,13 @@ def GenieWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # no
             volscale = np.ones_like(get_column(result_table, "wght"))
         weighter.add_weight_column("volscale", volscale)
 
-    else:
+    elif has_table(file_obj, "I3MCWeightDict") and has_table(file_obj, "I3GENIEResultDict"):
         # Branch for older genie-icetray files
         if nfiles is None:
             msg = (
                 f"GenieWeighter received an nfiles={nfiles}, but `{getattr(file_obj, 'filename', '<NONE>')}` "
-                "was produced with genie-reader instead of genie-icetray. We expect to read the number of "
-                "files from the number of observed S-frames in the file, so this is unnecessary. Do not pass "
-                "in a value for nfiles for genie-reader files."
+                "was produced with genie-icetray instead of genie-reader. We require the number of files to be "
+                "passed in for genie-icetray files since we can't simply count S-frames."
             )
             raise RuntimeError(msg)
 
@@ -149,4 +154,13 @@ def GenieWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # no
         weighter.add_weight_column("energy", get_column(result_table, "Ev"))
         weighter.add_weight_column("cos_zen", cos_zen)
         weighter.add_weight_column("wght", get_column(result_table, "wght") * get_column(result_table, "_glbprbscale"))
+
+    else:
+        msg = (
+            "Missing at least one necessary object for GENIE event weighting. If your file is produced by "
+            "genie-icetray, be sure to include both the I3MCWeightDict and I3GENIEResultDict in your input "
+            "file. If the file is produced by genie-reader, include both I3GenieInfo and I3GenieResult."
+        )
+        raise KeyError(msg)
+
     return weighter

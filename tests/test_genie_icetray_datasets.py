@@ -16,11 +16,11 @@ import tables
 from simweights import GenieWeighter
 
 datasets = [
-    "genie-icetray.140000A_000000.hdf",
-    "genie-icetray.140000B_000000.hdf",
-    "genie-icetray.140000C_000000.hdf",
-    "genie-icetray.140000D_000000.hdf",
-    "level2_genie-icetray.140000_000000.hdf",
+    "genie-icetray.140000A_000000.hdf5",
+    "genie-icetray.140000B_000000.hdf5",
+    "genie-icetray.140000C_000000.hdf5",
+    "genie-icetray.140000D_000000.hdf5",
+    "level2_genie-icetray.140000_000000.hdf5",
 ]
 approx = pytest.approx
 datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
