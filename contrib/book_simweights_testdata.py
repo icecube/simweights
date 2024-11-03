@@ -143,7 +143,7 @@ for simtype, filename in ((i, x) for i in filelist for x in filelist[i]):
     tray.Execute()
     del tray
 
-tarfilename = "/data/ana/Software/simweights/test-data/simweights_testdata_test.tar.gz"
+tarfilename = "/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz"
 print(f"Writing tarfile {tarfilename}")
 
 with tarfile.open(tarfilename, "w:gz") as tar:
