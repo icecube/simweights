@@ -77,11 +77,14 @@ class TestGenieWeighter(unittest.TestCase):
                         Ewidth = np.ediff1d(x)
                         np.testing.assert_allclose(y, flux * event_weight * Ewidth * c1.etendue / nfiles, 5e-3)
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(RuntimeError):
             simweights.GenieWeighter(d, nfiles=10)
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(TypeError):
             simweights.GenieWeighter({"I3CorsikaWeight": weight})
+
+        with self.assertRaises(KeyError):
+            simweights.GenieWeighter({"I3GenieResult": weight})
 
 
 if __name__ == "__main__":
