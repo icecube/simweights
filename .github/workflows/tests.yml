@@ -34,9 +34,6 @@ jobs:
         run: |
           python3 -m pip install flit
           python3 -m flit install --symlink --deps=production --extras=test
-          if [ "$RUNNER_OS" == "Linux" ]; then
-              python3 -m pip install nuflux
-          fi
       - name: Download Test Data
         run: curl -u icecube:${{secrets.ICECUBE_PASSWORD}} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz | tar xz
       - name: Run Tests
