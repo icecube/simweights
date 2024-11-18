@@ -38,7 +38,10 @@ jobs:
               python3 -m pip install nuflux
           fi
       - name: Download Test Data
-        run: curl -u icecube:${{secrets.ICECUBE_PASSWORD}} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz | tar xz
+        run: |
+          curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz | tar xz
+          echo curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz | tar xz
+          echo icecube:${{ secrets.ICECUBE_PASSWORD }} |shasum
       - name: Run Tests
         env:
           SIMWEIGHTS_TESTDATA: .
