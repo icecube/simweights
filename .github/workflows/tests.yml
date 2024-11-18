@@ -39,9 +39,8 @@ jobs:
           fi
       - name: Download Test Data
         run: |
-          echo icecube:${{ secrets.ICECUBE_PASSWORD }} |shasum
-          echo curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz | tar xz
-          curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz | tar xz
+          curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz -O
+          tar xzvf simweights_testdata.tar.gz
       - name: Run Tests
         env:
           SIMWEIGHTS_TESTDATA: .
