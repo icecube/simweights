@@ -17,11 +17,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         os: [ubuntu-24.04]
         include:
-          - python-version: "3.12"
-            os: macos-14
+          - python-version: "3.13"
+            os: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -32,11 +32,11 @@ jobs:
           cache-dependency-path: pyproject.toml
       - name: Install SimWeights
         run: |
+          if [ "${{matrix.python-version}}" == "3.9" ]; then
+            python3 -m pip install "numpy<2"
+          fi
           python3 -m pip install flit
           python3 -m flit install --symlink --deps=production --extras=test
-          if [ "$RUNNER_OS" == "Linux" ]; then
-              python3 -m pip install nuflux
-          fi
       - name: Download Test Data
         run: |
           curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz -O
