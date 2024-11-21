@@ -74,5 +74,17 @@ def test_GlobalSplineFit_similar(gsf):
         assert f == pytest.approx(f_gsf, rel=0.4)
 
 
+@pytest.mark.parametrize("gsf", gsfmodels)
+def test_GlobalSplineFIt_negative(gsf):
+    """
+    Since GSF was using a cubic spline, it could oscillate a bit between the interpolated data point.
+    This was noticed due to a very minor undershoot below zero for protons at high energies.
+    So here we explicitly test that we only return non-negative values.
+    """
+    test_e = np.geomspace(9.95e10, 10e10, 9)
+    flux = gsf(*np.meshgrid(test_e, gsf.pdgids))
+    assert np.all(flux >= 0)
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__, *sys.argv[1:]]))
