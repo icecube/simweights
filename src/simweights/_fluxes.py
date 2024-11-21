@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Callable, Mapping, Sequence
 
 from numpy import asarray, bool_, broadcast_arrays, exp, float64, genfromtxt, int32, piecewise, sqrt
 from numpy import sum as nsum
-from scipy.interpolate import CubicSpline  # pylint: disable=import-error
+from scipy.interpolate import PchipInterpolator  # pylint: disable=import-error
 
 from ._pdgcode import PDGCode
 
@@ -345,7 +345,7 @@ class GlobalSplineFitBase(CosmicRayFlux):
         self._funcs = []
         for z_low, z_high in self.groups:
             self._funcs.append(
-                CubicSpline(energy, nsum(elements[z_low - 1 : z_high], axis=0), extrapolate=False, axis=0),
+                PchipInterpolator(energy, nsum(elements[z_low - 1 : z_high], axis=0), extrapolate=False, axis=0),
             )
 
 
