@@ -139,6 +139,7 @@ class Weighter:
         self: Weighter,
         energy_bins: ArrayLike,
         cos_zenith_bins: ArrayLike,
+        flux: Any = 1e-4, # default is 1 GeV^-1 m^-2 sr^-1 flux
         mask: ArrayLike | None = None,
     ) -> NDArray[np.float64]:
         r"""Calculate The effective area for the given energy and zenith bins.
@@ -182,7 +183,7 @@ class Weighter:
         energy = self.get_weight_column("energy")
         cos_zen = self.get_weight_column("cos_zen")
 
-        weights = self.get_weights(1e-4)
+        weights = self.get_weights(flux)
         maska = np.full(weights.size, 1, dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
 
         assert maska.shape == weights.shape
@@ -198,8 +199,18 @@ class Weighter:
 
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
-        e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
-        return np.asarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies), dtype=np.float64)
+        if np.isscalar(flux):
+            e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
+            return np.asarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies), dtype=np.float64)
+        elif callable(flux):
+            flux_pdgids = [pdgid.value for pdgid in flux.pdgids]
+            flux_func = lambda E: sum([flux._funcs[flux_pdgids.index(np.unique(self.get_weight_column("pdgid")[maska])[i_species])](E) for i_species in range(nspecies)])
+            from scipy.integrate import quad
+            flux_integrals = np.asarray([quad(flux_func, energy_bins[bin_index], energy_bins[bin_index+1])[0] for bin_index in range(len(energy_bins)-1)])
+            e_width, z_width = np.meshgrid(flux_integrals, np.ediff1d(czbin))
+            return np.asarray(1e-4 * hist_val / (e_width * 2 * np.pi * z_width), dtype=np.float64)
+        else:
+            raise ValueError("only scalar flux or cosmic ray flux models are supported right now")
 
     def __add__(self: Weighter, other: Weighter | int) -> Weighter:
         if other == 0:
