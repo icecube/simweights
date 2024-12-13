@@ -158,13 +158,16 @@ class Weighter:
 
 
         Args:
-            energy_bins : array_like
+            energy_bins: array_like
                 A length N+1 array of energy bin edges
-            cos_zenith_bins : array_like
+            cos_zenith_bins: array_like
                 A length M+1 array of cos(zenith) bin edges
             mask: array_like
                 boolean array where 1 indicates to use the event in the calculation.
                 Must have the same length as the simulation sample.
+            flux: Any
+                A model describing the flux of the primaries to weight against. For
+                possible types, see get_weights()
 
         Returns:
             array_like
@@ -204,24 +207,15 @@ class Weighter:
             return np.asarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies), dtype=np.float64)
         elif callable(flux):
             flux_pdgids = [pdgid.value for pdgid in flux.pdgids]
-            flux_func = lambda E: sum(
-                [
-                    flux._funcs[flux_pdgids.index(np.unique(self.get_weight_column("pdgid")[maska])[i_species])](E)
-                    for i_species in range(nspecies)
-                ]
-            )
+            def flux_func(energy):
+                return sum(flux._funcs[flux_pdgids.index(np.unique(self.get_weight_column("pdgid")[maska])[i_species])](energy) for i_species in range(nspecies))
             from scipy.integrate import quad
-
-            flux_integrals = np.asarray(
-                [
-                    quad(flux_func, energy_bins[bin_index], energy_bins[bin_index + 1])[0]
-                    for bin_index in range(len(energy_bins) - 1)
-                ]
-            )
+            flux_integrals = np.asarray([quad(flux_func, energy_bins[bin_index], energy_bins[bin_index+1])[0] for bin_index in range(len(energy_bins)-1)])
             e_width, z_width = np.meshgrid(flux_integrals, np.ediff1d(czbin))
             return np.asarray(1e-4 * hist_val / (e_width * 2 * np.pi * z_width), dtype=np.float64)
         else:
-            raise ValueError("only scalar flux or cosmic ray flux models are supported right now")
+            mesg = f"flux of type {type(flux)} is supplied but only scalar flux or cosmic ray flux models are supported so far"
+            raise TypeError(mesg)
 
     def __add__(self: Weighter, other: Weighter | int) -> Weighter:
         if other == 0:
