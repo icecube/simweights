@@ -207,10 +207,21 @@ class Weighter:
             effective_area_binned = np.asarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies), dtype=np.float64)
         elif callable(flux):
             flux_pdgids = [pdgid.value for pdgid in flux.pdgids]
+
             def flux_func(energy: ArrayLike) -> NDArray[np.float64]:
-                return sum(flux._funcs[flux_pdgids.index(np.unique(self.get_weight_column("pdgid")[maska])[i_species])](energy) for i_species in range(nspecies))
+                return sum(
+                    flux._funcs[flux_pdgids.index(np.unique(self.get_weight_column("pdgid")[maska])[i_species])](energy)
+                    for i_species in range(nspecies)
+                )
+
             from scipy.integrate import quad
-            flux_integrals = np.asarray([quad(flux_func, energy_bins[bin_index], energy_bins[bin_index+1])[0] for bin_index in range(len(energy_bins)-1)])
+
+            flux_integrals = np.asarray(
+                [
+                    quad(flux_func, energy_bins[bin_index], energy_bins[bin_index + 1])[0]
+                    for bin_index in range(len(energy_bins) - 1)
+                ]
+            )
             e_width, z_width = np.meshgrid(flux_integrals, np.ediff1d(czbin))
             effective_area_binned = np.asarray(1e-4 * hist_val / (e_width * 2 * np.pi * z_width), dtype=np.float64)
         else:
