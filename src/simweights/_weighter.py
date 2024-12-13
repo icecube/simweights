@@ -139,8 +139,8 @@ class Weighter:
         self: Weighter,
         energy_bins: ArrayLike,
         cos_zenith_bins: ArrayLike,
-        flux: Any = 1e-4,  # default is 1 GeV^-1 m^-2 sr^-1 flux
         mask: ArrayLike | None = None,
+        flux: Any = 1e-4,  # default is 1 GeV^-1 m^-2 sr^-1 flux
     ) -> NDArray[np.float64]:
         r"""Calculate The effective area for the given energy and zenith bins.
 
