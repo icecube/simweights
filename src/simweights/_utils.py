@@ -99,8 +99,8 @@ def constcol(table: Any, colname: str, mask: ArrayLike | None = None) -> float:
     """
     col = get_column(table, colname)
     if mask is not None:
-        col = col[np.asarray(mask, dtype=bool)]
-    val = col[0]
+        col = col[mask]
+    val = col.flat[0]
     assert np.ndim(val) == 0
     assert (val == col).all()
     return float(val)
