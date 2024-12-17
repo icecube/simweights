@@ -9,6 +9,7 @@ import warnings
 from typing import TYPE_CHECKING, Any, Callable, Iterable
 
 import numpy as np
+from scipy.integrate import quad  # pylint: disable=import-error
 
 from ._utils import get_column, get_table
 
@@ -140,7 +141,7 @@ class Weighter:
         energy_bins: ArrayLike,
         cos_zenith_bins: ArrayLike,
         mask: ArrayLike | None = None,
-        flux: Any = 1e-4,  # default is 1 GeV^-1 m^-2 sr^-1 flux
+        flux: Any = 1,  # default is 1 GeV^-1 cm^-2 sr^-1 flux
     ) -> NDArray[np.float64]:
         r"""Calculate The effective area for the given energy and zenith bins.
 
@@ -175,6 +176,7 @@ class Weighter:
                 is the number of cos(zenith) bins.
 
         """
+        cm2_to_m2 = 1e-4
         energy_bins = np.array(energy_bins)
         cos_zenith_bins = np.array(cos_zenith_bins)
 
@@ -198,36 +200,24 @@ class Weighter:
             bins=[cos_zenith_bins, energy_bins],
         )
 
-        nspecies = len(np.unique(self.get_weight_column("pdgid")[maska]))
-
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
+        pdgids = np.unique(self.get_weight_column("pdgid")[maska])
+
         if np.isscalar(flux):
-            e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
-            effective_area_binned = np.asarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies), dtype=np.float64)
+            flux_integrals = len(pdgids) * np.ediff1d(enbin)
         elif callable(flux):
-            flux_pdgids = [pdgid.value for pdgid in flux.pdgids]
-
-            def flux_func(energy: ArrayLike) -> NDArray[np.float64]:
-                return sum(
-                    flux._funcs[flux_pdgids.index(np.unique(self.get_weight_column("pdgid")[maska])[i_species])](energy)
-                    for i_species in range(nspecies)
-                )
-
-            from scipy.integrate import quad
-
             flux_integrals = np.asarray(
                 [
-                    quad(flux_func, energy_bins[bin_index], energy_bins[bin_index + 1])[0]
+                    sum(quad(flux, energy_bins[bin_index], energy_bins[bin_index + 1], args=(p,))[0] for p in pdgids)
                     for bin_index in range(len(energy_bins) - 1)
                 ]
             )
-            e_width, z_width = np.meshgrid(flux_integrals, np.ediff1d(czbin))
-            effective_area_binned = np.asarray(1e-4 * hist_val / (e_width * 2 * np.pi * z_width), dtype=np.float64)
         else:
             mesg = f"flux of type {type(flux)} is supplied but only scalar flux or cosmic ray flux models are supported so far"
             raise TypeError(mesg)
-        return effective_area_binned
+        e_int, z_int = np.meshgrid(flux_integrals, np.ediff1d(czbin))
+        return np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64)
 
     def __add__(self: Weighter, other: Weighter | int) -> Weighter:
         if other == 0:
