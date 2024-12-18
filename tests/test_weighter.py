@@ -223,7 +223,6 @@ class TestWeighter(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             self.weighter1.effective_area([5e5, 5e6], [0, 1], flux=list(range(self.N1)))
-        
 
     def test_weighter_addition(self):
         weighter_sum = self.weighter1 + self.weighter1
