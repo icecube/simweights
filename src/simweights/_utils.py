@@ -27,9 +27,9 @@ class Column:
     def __init__(self: Column, colname: str | None = None) -> None:
         self.columns = (colname,)
 
-    def pdf(self: Column, value: ArrayLike) -> NDArray[np.float64]:
+    def pdf(self: Column, value: ArrayLike) -> NDArray[np.floating]:
         r"""Probability density function."""
-        return 1 / np.asarray(value, dtype=np.float64)
+        return 1.0 / np.asarray(value, dtype=np.float64)
 
     def __eq__(self: Column, other: object) -> bool:
         return isinstance(other, Column) and self.columns == other.columns
@@ -91,7 +91,7 @@ def get_column(table: Any, name: str) -> NDArray[np.float64]:
     return np.asarray(column, dtype=np.float64)
 
 
-def constcol(table: Any, colname: str, mask: NDArray[np.bool_] | None = None) -> float:
+def constcol(table: Any, colname: str, mask: ArrayLike | None = None) -> float:
     """Helper function which makes sure that all of the entries in a column are exactly the same.
 
     This is necessary because CORSIKA and NuGen store generation surface parameters in every frame and we
@@ -99,7 +99,7 @@ def constcol(table: Any, colname: str, mask: NDArray[np.bool_] | None = None) ->
     """
     col = get_column(table, colname)
     if mask is not None:
-        col = col[mask]
+        col = col[np.asarray(mask, dtype=bool)]
     val = col[0]
     assert np.ndim(val) == 0
     assert (val == col).all()
