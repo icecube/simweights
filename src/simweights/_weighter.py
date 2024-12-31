@@ -9,6 +9,7 @@ import warnings
 from typing import TYPE_CHECKING, Any, Callable, Iterable
 
 import numpy as np
+from scipy.integrate import quad  # pylint: disable=import-error
 
 from ._utils import get_column, get_table
 
@@ -140,6 +141,7 @@ class Weighter:
         energy_bins: ArrayLike,
         cos_zenith_bins: ArrayLike,
         mask: ArrayLike | None = None,
+        flux: Any = 1,  # default is 1 GeV^-1 cm^-2 sr^-1 flux
     ) -> NDArray[np.float64]:
         r"""Calculate The effective area for the given energy and zenith bins.
 
@@ -157,13 +159,16 @@ class Weighter:
 
 
         Args:
-            energy_bins : array_like
+            energy_bins: array_like
                 A length N+1 array of energy bin edges
-            cos_zenith_bins : array_like
+            cos_zenith_bins: array_like
                 A length M+1 array of cos(zenith) bin edges
             mask: array_like
                 boolean array where 1 indicates to use the event in the calculation.
                 Must have the same length as the simulation sample.
+            flux: Any
+                A model describing the flux of the primaries to weight against. For
+                possible types, see get_weights()
 
         Returns:
             array_like
@@ -171,6 +176,7 @@ class Weighter:
                 is the number of cos(zenith) bins.
 
         """
+        cm2_to_m2 = 1e-4
         energy_bins = np.array(energy_bins)
         cos_zenith_bins = np.array(cos_zenith_bins)
 
@@ -182,7 +188,7 @@ class Weighter:
         energy = self.get_weight_column("energy")
         cos_zen = self.get_weight_column("cos_zen")
 
-        weights = self.get_weights(1e-4)
+        weights = self.get_weights(flux)
         maska = np.full(weights.size, 1, dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
 
         assert maska.shape == weights.shape
@@ -194,12 +200,24 @@ class Weighter:
             bins=[cos_zenith_bins, energy_bins],
         )
 
-        nspecies = len(np.unique(self.get_weight_column("pdgid")[maska]))
-
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
-        e_width, z_width = np.meshgrid(np.ediff1d(enbin), np.ediff1d(czbin))
-        return np.asarray(hist_val / (e_width * 2 * np.pi * z_width * nspecies), dtype=np.float64)
+        pdgids = np.unique(self.get_weight_column("pdgid")[maska])
+
+        if np.isscalar(flux):
+            flux_integrals = len(pdgids) * np.ediff1d(enbin)
+        elif callable(flux):
+            flux_integrals = np.asarray(
+                [
+                    sum(quad(flux, energy_bins[bin_index], energy_bins[bin_index + 1], args=(p,))[0] for p in pdgids)
+                    for bin_index in range(len(energy_bins) - 1)
+                ]
+            )
+        else:
+            mesg = f"flux of type {type(flux)} is supplied but only scalar flux or cosmic ray flux models are supported so far"
+            raise TypeError(mesg)
+        e_int, z_int = np.meshgrid(flux_integrals, np.ediff1d(czbin))
+        return np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64)
 
     def __add__(self: Weighter, other: Weighter | int) -> Weighter:
         if other == 0:

@@ -88,7 +88,7 @@ class UniformSolidAngleCylinder(CylinderBase):
 
     """
 
-    def _pdf(self: UniformSolidAngleCylinder, cos_zen: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _pdf(self: UniformSolidAngleCylinder, cos_zen: NDArray[np.float64]) -> NDArray[np.floating]:
         return 1 / (2 * np.pi * (self.cos_zen_max - self.cos_zen_min) * self.projected_area(cos_zen))
 
     def pdf(self: UniformSolidAngleCylinder, cos_zen: ArrayLike) -> NDArray[np.float64]:

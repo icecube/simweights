@@ -207,6 +207,22 @@ class TestWeighter(unittest.TestCase):
             self.weighter1.effective_area(np.linspace(5e5, 5e6, self.N1 + 1), [0, 1]),
             [np.full(self.N1, self.c1.etendue / 2e4 / np.pi)],
         )
+        self.assertAlmostEqual(
+            self.weighter1.effective_area([5e5, 5e6], [0, 1], flux=TIG1996())[0][0],
+            149998.97822505102,
+            6,
+        )
+        self.assertAlmostEqual(
+            self.weighter1.effective_area([5e5, 5e6], [0, 1], np.ones(self.N1, dtype=bool), flux=TIG1996())[0][0],
+            149998.97822505102,
+            6,
+        )
+
+        with self.assertRaises(ValueError):
+            self.weighter1.effective_area([5e5, 5e6], [0, 1], flux="flux")
+
+        with self.assertRaises(TypeError):
+            self.weighter1.effective_area([5e5, 5e6], [0, 1], flux=list(range(self.N1)))
 
     def test_weighter_addition(self):
         weighter_sum = self.weighter1 + self.weighter1
