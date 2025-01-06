@@ -5,6 +5,16 @@
 Changelog
 =========
 
+`v0.1.3`_ - 2025-01-07
+----------------------
+
+* More versatile generation surfaces by @kjmeagher in https://github.com/icecube/simweights/pull/25
+* Cr flux 4comp fix by @athakuri22 in https://github.com/icecube/simweights/pull/28
+* Update the genie weighter by @mjlarson in https://github.com/icecube/simweights/pull/39
+* Add support for genie-icetray.  by @mjlarson in https://github.com/icecube/simweights/pull/41
+* GSF CubicInterpolation oscillation fix. by @The-Ludwig in https://github.com/icecube/simweights/pull/46
+* Adding flux weighting option to the effective_area function of Weighter objects by @jsaffer in https://github.com/icecube/simweights/pull/47
+
 `v0.1.2`_ - 2023-11-02
 ----------------------
 
@@ -26,6 +36,7 @@ Changelog
 
 Initial Release
 
+.. _v0.1.3: https://github.com/icecube/simweights/releases/tag/v0.1.3
 .. _v0.1.2: https://github.com/icecube/simweights/releases/tag/v0.1.2
 .. _v0.1.1: https://github.com/icecube/simweights/releases/tag/v0.1.1
 .. _v0.1.0: https://github.com/icecube/simweights/releases/tag/v0.1.0
