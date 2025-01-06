@@ -17,7 +17,7 @@ from ._weighter import Weighter
 def sframe_icetop_surface(table: Any) -> GenerationSurface:
     """Inspect the rows of a I3TopInjectorInfo S-Frame table object to generate a surface object."""
     surfaces = []
-    
+
     n_events = get_column(table, "n_events")
     power_law_index = get_column(table, "power_law_index")
     min_energy = get_column(table, "min_energy")
