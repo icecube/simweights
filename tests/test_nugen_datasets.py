@@ -38,10 +38,10 @@ datasets = [
     "Level2_IC86.2011_nugen_NuMu.010634.000000",
 ]
 loaders = [
-    lambda f: h5py.File(f"{f}.hdf5", "r"),
-    lambda f: uproot.open(f"{f}.root"),
-    lambda f: tables.open_file(f"{f}.hdf5", "r"),
-    lambda f: pd.HDFStore(f"{f}.hdf5", "r"),
+    pytest.param(lambda f: h5py.File(f"{f}.hdf5", "r"), id="h5py"),
+    pytest.param(lambda f: uproot.open(f"{f}.root"), id="uproot"),
+    pytest.param(lambda f: tables.open_file(f"{f}.hdf5", "r"), id="pytables"),
+    pytest.param(lambda f: pd.HDFStore(f"{f}.hdf5", "r"), id="pandas"),
 ]
 
 approx = pytest.approx
@@ -115,6 +115,8 @@ def test_dataset_i3file(fname):
     f = dataio.I3File(str(Path(datadir) / (fname + ".i3.zst")))
     while f.more():
         frame = f.pop_frame()
+        if frame.Stop != frame.Physics:
+            continue
         w = NuGenWeighter(frame, nfiles=1)
         event_weight = w.get_weight_column("event_weight")
         assert event_weight == approx(d["total_weight"][i])

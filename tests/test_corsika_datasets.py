@@ -24,16 +24,26 @@ if datadir:
     datadir = Path(datadir)
 
 datasets = [
-    (False, "Level2_IC86.2015_corsika.012602.000000", 102.01712611701736),
-    (False, "Level2_IC86.2015_corsika.020014.000000", 23.015500214424705),
-    (False, "Level2_IC86.2015_corsika.020021.000000", 69.75465614509928),
-    (False, "Level2_IC86.2016_corsika.020208.000001", 22.622983704306385),
-    (False, "Level2_IC86.2016_corsika.020243.000001", 4.590586137762489),
-    (False, "Level2_IC86.2016_corsika.020263.000000", 10.183937153798436),
-    (False, "Level2_IC86.2016_corsika.020777.000000", 362.94284441826704),
-    (False, "Level2_IC86.2016_corsika.020778.000000", 6.2654796956603),
-    (False, "Level2_IC86.2016_corsika.020780.000000", 14.215947086098588),
-    (True, "Level2_IC86.2016_corsika.021889.000000", 122.83809329321922),
+    pytest.param(False, "Level2_IC86.2015_corsika.012602.000000", 101.71983520393832, id="12602"),
+    pytest.param(False, "Level2_IC86.2015_corsika.020014.000000", 22.857025444108743, id="20014"),
+    pytest.param(False, "Level2_IC86.2015_corsika.020021.000000", 68.93732262681625, id="20021"),
+    pytest.param(False, "Level2_IC86.2016_corsika.020208.000001", 12.397742530207822, id="20208"),
+    pytest.param(False, "Level2_IC86.2016_corsika.020243.000001", 3.302275062730073, id="20243"),
+    pytest.param(False, "Level2_IC86.2016_corsika.020263.000000", 5.3137132171197905, id="20263"),
+    pytest.param(False, "Level2_IC86.2016_corsika.020777.000000", 359.20422121174204, id="20777"),
+    pytest.param(False, "Level2_IC86.2016_corsika.020778.000000", 6.25969855736358, id="20778"),
+    pytest.param(False, "Level2_IC86.2016_corsika.020780.000000", 13.864780296171585, id="20780"),
+    pytest.param(True, "Level2_IC86.2016_corsika.021889.000000", 122.56278334422919, id="21889"),
+]
+
+loaders = [
+    pytest.param(lambda f: h5py.File(str(f) + ".hdf5", "r"), id="h5py"),
+    pytest.param(lambda f: uproot.open(str(f) + ".root"), id="uproot"),
+    pytest.param(lambda f: tables.open_file(str(f) + ".hdf5", "r"), id="pytables"),
+    pytest.param(
+        lambda f: pd.HDFStore(str(f) + ".hdf5", "r"),
+        id="pandas",
+    ),
 ]
 
 
@@ -88,8 +98,9 @@ def triggered_weights(f):
 
 
 @pytest.mark.parametrize(("triggered", "fname", "rate"), datasets)
+@pytest.mark.parametrize("loader", loaders)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
-def test_dataset(triggered, fname, rate):
+def test_dataset(triggered, fname, rate, loader):
     fname = datadir / fname
 
     if triggered:
@@ -102,21 +113,12 @@ def test_dataset(triggered, fname, rate):
     reffile = h5py.File(str(fname) + ".hdf5", "r")
     w0 = refweight(reffile)
 
-    inputfiles = [
-        ("h5py", reffile),
-        ("uproot", uproot.open(str(fname) + ".root")),
-        ("tables", tables.open_file(str(fname) + ".hdf5", "r")),
-        ("pandas", pd.HDFStore(str(fname) + ".hdf5", "r")),
-    ]
-
-    for _, infile in inputfiles:
-        wobj = CorsikaWeighter(infile, nfiles)
-        w = wobj.get_weights(flux)
-        assert w.sum() == pytest.approx(rate)
-        assert w0 == pytest.approx(w, 1e-6)
-
-    for _, infile in inputfiles:
-        infile.close()
+    infile = loader(fname)
+    wobj = CorsikaWeighter(infile, nfiles)
+    w = wobj.get_weights(flux)
+    assert w.sum() == pytest.approx(rate)
+    assert w0 == pytest.approx(w, 1e-6)
+    infile.close()
 
 
 if __name__ == "__main__":
