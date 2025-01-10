@@ -76,9 +76,7 @@ jobs:
       - name: Run Unit Tests
         env:
           SIMWEIGHTS_TESTDATA: .
-        run: |
-          echo i3src=$I3_SRC i3build$I3_BUILD
-          python -m pytest --junit-xml=test-results-icetray.junit.xml
+        run: /opt/icetray/bin/icetray-shell python -m pytest --junit-xml=test-results-icetray.junit.xml
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()

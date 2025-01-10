@@ -74,6 +74,8 @@ def has_column(table: Any, name: str) -> bool:
     """Helper function for determining if a table has a column, works with h5py, pytables, and pandas."""
     if hasattr(table, "cols"):
         return hasattr(table.cols, name)
+    if hasattr(table, name):
+        return True
     try:
         table[name]  # pylint: disable=pointless-statement
         return True  # noqa: TRY300
@@ -81,10 +83,12 @@ def has_column(table: Any, name: str) -> bool:
         return False
 
 
-def get_column(table: Any, name: str) -> NDArray[np.float64]:
+def get_column(table: Any, name: str) -> Any:
     """Helper function getting a column from a table, works with h5py, pytables, and pandas."""
     if hasattr(table, "cols"):
         return np.asarray(getattr(table.cols, name)[:], dtype=np.float64)
+    if hasattr(table, name):
+        return np.atleast_1d(getattr(table, name))
     column = table[name]
     if hasattr(column, "array") and callable(column.array):
         return np.asarray(column.array(library="np"), dtype=np.float64)
