@@ -68,7 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install SimWeights
-        run: python3 -m pip install .[test]
+        run: python3 -m pip install 'pytest>7' .[test]
       - name: Download Test Data
         run: |
           curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz -O
