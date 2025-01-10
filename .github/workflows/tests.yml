@@ -32,8 +32,8 @@ jobs:
           cache-dependency-path: pyproject.toml
       - name: Install SimWeights
         run: |
-          if [ "${{matrix.python-version}}" == "3.9" ]; then
-            python3 -m pip install "numpy<2"
+          if [ "${{matrix.python-version}}" != "3.13" ]; then
+            python3 -m pip install nuflux
           fi
           python3 -m pip install flit
           python3 -m flit install --symlink --deps=production --extras=test
