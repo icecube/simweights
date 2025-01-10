@@ -91,7 +91,7 @@ def get_column(table: Any, name: str) -> NDArray[np.float64]:
     return np.asarray(column, dtype=np.float64)
 
 
-def constcol(table: Any, colname: str, mask: ArrayLike | None = None) -> float:
+def constcol(table: Any, colname: str, mask: Any = None) -> float:
     """Helper function which makes sure that all of the entries in a column are exactly the same.
 
     This is necessary because CORSIKA and NuGen store generation surface parameters in every frame and we

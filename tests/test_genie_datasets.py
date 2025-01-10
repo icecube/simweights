@@ -19,7 +19,7 @@ import uproot
 from simweights import GenieWeighter
 
 with contextlib.suppress(ImportError):
-    from icecube import dataio, simclasses
+    from icecube import dataio, simclasses  # noqa: F401
 
 approx = pytest.approx
 datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)

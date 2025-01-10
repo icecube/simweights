@@ -108,7 +108,8 @@ select = ["ALL"]
 "examples/*" = [
   "D",  # pydocstyle
   "F401",  # unused-import
-  "T201"  # flake8-print
+  "T201",  # flake8-print
+  "PLC0206"  # Extracting value from dictionary without calling `.items()`
 ]
 "tests/*" = [
   "D",  # pydocstyle

@@ -202,11 +202,7 @@ for simtype, (filename, split) in ((i, x) for i in filelist for x in filelist[i]
         keys=keys[simtype],
     )
     tray.Add("Keep", keys=["I3EventHeader"] + keys[simtype])
-
-    def s(frame):
-        return frame["I3EventHeader"].sub_event_stream == "NullSplit"
-
-    tray.AddModule(s)
+    tray.AddModule(lambda frame: frame["I3EventHeader"].sub_event_stream == "NullSplit")
     tray.Add(
         "I3Writer",
         Filename=str(outfile) + ".i3.zst",
