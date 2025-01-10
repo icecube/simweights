@@ -60,6 +60,32 @@ jobs:
         with:
           fail_ci_if_error: false
           verbose: true
+  TestsIceTray:
+    runs-on: ubuntu-latest
+    container: icecube/icetray:icetray-devel-current-ubuntu22.04-X64
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SimWeights
+        run: python3 -m pip install .[test]
+      - name: Download Test Data
+        run: |
+          curl -u icecube:${{ secrets.ICECUBE_PASSWORD }} https://convey.icecube.wisc.edu/data/ana/Software/simweights/test-data/simweights_testdata.tar.gz -O
+          tar xzvf simweights_testdata.tar.gz
+      - name: Run Unit Tests
+        env:
+          SIMWEIGHTS_TESTDATA: .
+        run: |
+          echo i3src=$I3_SRC i3build$I3_BUILD
+          python -m pytest --junit-xml=test-results-icetray.junit.xml
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          if-no-files-found: error
+          name: test-results-icetray.junit.xml
+          path: test-results-icetray.junit.xml
   publish-test-results:
     name: "Publish Tests Results"
     needs: Tests
