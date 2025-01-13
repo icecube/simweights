@@ -107,7 +107,7 @@ def test_dataset(fname, loader):
 
 @pytest.mark.parametrize("fname", datasets)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
-@pytest.mark.skipif("dataio" not in globals(), reason="not in icetray environment")
+@pytest.mark.skipif("dataio" not in globals(), reason="Not in an IceTray environment")
 def test_dataset_i3file(fname):
     d = load_reference_values(Path(datadir) / (fname + ".hdf5"))
 

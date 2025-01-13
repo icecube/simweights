@@ -74,13 +74,13 @@ def has_column(table: Any, name: str) -> bool:
     """Helper function for determining if a table has a column, works with h5py, pytables, and pandas."""
     if hasattr(table, "cols"):
         return hasattr(table.cols, name)
-    if hasattr(table, name):
+    if hasattr(table, "__getitem__"):
+        try:
+            get_column(table, name)
+        except (AttributeError, KeyError, ValueError, TypeError):
+            return False
         return True
-    try:
-        table[name]  # pylint: disable=pointless-statement
-        return True  # noqa: TRY300
-    except (ValueError, KeyError):
-        return False
+    return False
 
 
 def get_column(table: Any, name: str) -> Any:
@@ -88,11 +88,17 @@ def get_column(table: Any, name: str) -> Any:
     if hasattr(table, "cols"):
         return np.asarray(getattr(table.cols, name)[:], dtype=np.float64)
     if hasattr(table, name):
-        return np.atleast_1d(getattr(table, name))
+        return np.asarray(np.atleast_1d(getattr(table, name)), dtype=np.float64)
+    if hasattr(table, "dir") and hasattr(table.dir, name):
+        return np.asarray(np.atleast_1d(getattr(table.dir, name)), dtype=np.float64)
+    if hasattr(table, "primary") and hasattr(table.primary, name):
+        return np.asarray(np.atleast_1d(getattr(table.primary, name)), dtype=np.float64)
+    if hasattr(table, "primary") and hasattr(table.primary.dir, name):
+        return np.asarray(np.atleast_1d(getattr(table.primary.dir, name)), dtype=np.float64)
     column = table[name]
     if hasattr(column, "array") and callable(column.array):
         return np.asarray(column.array(library="np"), dtype=np.float64)
-    return np.asarray(column, dtype=np.float64)
+    return np.asarray(np.atleast_1d(column), dtype=np.float64)
 
 
 def constcol(table: Any, colname: str, mask: Any = None) -> float:

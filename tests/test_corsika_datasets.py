@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+import contextlib
 import os
 import sys
 from pathlib import Path
@@ -17,6 +18,9 @@ import uproot
 
 from simweights import CorsikaWeighter, GaisserH4a
 from simweights._utils import constcol
+
+with contextlib.suppress(ImportError):
+    from icecube import dataio, simclasses  # noqa: F401
 
 flux = GaisserH4a()
 datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
@@ -119,6 +123,41 @@ def test_dataset(triggered, fname, rate, loader):
     assert w.sum() == pytest.approx(rate)
     assert w0 == pytest.approx(w, 1e-6)
     infile.close()
+
+
+@pytest.mark.parametrize(("triggered", "fname", "rate"), datasets)
+@pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
+@pytest.mark.skipif("dataio" not in globals(), reason="Not in an IceTray environment")
+def test_dataset_i3file(triggered, fname, rate):
+    fname = datadir / fname
+
+    reffile = h5py.File(str(fname) + ".hdf5", "r")
+    if triggered:
+        nfiles = None
+        refweight = triggered_weights
+        counts = np.unique(reffile["I3PrimaryInjectorInfo"]["primary_type"], return_counts=True)
+        s_frame_counts = {counts[0][i]: counts[1][i] for i in range(len(counts[0]))}
+    else:
+        nfiles = 1
+        refweight = untriggered_weights
+        s_frame_counts = {c: 1 for c in set(reffile["CorsikaWeightMap"]["PrimaryType"])}
+
+    w0 = refweight(reffile)
+    f = dataio.I3File(str(fname) + ".i3.zst")
+    i = 0
+    W = 0
+    while f.more():
+        frame = f.pop_frame()
+        if frame.Stop != frame.DAQ:
+            continue
+        ww = CorsikaWeighter(frame, nfiles)
+        pdgid = ww.get_weight_column("pdgid")[0]
+        w = ww.get_weights(flux) / s_frame_counts[pdgid]
+        assert w == pytest.approx(w0[i], 1e-6)
+        i += 1
+        W += w
+
+    assert rate == pytest.approx(W, 1e-6)
 
 
 if __name__ == "__main__":
