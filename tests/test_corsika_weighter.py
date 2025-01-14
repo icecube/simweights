@@ -4,9 +4,10 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-import unittest
+import sys
 
 import numpy as np
+import pytest
 from scipy.interpolate import interp1d
 
 import simweights
@@ -74,141 +75,142 @@ def make_corsika_data(pdgid, nevents, c, p):
     return {"CorsikaWeightMap": weight, "PolyplopiaPrimary": primary}
 
 
-class TestCorsikaWeighter(unittest.TestCase):
-    def test_old_corsika(self):
-        c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
-        p1 = simweights.PowerLaw(0, 1e3, 1e4)
-        d = make_corsika_data(2212, 10000, c1, p1)
+@pytest.mark.parametrize("oversampling", (1, 5, 50))
+@pytest.mark.parametrize("nfiles", (1, 10, 100))
+@pytest.mark.parametrize("flux", (0.1, 1, 10))
+def test_old_corsika(oversampling, nfiles, flux):
+    c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
+    p1 = simweights.PowerLaw(0, 1e3, 1e4)
+    d = make_corsika_data(2212, 10000, c1, p1)
 
-        for oversampling in [1, 5, 50]:
-            d["CorsikaWeightMap"]["OverSampling"] = oversampling
-            for nfiles in [1, 10, 100]:
-                wobj = CorsikaWeighter(d, nfiles=nfiles)
+    d["CorsikaWeightMap"]["OverSampling"] = oversampling
+    wobj = CorsikaWeighter(d, nfiles=nfiles)
 
-                for flux in [0.1, 1, 10]:
-                    w = wobj.get_weights(flux)
-                    np.testing.assert_allclose(
-                        w.sum(),
-                        flux * c1.etendue * p1.integral / nfiles / oversampling,
-                    )
-                    E = d["PolyplopiaPrimary"]["energy"]
-                    y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
-                    Ewidth = np.ediff1d(x)
-                    np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / nfiles / oversampling, 5e-3)
+    w = wobj.get_weights(flux)
+    np.testing.assert_allclose(
+        w.sum(),
+        flux * c1.etendue * p1.integral / nfiles / oversampling,
+    )
+    E = d["PolyplopiaPrimary"]["energy"]
+    y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
+    Ewidth = np.ediff1d(x)
+    np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / nfiles / oversampling, 5e-3)
 
-        with self.assertRaises(RuntimeError):
-            CorsikaWeighter(d)
+    with pytest.raises(RuntimeError):
+        CorsikaWeighter(d)
 
-        with self.assertRaises(TypeError):
-            CorsikaWeighter(d, nfiles=object())
+    with pytest.raises(TypeError):
+        CorsikaWeighter(d, nfiles=object())
 
-        with self.assertRaises(RuntimeError):
-            x = {"CorsikaWeightMap": {"ParticleType": []}, "PolyplopiaPrimary": {}}
-            CorsikaWeighter(x, nfiles=1)
+    with pytest.raises(RuntimeError):
+        x = {"CorsikaWeightMap": {"ParticleType": []}, "PolyplopiaPrimary": {}}
+        CorsikaWeighter(x, nfiles=1)
 
-    def test_sframe_corsika(self):
-        c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
-        p1 = simweights.PowerLaw(0, 1e3, 1e4)
-        d = make_corsika_data(2212, 10000, c1, p1)
-        for oversampling in [1, 5, 50]:
-            for nfiles in [1, 10, 100]:
-                rows = nfiles * [
-                    (
-                        10000,
-                        2212,
-                        oversampling,
-                        c1.length,
-                        c1.radius,
-                        np.arccos(c1.cos_zen_max),
-                        np.arccos(c1.cos_zen_min),
-                        p1.a,
-                        p1.b,
-                        p1.g,
-                    ),
-                ]
-                d["I3CorsikaInfo"] = np.array(rows, dtype=info_dtype)
-                wobj = CorsikaWeighter(d)
 
-                for flux in [0.1, 1, 10]:
-                    w = wobj.get_weights(flux)
-                    np.testing.assert_allclose(
-                        w.sum(),
-                        flux * c1.etendue * p1.integral / nfiles / oversampling,
-                    )
-                    E = d["PolyplopiaPrimary"]["energy"]
-                    y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
-                    Ewidth = np.ediff1d(x)
-                    np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / nfiles / oversampling, 5e-3)
+@pytest.mark.parametrize("oversampling", (1, 5, 50))
+@pytest.mark.parametrize("nfiles", (1, 10, 100))
+@pytest.mark.parametrize("flux", (0.1, 1, 10))
+def test_sframe_corsika(oversampling, nfiles, flux):
+    c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
+    p1 = simweights.PowerLaw(0, 1e3, 1e4)
+    d = make_corsika_data(2212, 10000, c1, p1)
+    rows = nfiles * [
+        (
+            10000,
+            2212,
+            oversampling,
+            c1.length,
+            c1.radius,
+            np.arccos(c1.cos_zen_max),
+            np.arccos(c1.cos_zen_min),
+            p1.a,
+            p1.b,
+            p1.g,
+        ),
+    ]
+    d["I3CorsikaInfo"] = np.array(rows, dtype=info_dtype)
+    wobj = CorsikaWeighter(d)
 
-        with self.assertWarns(UserWarning):
-            CorsikaWeighter(d, nfiles=10)
+    w = wobj.get_weights(flux)
+    np.testing.assert_allclose(
+        w.sum(),
+        flux * c1.etendue * p1.integral / nfiles / oversampling,
+    )
+    E = d["PolyplopiaPrimary"]["energy"]
+    y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
+    Ewidth = np.ediff1d(x)
+    np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / nfiles / oversampling, 5e-3)
 
-    def test_triggered_corsika(self):
-        weight_dtype = [
-            ("type", np.int32),
-            ("energy", np.float64),
-            ("zenith", np.float64),
-            ("weight", np.float64),
-        ]
-        info_dtype = [
-            ("primary_type", np.int32),
-            ("n_events", np.int32),
-            ("cylinder_height", np.float64),
-            ("cylinder_radius", np.float64),
-            ("min_zenith", np.float64),
-            ("max_zenith", np.float64),
-            ("min_energy", np.float64),
-            ("max_energy", np.float64),
-            ("power_law_index", np.float64),
-        ]
+    with pytest.warns(UserWarning):
+        CorsikaWeighter(d, nfiles=10)
 
-        nevents = 10000
-        c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
-        p1 = simweights.PowerLaw(0, 1e3, 1e4)
-        d = make_corsika_data(2212, 10000, c1, p1)
-        weight = np.zeros(nevents, dtype=weight_dtype)
-        weight["type"] = 2212
-        weight["zenith"] = np.arccos(get_cos_zenith_dist(c1, nevents))
-        weight["energy"] = p1.ppf(np.linspace(0, 1, nevents))
 
-        for event_weight in [1e-6, 1e-3, 1]:
-            weight["weight"] = event_weight
+@pytest.mark.parametrize("event_weight", (1e-6, 1e-3, 1))
+@pytest.mark.parametrize("nfiles", (1, 5, 50))
+@pytest.mark.parametrize("flux", (0.1, 1, 10))
+def test_triggered_corsika(event_weight, nfiles, flux):
+    weight_dtype = [
+        ("type", np.int32),
+        ("energy", np.float64),
+        ("zenith", np.float64),
+        ("weight", np.float64),
+    ]
+    info_dtype = [
+        ("primary_type", np.int32),
+        ("n_events", np.int32),
+        ("cylinder_height", np.float64),
+        ("cylinder_radius", np.float64),
+        ("min_zenith", np.float64),
+        ("max_zenith", np.float64),
+        ("min_energy", np.float64),
+        ("max_energy", np.float64),
+        ("power_law_index", np.float64),
+    ]
 
-            for nfiles in [1, 5, 50]:
-                rows = nfiles * [
-                    (
-                        2212,
-                        nevents,
-                        c1.length,
-                        c1.radius,
-                        np.arccos(c1.cos_zen_max),
-                        np.arccos(c1.cos_zen_min),
-                        p1.a,
-                        p1.b,
-                        p1.g,
-                    ),
-                ]
-                info = np.array(rows, dtype=info_dtype)
-                d = {"I3CorsikaWeight": weight, "I3PrimaryInjectorInfo": info}
+    nevents = 10000
+    c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
+    p1 = simweights.PowerLaw(0, 1e3, 1e4)
+    d = make_corsika_data(2212, 10000, c1, p1)
+    weight = np.zeros(nevents, dtype=weight_dtype)
+    weight["type"] = 2212
+    weight["zenith"] = np.arccos(get_cos_zenith_dist(c1, nevents))
+    weight["energy"] = p1.ppf(np.linspace(0, 1, nevents))
 
-                for flux in [0.1, 1, 10]:
-                    wobj = CorsikaWeighter(d)
-                    w = wobj.get_weights(flux)
-                    np.testing.assert_allclose(
-                        w.sum(),
-                        flux * event_weight * c1.etendue * p1.integral / nfiles,
-                    )
-                    E = d["I3CorsikaWeight"]["energy"]
-                    y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
-                    Ewidth = np.ediff1d(x)
-                    np.testing.assert_allclose(y, flux * event_weight * Ewidth * c1.etendue / nfiles, 5e-3)
+    weight["weight"] = event_weight
 
-        with self.assertRaises(RuntimeError):
-            CorsikaWeighter(d, nfiles=10)
+    rows = nfiles * [
+        (
+            2212,
+            nevents,
+            c1.length,
+            c1.radius,
+            np.arccos(c1.cos_zen_max),
+            np.arccos(c1.cos_zen_min),
+            p1.a,
+            p1.b,
+            p1.g,
+        ),
+    ]
+    info = np.array(rows, dtype=info_dtype)
+    d = {"I3CorsikaWeight": weight, "I3PrimaryInjectorInfo": info}
 
-        with self.assertRaises(RuntimeError):
-            CorsikaWeighter({"I3CorsikaWeight": weight})
+    wobj = CorsikaWeighter(d)
+    w = wobj.get_weights(flux)
+    np.testing.assert_allclose(
+        w.sum(),
+        flux * event_weight * c1.etendue * p1.integral / nfiles,
+    )
+    E = d["I3CorsikaWeight"]["energy"]
+    y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
+    Ewidth = np.ediff1d(x)
+    np.testing.assert_allclose(y, flux * event_weight * Ewidth * c1.etendue / nfiles, 5e-3)
+
+    with pytest.raises(RuntimeError):
+        CorsikaWeighter(d, nfiles=10)
+
+    with pytest.raises(RuntimeError):
+        CorsikaWeighter({"I3CorsikaWeight": weight})
 
 
 if __name__ == "__main__":
-    unittest.main()
+    sys.exit(pytest.main(["-v", __file__, *sys.argv[1:]]))
