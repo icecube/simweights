@@ -72,15 +72,11 @@ def get_table(file_obj: Any, name: str) -> Any:
 
 def has_column(table: Any, name: str) -> bool:
     """Helper function for determining if a table has a column, works with h5py, pytables, and pandas."""
-    if hasattr(table, "cols"):
-        return hasattr(table.cols, name)
-    if hasattr(table, "__getitem__"):
-        try:
-            get_column(table, name)
-        except (AttributeError, KeyError, ValueError, TypeError):
-            return False
-        return True
-    return False
+    try:
+        get_column(table, name)
+    except (AttributeError, KeyError, ValueError, TypeError):
+        return False
+    return True
 
 
 def get_column(table: Any, name: str) -> Any:

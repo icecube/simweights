@@ -4,14 +4,19 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+import contextlib
 import sys
 
 import numpy as np
 import pytest
+from pytest import approx
 from scipy.interpolate import interp1d
 
 import simweights
 from simweights import CorsikaWeighter
+
+with contextlib.suppress(ImportError):
+    from icecube import dataclasses, icetray, simclasses
 
 info_dtype = [
     ("n_events", np.int32),
@@ -210,6 +215,99 @@ def test_triggered_corsika(event_weight, nfiles, flux):
 
     with pytest.raises(RuntimeError):
         CorsikaWeighter({"I3CorsikaWeight": weight})
+
+
+@pytest.mark.parametrize("oversampling", (1, 5, 50))
+@pytest.mark.parametrize("flux", (0.1, 1, 10))
+@pytest.mark.skipif("icetray" not in globals(), reason="Not in an IceTray environment")
+def test_old_corsika_i3file(oversampling, flux):
+    c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
+    p1 = simweights.PowerLaw(0, 1e3, 1e4)
+    d = make_corsika_data(2212, 1, c1, p1)
+    d["CorsikaWeightMap"]["OverSampling"] = oversampling
+
+    cwm = d["CorsikaWeightMap"]
+    wm = dataclasses.I3MapStringDouble({k: float(cwm[k][0]) for k in cwm.dtype.names})
+    pp = dataclasses.I3Particle()
+    pp.type = pp.ParticleType(d["PolyplopiaPrimary"]["type"][0])
+    pp.energy = d["PolyplopiaPrimary"]["energy"][0]
+    pp.dir = dataclasses.I3Direction(d["PolyplopiaPrimary"]["zenith"][0], 0)
+    frame = icetray.I3Frame()
+    frame["CorsikaWeightMap"] = wm
+    frame["PolyplopiaPrimary"] = pp
+    wobj = CorsikaWeighter(frame, nfiles=1)
+    w = wobj.get_weights(flux)
+    assert w == approx(flux / c1.pdf(np.cos(pp.dir.zenith)) / p1.pdf(pp.energy) / oversampling)
+
+
+@pytest.mark.parametrize("oversampling", (1, 10, 100, 1000))
+@pytest.mark.parametrize("n_events", (1, 10, 100))
+@pytest.mark.parametrize("flux", (0.1, 1, 10))
+def test_sframe_corsika_i3files(oversampling, n_events, flux):
+    c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
+    p1 = simweights.PowerLaw(0, 1e3, 1e4)
+    d = make_corsika_data(2212, 1, c1, p1)
+
+    info = simclasses.I3CorsikaInfo()
+    info.n_events = n_events
+    info.primary_type = dataclasses.I3Particle.ParticleType(2212)
+    info.oversampling = oversampling
+    info.cylinder_height = c1.length
+    info.cylinder_radius = c1.radius
+    info.min_zenith = np.arccos(c1.cos_zen_max)
+    info.max_zenith = np.arccos(c1.cos_zen_min)
+    info.power_law_index = p1.g
+    info.min_energy = p1.a
+    info.max_energy = p1.b
+
+    pp = dataclasses.I3Particle()
+    pp.type = pp.ParticleType(d["PolyplopiaPrimary"]["type"][0])
+    pp.energy = d["PolyplopiaPrimary"]["energy"][0]
+    pp.dir = dataclasses.I3Direction(d["PolyplopiaPrimary"]["zenith"][0], 0)
+
+    frame = icetray.I3Frame()
+    frame["I3CorsikaInfo"] = info
+    frame["PolyplopiaPrimary"] = pp
+    w = CorsikaWeighter(frame).get_weights(flux)
+    assert w == approx(flux / c1.pdf(np.cos(pp.dir.zenith)) / p1.pdf(pp.energy) / n_events / oversampling)
+
+
+@pytest.mark.parametrize("event_weight", (1e-6, 1e-3, 1))
+@pytest.mark.parametrize("nevents", (1, 5, 50))
+@pytest.mark.parametrize("flux", (0.1, 1, 10))
+def test_triggered_corsika_i3file(event_weight, nevents, flux):
+    c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
+    p1 = simweights.PowerLaw(0, 1e3, 1e4)
+    d = make_corsika_data(2212, 1, c1, p1)
+
+    primary = dataclasses.I3Particle()
+    primary.type = primary.ParticleType(2212)
+    primary.dir = dataclasses.I3Direction(d["PolyplopiaPrimary"]["zenith"][0], 0)
+    primary.energy = d["PolyplopiaPrimary"]["energy"][0]
+    weight = simclasses.I3CorsikaWeight()
+    weight.primary = primary
+    weight.weight = event_weight
+
+    # you can't set values for I3PrimaryInjectorInfo in python so lets just fake it
+    info = dataclasses.I3MapStringDouble(
+        {
+            "n_events": nevents,
+            "primary_type": 2212,
+            "cylinder_height": c1.length,
+            "cylinder_radius": c1.radius,
+            "min_zenith": np.arccos(c1.cos_zen_max),
+            "max_zenith": np.arccos(c1.cos_zen_min),
+            "min_energy": p1.a,
+            "max_energy": p1.b,
+            "power_law_index": p1.g,
+        }
+    )
+    frame = icetray.I3Frame()
+    frame["I3CorsikaWeight"] = weight
+    frame["I3PrimaryInjectorInfo"] = info
+
+    w = CorsikaWeighter(frame).get_weights(flux)
+    assert w == approx(flux * event_weight * c1.etendue * p1.integral / nevents)
 
 
 if __name__ == "__main__":
