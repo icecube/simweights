@@ -32,6 +32,8 @@ class TestUtil(unittest.TestCase):
         f1 = SimpleNamespace(root=SimpleNamespace(x=t1))
         t2 = {"a": np.full(10, 7), "b": np.arange(10)}
         f2 = {"x": t2}
+        p1 = SimpleNamespace(energy=1e5, dir=SimpleNamespace(zenith=1.57))
+        w1 = SimpleNamespace(primary=p1)
 
         self.assertEqual(has_table(f1, "x"), True)
         self.assertEqual(has_table(f1, "y"), False)
@@ -48,8 +50,16 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(has_column(t1, "a"), True)
         self.assertEqual(has_column(t1, "b"), True)
         self.assertEqual(has_column(t1, "c"), False)
+        self.assertEqual(has_column(p1, "energy"), True)
+        self.assertEqual(has_column(p1, "zenith"), True)
+        self.assertEqual(has_column(w1, "energy"), True)
+        self.assertEqual(has_column(w1, "zenith"), True)
         assert_array_equal(get_column(t1, "a"), 10 * [3])
         assert_array_equal(get_column(t1, "b"), 5 * [3] + 5 * [4])
+        assert_array_equal(get_column(p1, "energy"), [1e5])
+        assert_array_equal(get_column(p1, "zenith"), [1.57])
+        assert_array_equal(get_column(w1, "energy"), [1e5])
+        assert_array_equal(get_column(w1, "zenith"), [1.57])
         with self.assertRaises(AttributeError):
             get_column(t1, "c")
 

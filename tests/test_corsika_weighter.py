@@ -243,6 +243,7 @@ def test_old_corsika_i3file(oversampling, flux):
 @pytest.mark.parametrize("oversampling", (1, 10, 100, 1000))
 @pytest.mark.parametrize("n_events", (1, 10, 100))
 @pytest.mark.parametrize("flux", (0.1, 1, 10))
+@pytest.mark.skipif("icetray" not in globals(), reason="Not in an IceTray environment")
 def test_sframe_corsika_i3files(oversampling, n_events, flux):
     c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
     p1 = simweights.PowerLaw(0, 1e3, 1e4)
@@ -275,6 +276,7 @@ def test_sframe_corsika_i3files(oversampling, n_events, flux):
 @pytest.mark.parametrize("event_weight", (1e-6, 1e-3, 1))
 @pytest.mark.parametrize("nevents", (1, 5, 50))
 @pytest.mark.parametrize("flux", (0.1, 1, 10))
+@pytest.mark.skipif("icetray" not in globals(), reason="Not in an IceTray environment")
 def test_triggered_corsika_i3file(event_weight, nevents, flux):
     c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
     p1 = simweights.PowerLaw(0, 1e3, 1e4)
