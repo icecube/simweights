@@ -14,20 +14,20 @@ from ._utils import Column, constcol, get_column, get_table, has_column
 from ._weighter import Weighter
 
 
-def nugen_spatial(table: Any) -> SpatialDist:
+def nugen_spatial(table: Any, mask: Any = None) -> SpatialDist:
     """Inspect the ``I3MCWeightDict`` table of a nugen file to generate the spatial distribution.
 
     It will either return a CircleInjector or UniformSolidAngleCylinder
     depending on how the dataset was generated.
     """
-    max_cos = np.cos(constcol(table, "MinZenith"))
-    min_cos = np.cos(constcol(table, "MaxZenith"))
+    max_cos = np.cos(constcol(table, "MinZenith", mask))
+    min_cos = np.cos(constcol(table, "MaxZenith", mask))
 
     # Before V04-01-00, nugen injection primaries on the surface of a circle perpendicular to the momentum
     # vector of the primary, this can be determined by checking `InjectionSurfaceR`. It will
     # be > 0 for circle injection and -1 for surface injection. In new versions >V6-00-00 it is not even
     # present indicating surface mode
-    injection_radius = constcol(table, "InjectionSurfaceR") if has_column(table, "InjectionSurfaceR") else -1
+    injection_radius = constcol(table, "InjectionSurfaceR", mask) if has_column(table, "InjectionSurfaceR") else -1
 
     if injection_radius > 0:
         return CircleInjector(injection_radius, min_cos, max_cos, "cos_zen")
@@ -35,18 +35,18 @@ def nugen_spatial(table: Any) -> SpatialDist:
     # Surface mode was added in V04-01-00 but the cylinder size was hard coded, `CylinderHeight` and
     # `CylinderRadius` were added after later V06-00-00. If they are not in the table then use the
     # hardcoded values
-    cylinder_height = constcol(table, "CylinderHeight") if has_column(table, "CylinderHeight") else 1900
-    cylinder_radius = constcol(table, "CylinderRadius") if has_column(table, "CylinderRadius") else 950
+    cylinder_height = constcol(table, "CylinderHeight", mask) if has_column(table, "CylinderHeight") else 1900
+    cylinder_radius = constcol(table, "CylinderRadius", mask) if has_column(table, "CylinderRadius") else 950
     return UniformSolidAngleCylinder(cylinder_height, cylinder_radius, min_cos, max_cos, "cos_zen")
 
 
-def nugen_spectrum(table: Any) -> PowerLaw:
+def nugen_spectrum(table: Any, mask: Any = None) -> PowerLaw:
     """Inspect the ``I3MCWeightDict`` table of a nugen file to generate to represent the energy spectrum."""
-    min_energy = 10 ** constcol(table, "MinEnergyLog")
-    max_energy = 10 ** constcol(table, "MaxEnergyLog")
+    min_energy = 10 ** constcol(table, "MinEnergyLog", mask)
+    max_energy = 10 ** constcol(table, "MaxEnergyLog", mask)
     # the energy spectrum is always powerlaw however nugen uses positive value of `PowerLawIndex`
     # for negative slopes ie +2 means E**-2 injection spectrum
-    power_law_index = -constcol(table, "PowerLawIndex")
+    power_law_index = -constcol(table, "PowerLawIndex", mask)
     assert power_law_index <= 0
     return PowerLaw(power_law_index, min_energy, max_energy, "energy")
 

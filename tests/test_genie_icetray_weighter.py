@@ -4,12 +4,18 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-import unittest
+import contextlib
+import sys
 
 import numpy as np
 import pandas as pd
+import pytest
+from pytest import approx
 
 from simweights import CircleInjector, GenieWeighter, PowerLaw
+
+with contextlib.suppress(ImportError):
+    from icecube import dataclasses, icetray, simclasses
 
 mcwd_keys = [
     "NEvents",
@@ -52,41 +58,80 @@ def make_new_table(pdgid, nevents, spatial, spectrum, coszen):
     return weight, resultdict
 
 
-class TestGenieIcetrayWeighter(unittest.TestCase):
-    def test_genie_icetray(self):
-        nevents = 100000
-        coszen = 0.7
-        pdgid = 12
-        c1 = CircleInjector(300, 0, 1)
-        p1 = PowerLaw(0, 1e3, 1e4)
+@pytest.mark.parametrize("nfiles", (1, 10, 100))
+@pytest.mark.parametrize("flux", (1e-6, 1, 1e6))
+def test_genie_icetray(nfiles, flux):
+    nevents = 100000
+    coszen = 0.7
+    pdgid = 12
+    c1 = CircleInjector(300, 0, 1)
+    p1 = PowerLaw(0, 1e3, 1e4)
 
-        t1 = make_new_table(pdgid, nevents, c1, p1, coszen)
+    t1 = make_new_table(pdgid, nevents, c1, p1, coszen)
 
-        mcwd = pd.DataFrame(t1[0])
-        grd = pd.DataFrame(t1[1])
+    mcwd = pd.DataFrame(t1[0])
+    grd = pd.DataFrame(t1[1])
 
-        f1 = {"I3MCWeightDict": mcwd, "I3GENIEResultDict": grd}
+    f1 = {"I3MCWeightDict": mcwd, "I3GENIEResultDict": grd}
 
-        for nfiles in [1, 10, 100]:
-            wf = GenieWeighter(f1, nfiles=nfiles)
-            for flux in [1e-6, 1, 1e6]:
-                w1 = wf.get_weights(flux)
-                w2 = flux * p1.integral * c1.etendue / (0.7 * nfiles)
-                np.testing.assert_allclose(w1.sum(), w2)
-                E = mcwd["PrimaryNeutrinoEnergy"]
-                y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])
-                Ewidth = np.ediff1d(x)
-                np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / (0.7 * nfiles), 6e-3)
+    wf = GenieWeighter(f1, nfiles=nfiles)
+    w1 = wf.get_weights(flux)
+    w2 = flux * p1.integral * c1.etendue / (0.7 * nfiles)
+    np.testing.assert_allclose(w1.sum(), w2)
+    E = mcwd["PrimaryNeutrinoEnergy"]
+    y, x = np.histogram(E, weights=w1, bins=51, range=[p1.a, p1.b])
+    Ewidth = np.ediff1d(x)
+    np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / (0.7 * nfiles), 6e-3)
 
-    def test_empty(self):
-        with self.assertRaises(RuntimeError):
-            x = {"I3MCWeightDict": {key: [] for key in mcwd_keys}, "I3GENIEResultDict": {key: [] for key in grd_keys}}
-            GenieWeighter(x, nfiles=1)
 
-        with self.assertRaises(RuntimeError):
-            x = {"I3MCWeightDict": {key: [1] for key in mcwd_keys}, "I3GENIEResultDict": {key: [1] for key in grd_keys}}
-            GenieWeighter(x)
+def test_empty():
+    with pytest.raises(RuntimeError):
+        x = {"I3MCWeightDict": {key: [] for key in mcwd_keys}, "I3GENIEResultDict": {key: [] for key in grd_keys}}
+        GenieWeighter(x, nfiles=1)
+
+    with pytest.raises(RuntimeError):
+        x = {"I3MCWeightDict": {key: [1] for key in mcwd_keys}, "I3GENIEResultDict": {key: [1] for key in grd_keys}}
+        GenieWeighter(x)
+
+
+@pytest.mark.parametrize("nfiles", (1, 10, 100))
+@pytest.mark.parametrize("flux", (1e-6, 1, 1e6))
+@pytest.mark.parametrize("nevents", (10000, 100000, 1000000))
+def test_genie_icetray_i3files(nfiles, flux, nevents):
+    coszen = 0.7
+    pdgid = 12
+    energy = 5e3
+    c1 = CircleInjector(300, 0, 1)
+    p1 = PowerLaw(0, 1e3, 1e4)
+
+    weight = dataclasses.I3MapStringDouble()
+    weight["NEvents"] = nevents
+    weight["MinZenith"] = np.arccos(c1.cos_zen_max)
+    weight["MaxZenith"] = np.arccos(c1.cos_zen_min)
+    weight["PowerLawIndex"] = -1 * p1.g
+    weight["MinEnergyLog"] = np.log10(p1.a)
+    weight["MaxEnergyLog"] = np.log10(p1.b)
+    weight["InjectionSurfaceR"] = c1.radius
+    weight["GeneratorVolume"] = 1.0
+    weight["PrimaryNeutrinoEnergy"] = energy
+
+    resultdict = simclasses.I3GENIEResultDict()
+    resultdict.neu = pdgid
+    resultdict.pxv = 1
+    resultdict.pyv = 1
+    resultdict.pzv = -coszen
+    resultdict.Ev = energy
+    resultdict.wght = 1.0
+    resultdict._glbprbscale = 1.0
+
+    frame = icetray.I3Frame()
+    frame["I3MCWeightDict"] = weight
+    frame["I3GENIEResultDict"] = resultdict
+
+    w1 = GenieWeighter(frame, nfiles=nfiles).get_weights(flux)
+    w2 = flux / c1.pdf(coszen) / p1.pdf(energy) / (0.7 * nfiles * nevents)
+    assert w1 == approx(w2)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    sys.exit(pytest.main(["-v", __file__, *sys.argv[1:]]))
