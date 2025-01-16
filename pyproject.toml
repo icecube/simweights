@@ -78,7 +78,7 @@ warn_unreachable = true
 max-line-length = "128"
 
 [tool.pylint.messages_control]
-disable = "C0114,R0902,R0913,R0917,R0914"
+disable = "C0114,R0902,R0913,R0917,R0914,R0911"
 
 [tool.pytest.ini_options]
 addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights", "-W ignore"]
@@ -99,7 +99,8 @@ ignore = [
   "S101",  # assert-used
   "COM812",  # conflicts with ruff formatter
   "ISC001",  # conflicts with ruff formatter
-  "PLR0913"  # Too many arguments in function definition
+  "PLR0913",  # Too many arguments in function definition
+  "PLR0911"  # Too many return statement
 ]
 select = ["ALL"]
 
@@ -108,7 +109,9 @@ select = ["ALL"]
 "examples/*" = [
   "D",  # pydocstyle
   "F401",  # unused-import
-  "T201"  # flake8-print
+  "T201",  # flake8-print
+  "PLC0206",  # Extracting value from dictionary without calling `.items()`
+  "N802"  # Function name should be lowercase
 ]
 "tests/*" = [
   "D",  # pydocstyle

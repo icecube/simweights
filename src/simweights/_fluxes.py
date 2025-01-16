@@ -331,7 +331,7 @@ class GlobalFitGST_IT(CosmicRayFlux):  # pylint: disable=invalid-name
 
 
 class GlobalSplineFitBase(CosmicRayFlux):
-    r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
+    r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]_.
 
     Base class all actual classes should inherit from this one.
     """
@@ -350,7 +350,7 @@ class GlobalSplineFitBase(CosmicRayFlux):
 
 
 class GlobalSplineFit(GlobalSplineFitBase):
-    r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]."""
+    r"""Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]_."""
 
     pdgids = PDGID_ALL
 
@@ -362,7 +362,7 @@ class GlobalSplineFit(GlobalSplineFitBase):
 class GlobalSplineFit5Comp(GlobalSplineFitBase):
     r"""Sum of the flux of the GSF model for the standard 5 components injected by IceCube.
 
-    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
+    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]_.
     """
 
     pdgids = PDGID_5COMP
@@ -376,7 +376,7 @@ class GlobalSplineFit_IT(GlobalSplineFitBase):  # pylint: disable=invalid-name
     r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
 
     [(H),  (He),  (Li, Be, B, C, N, O, F, Ne),  (Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]
-    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski].
+    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]_.
     """
 
     pdgids = PDGID_4COMP

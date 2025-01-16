@@ -72,26 +72,32 @@ def get_table(file_obj: Any, name: str) -> Any:
 
 def has_column(table: Any, name: str) -> bool:
     """Helper function for determining if a table has a column, works with h5py, pytables, and pandas."""
-    if hasattr(table, "cols"):
-        return hasattr(table.cols, name)
     try:
-        table[name]  # pylint: disable=pointless-statement
-        return True  # noqa: TRY300
-    except (ValueError, KeyError):
+        get_column(table, name)
+    except (AttributeError, KeyError, ValueError, TypeError):
         return False
+    return True
 
 
-def get_column(table: Any, name: str) -> NDArray[np.float64]:
+def get_column(table: Any, name: str) -> Any:
     """Helper function getting a column from a table, works with h5py, pytables, and pandas."""
     if hasattr(table, "cols"):
         return np.asarray(getattr(table.cols, name)[:], dtype=np.float64)
+    if hasattr(table, name):
+        return np.asarray(np.atleast_1d(getattr(table, name)), dtype=np.float64)
+    if hasattr(table, "dir") and hasattr(table.dir, name):
+        return np.asarray(np.atleast_1d(getattr(table.dir, name)), dtype=np.float64)
+    if hasattr(table, "primary") and hasattr(table.primary, name):
+        return np.asarray(np.atleast_1d(getattr(table.primary, name)), dtype=np.float64)
+    if hasattr(table, "primary") and hasattr(table.primary.dir, name):
+        return np.asarray(np.atleast_1d(getattr(table.primary.dir, name)), dtype=np.float64)
     column = table[name]
     if hasattr(column, "array") and callable(column.array):
         return np.asarray(column.array(library="np"), dtype=np.float64)
-    return np.asarray(column, dtype=np.float64)
+    return np.asarray(np.atleast_1d(column), dtype=np.float64)
 
 
-def constcol(table: Any, colname: str, mask: ArrayLike | None = None) -> float:
+def constcol(table: Any, colname: str, mask: Any = None) -> float:
     """Helper function which makes sure that all of the entries in a column are exactly the same.
 
     This is necessary because CORSIKA and NuGen store generation surface parameters in every frame and we
@@ -99,8 +105,8 @@ def constcol(table: Any, colname: str, mask: ArrayLike | None = None) -> float:
     """
     col = get_column(table, colname)
     if mask is not None:
-        col = col[np.asarray(mask, dtype=bool)]
-    val = col[0]
+        col = col[mask]
+    val = col.flat[0]
     assert np.ndim(val) == 0
     assert (val == col).all()
     return float(val)

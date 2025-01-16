@@ -46,8 +46,8 @@ def genie_icetray_surface(
         (pid, _, _, _, _) = row
         mask = np.all(gen_schemes == row[None, :], axis=1)
 
-        spatial = nugen_spatial(mcweightdict[mask])
-        spectrum = nugen_spectrum(mcweightdict[mask])
+        spatial = nugen_spatial(mcweightdict, mask)
+        spectrum = nugen_spectrum(mcweightdict, mask)
 
         type_weight = nufraction if pid > 0 else 1 - nufraction
         n_events = type_weight * constcol(mcweightdict, "NEvents", mask)

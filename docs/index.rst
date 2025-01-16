@@ -42,6 +42,7 @@
     reading_files
     reading_nugen
     units
+    i3frame_support
 
 ..  toctree::
     :maxdepth: 1
