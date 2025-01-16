@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+# start-example1
 from collections import defaultdict
 from pathlib import Path
 
