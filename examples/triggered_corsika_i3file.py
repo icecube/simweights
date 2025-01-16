@@ -17,24 +17,24 @@ files = sorted(str(f) for f in FILE_DIR.glob("Level2_IC86.2016_corsika.021889.00
 
 
 class Weighter(icetray.I3Module):
-    def __init__(self, context):
+    def __init__(self, context: icetray.I3Context) -> None:
         icetray.I3Module.__init__(self, context)
         self.weighter = None
         self.fluxmodel = GaisserH3a()
         self.s_frames = defaultdict(int)
 
-    def Simulation(self, frame):
+    def Simulation(self, frame: icetray.I3Frame) -> None:
         pdgid = frame["I3PrimaryInjectorInfo"].primary_type
         self.s_frames[pdgid] += 1
 
-    def DAQ(self, frame):
+    def DAQ(self, frame: icetray.I3Frame) -> None:
         weighter = CorsikaWeighter(frame)
         weight = weighter.get_weights(self.fluxmodel)[0]
         name = f"weight_{self.fluxmodel.__class__.__name__}"
         frame[name] = dataclasses.I3Double(weight)
         self.PushFrame(frame)
 
-    def Finish(self):
+    def Finish(self) -> None:
         print("Weights Need to be adjusted by the following factors:")
         for pdgid, counts in self.s_frames.items():
             print(f"{pdgid!s:>11} {counts}")

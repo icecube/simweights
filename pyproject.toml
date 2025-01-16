@@ -110,7 +110,8 @@ select = ["ALL"]
   "D",  # pydocstyle
   "F401",  # unused-import
   "T201",  # flake8-print
-  "PLC0206"  # Extracting value from dictionary without calling `.items()`
+  "PLC0206",  # Extracting value from dictionary without calling `.items()`
+  "N802"  # Function name should be lowercase
 ]
 "tests/*" = [
   "D",  # pydocstyle
