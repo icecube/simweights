@@ -27,7 +27,7 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
     min_zenith = np.cos(get_column(table, "min_zenith"))
     primary_type = get_column(table, "primary_type")
 
-    for i in range(len(n_events)):
+    for i, nevents in enumerate(n_events):
         assert power_law_index[i] <= 0
         spectrum = PowerLaw(  # pylint: disable=duplicate-code
             power_law_index[i],
@@ -42,7 +42,6 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
             min_zenith[i],
             "cos_zen",
         )
-        nevents = n_events[i]
         pdgid = int(primary_type[i])
         surfaces.append(nevents * generation_surface(pdgid, spectrum, spatial))
     retval = sum(surfaces)
