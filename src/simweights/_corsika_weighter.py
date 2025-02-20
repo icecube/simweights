@@ -24,28 +24,33 @@ def sframe_corsika_surface(table: Any) -> GenerationSurface:
     `I3PrimaryInjectorInfo` and `I3CorsikaInfo` use exactly the same names for quantities.
     """
     surfaces = []
-
+    cylinder_height = get_column(table, "cylinder_height")
+    cylinder_radius = get_column(table, "cylinder_radius")
+    max_zenith = get_column(table, "max_zenith")
+    min_zenith = get_column(table, "min_zenith")
+    power_law_index = get_column(table, "power_law_index")
+    min_energy = get_column(table, "min_energy")
+    max_energy = get_column(table, "max_energy")
+    n_events = get_column(table, "n_events")
     for i in range(len(get_column(table, "n_events"))):
         assert get_column(table, "power_law_index")[i] <= 0
         spatial = NaturalRateCylinder(
-            get_column(table, "cylinder_height")[i],
-            get_column(table, "cylinder_radius")[i],
-            np.cos(get_column(table, "max_zenith")[i]),
-            np.cos(get_column(table, "min_zenith")[i]),
+            cylinder_height[i],
+            cylinder_radius[i],
+            np.cos(max_zenith[i]),
+            np.cos(min_zenith[i]),
             "cos_zen",
         )
         spectrum = PowerLaw(
-            get_column(table, "power_law_index")[i],
-            get_column(table, "min_energy")[i],
-            get_column(table, "max_energy")[i],
+            power_law_index[i],
+            min_energy[i],
+            max_energy[i],
             "energy",
         )
         oversampling_val = get_column(table, "oversampling")[i] if has_column(table, "oversampling") else 1
         pdgid = int(get_column(table, "primary_type")[i])
         surfaces.append(
-            get_column(table, "n_events")[i]
-            * oversampling_val
-            * generation_surface(pdgid, Column("event_weight"), spectrum, spatial),
+            n_events[i] * oversampling_val * generation_surface(pdgid, Column("event_weight"), spectrum, spatial),
         )
     retval = sum(surfaces)
     assert isinstance(retval, GenerationSurface)

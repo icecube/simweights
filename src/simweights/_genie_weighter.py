@@ -61,25 +61,31 @@ def genie_icetray_surface(
 def genie_reader_surface(table: Iterable[Mapping[str, float]]) -> GenerationSurface:
     """Inspect the rows of a GENIE S-Frame table object to generate a surface object."""
     surfaces = []
-
-    for i in range(len(get_column(table, "n_flux_events"))):
-        assert get_column(table, "power_law_index")[i] >= 0
+    n_flux_events = get_column(table, "n_flux_events")
+    power_law_index = get_column(table, "power_law_index")
+    cylinder_radius = get_column(table, "cylinder_radius")
+    max_zenith = get_column(table, "max_zenith")
+    min_zenith = get_column(table, "min_zenith")
+    min_energy = get_column(table, "min_energy")
+    max_energy = get_column(table, "max_energy")
+    primary_type = get_column(table, "primary_type")
+    n_flux_events = get_column(table, "n_flux_events")
+    global_probability_scale = get_column(table, "global_probability_scale")
+    for i, nevents in enumerate(n_flux_events):
+        assert power_law_index[i] >= 0
         spatial = CircleInjector(
-            get_column(table, "cylinder_radius")[i],
-            np.cos(get_column(table, "max_zenith")[i]),
-            np.cos(get_column(table, "min_zenith")[i]),
+            cylinder_radius[i],
+            np.cos(max_zenith[i]),
+            np.cos(min_zenith[i]),
         )
         spectrum = PowerLaw(
-            -get_column(table, "power_law_index")[i],
-            get_column(table, "min_energy")[i],
-            get_column(table, "max_energy")[i],
+            -power_law_index[i],
+            min_energy[i],
+            max_energy[i],
             "energy",
         )
-        pdgid = int(get_column(table, "primary_type")[i])
-        nevents = get_column(table, "n_flux_events")[i]
-        global_probability_scale = get_column(table, "global_probability_scale")[i]
-
-        const_factor = 1 / spatial.etendue / global_probability_scale
+        pdgid = int(primary_type[i])
+        const_factor = 1 / spatial.etendue / global_probability_scale[i]
         surfaces.append(
             nevents * generation_surface(pdgid, Const(const_factor), Column("wght"), Column("volscale"), spectrum),
         )
