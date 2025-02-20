@@ -122,7 +122,8 @@ select = ["ALL"]
   "SLF001",  # private-member-access
   "PLR2004",  # magic-value-comparison
   "PLR0915",  # too-many-statements
-  "S307"  # suspicious-eval-usage
+  "S307",  # suspicious-eval-usage
+  "ARG005"  # unused function argument
 ]
 
 [tool.ruff.lint.pydocstyle]
