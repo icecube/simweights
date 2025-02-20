@@ -106,7 +106,7 @@ class Weighter:
             except KeyError as missing_params:
                 mesg = (
                     f"get_weights() was passed callable {flux!r} which has parameters {list(keys)}. "
-                    "The weight columns which are available are {repr(self.colnames)}"
+                    f"The weight columns which are available are {repr(self.colnames)}"
                 )
                 raise ValueError(mesg) from missing_params
             flux_val = flux(**arguments)
