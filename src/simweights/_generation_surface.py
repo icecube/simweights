@@ -105,7 +105,7 @@ class GenerationSurface:
             if shape is None:
                 shape = cols[key].shape
             else:
-                assert shape == cols[key].shape  # type: ignore[unreachable]
+                assert shape == cols[key].shape
         assert shape is not None
         count = np.zeros(shape, dtype=np.float64)
         # loop over particle type

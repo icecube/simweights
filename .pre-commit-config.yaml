@@ -1,13 +1,12 @@
 # SPDX-FileCopyrightText: © 2022 the SimWeights contributors
 #
 # SPDX-License-Identifier: BSD-2-Clause
-
 ci:
   autoupdate_commit_msg: autoupdate pre-commit hooks
   autoupdate_schedule: quarterly
 repos:
   - repo: https://github.com/google/yamlfmt
-    rev: v0.15.0
+    rev: v0.16.0
     hooks:
       - id: yamlfmt
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
@@ -20,7 +19,7 @@ repos:
     hooks:
       - id: reuse
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
       - id: codespell
   - repo: https://github.com/adamchainz/blacken-docs
@@ -29,21 +28,21 @@ repos:
       - id: blacken-docs
         args: [-l 100]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v1.15.0
     hooks:
       - id: mypy
         files: simweights
         additional_dependencies: [numpy]
         exclude: ^contrib/
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.3
+    rev: v3.3.4
     hooks:
       - id: pylint
         files: simweights
         exclude: ^contrib/
         additional_dependencies: [numpy, pandas]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.1
+    rev: v0.9.7
     hooks:
       - id: ruff
         args: [--fix, --show-fixes]
@@ -91,7 +90,7 @@ repos:
       - id: trailing-whitespace
         exclude: \.svg$
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: "3.0.3"
+    rev: "3.2.0"
     hooks:
       - id: editorconfig-checker
         alias: ec

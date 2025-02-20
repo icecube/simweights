@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: © 2024 the SimWeights contributors
 #
 # SPDX-License-Identifier: BSD-2-Clause
-
 version: 2
 updates:
   - package-ecosystem: "pip"
