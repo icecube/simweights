@@ -87,13 +87,6 @@ keys = {
     ],
     "icetop": ["I3TopInjectorInfo", "MCPrimary"],
 }
-streams = {
-    "corsika": ["InIceSplit"],
-    "nugen": ["InIceSplit", "in_ice"],
-    "genie": ["NullSplit"],
-    "icetop": ["IceTopSplit"],
-}
-
 
 if "notemp" in sys.argv:
     outdir = Path("/scratch/kmeagher/simweights/")
@@ -104,40 +97,34 @@ else:
 for simtype, filename in ((i, x) for i in filelist for x in filelist[i]):
     basename = Path(filename).name.replace(".i3.zst", "").replace(".i3.bz2", "").replace(".i3.gz", "")
     assert basename != Path(filename).name
-
-    split = simtype == "genie"
     outfile = outdir / basename
 
     print(f"Booking  : {filename}")
     print(f"  outfile: {outfile}")
     print(f"  keys   : {keys[simtype]}")
-    print(f"  streams: {streams[simtype]}")
 
     tray = icetray.I3Tray()
     tray.Add("I3Reader", FileNameList=[filename])
-
-    if split:
-        tray.Add(
-            fake_event_header,
-            Streams=[icetray.I3Frame.DAQ],
-            If=lambda f: "I3EventHeader" not in f,
-        )
-        tray.Add("I3NullSplitter", SubEventStreamName="NullSplit")
+    tray.Add(
+        fake_event_header,
+        Streams=[icetray.I3Frame.DAQ],
+        If=lambda f: "I3EventHeader" not in f,
+    )
+    tray.Add("I3NullSplitter", SubEventStreamName="weight")
     tray.Add(
         tableio.I3TableWriter,
         tableservice=[
             hdfwriter.I3HDFTableService(str(outfile) + ".hdf5"),
             rootwriter.I3ROOTTableService(str(outfile) + ".root"),
         ],
-        SubEventStreams=streams[simtype],
+        SubEventStreams=["weight"],
         keys=keys[simtype],
     )
-    tray.Add("Keep", keys=keys[simtype])
+    tray.Add("Keep", keys=["I3EventHeader"] + keys[simtype])
     tray.Add(
         "I3Writer",
         Filename=str(outfile) + ".i3.zst",
         Streams=[icetray.I3Frame.Simulation, icetray.I3Frame.DAQ],
-        DropOrphanStreams=[icetray.I3Frame.Physics],
     )
 
     tray.Execute()

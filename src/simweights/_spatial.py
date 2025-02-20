@@ -61,7 +61,7 @@ class CylinderBase:
         raise NotImplementedError
 
     def __repr__(self: CylinderBase) -> str:
-        return f"{self.__class__.__name__}" f"({self.length}, {self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
+        return f"{self.__class__.__name__}({self.length}, {self.radius}, {self.cos_zen_min}, {self.cos_zen_max})"
 
     def __eq__(self: CylinderBase, other: object) -> bool:
         return (

@@ -255,7 +255,7 @@ class Weighter:
             weights = self.get_weights(flux)
             output += f"Using flux model : {flux.__class__.__name__}\n"
             output += f"Event Rate       : {weights.sum():8.6g} Hz\n"
-            output += f"Livetime         : {weights.sum() / (weights ** 2).sum():8.6g} s\n"
+            output += f"Livetime         : {weights.sum() / (weights**2).sum():8.6g} s\n"
         return output
 
     def __str__(self: Weighter) -> str:
