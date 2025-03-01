@@ -234,6 +234,7 @@ class Weighter:
             mesg = f"flux of type {type(flux)} is supplied but only scalar flux or cosmic ray flux models are supported so far"
             raise TypeError(mesg)
         e_int, z_int = np.meshgrid(flux_integrals, np.ediff1d(czbin))
+        output: NDArray[np.float64] | tuple[NDArray[np.float64], NDArray[np.float64]]
         if return_stddev:
             output = (
                 np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64),
