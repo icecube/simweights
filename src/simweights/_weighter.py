@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Iterable
 
 import numpy as np
 from scipy.integrate import quad  # pylint: disable=import-error
@@ -140,10 +140,11 @@ class Weighter:
         self: Weighter,
         energy_bins: ArrayLike,
         cos_zenith_bins: ArrayLike,
-        mask: ArrayLike | None = None,
+        mask: ArrayLike  None = None,
         flux: Any = 1,  # default is 1 GeV^-1 cm^-2 sr^-1 flux
+        *,
         return_stddev: bool = False,
-    ) -> NDArray[np.float64] | Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    ) -> NDArray[np.float64] | tuple[NDArray[np.float64], NDArray[np.float64]]:
         r"""Calculate the effective area for the given energy and zenith bins.
 
         This is accomplished by histogramming the generation surface of the simulation sample
