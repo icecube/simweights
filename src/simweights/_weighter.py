@@ -212,7 +212,7 @@ class Weighter:
         hist_val_variance, _, _ = np.histogram2d(
             cos_zen[maska],
             energy[maska],
-            weights=(weights[maska])**2,
+            weights=(weights[maska]) ** 2,
             bins=[cos_zenith_bins, energy_bins],
         )
 
@@ -234,7 +234,10 @@ class Weighter:
             raise TypeError(mesg)
         e_int, z_int = np.meshgrid(flux_integrals, np.ediff1d(czbin))
         if return_stddev:
-            output = np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64), np.asarray(cm2_to_m2 * np.sqrt(hist_val_variance) / (e_int * 2 * np.pi * z_int), dtype=np.float64)
+            output = (
+                np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64),
+                np.asarray(cm2_to_m2 * np.sqrt(hist_val_variance) / (e_int * 2 * np.pi * z_int), dtype=np.float64),
+            )
         else:
             output = np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64)
         return output
