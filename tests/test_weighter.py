@@ -223,7 +223,9 @@ class TestWeighter(unittest.TestCase):
             6,
         )
         self.assertAlmostEqual(
-            self.weighter1.effective_area([5e5, 5e6], [0, 1], flux=lambda energy, pdgid: energy ** (-2.7), return_stddev=True)[1][0][0],
+            self.weighter1.effective_area([5e5, 5e6], [0, 1], flux=lambda energy, pdgid: energy ** (-2.7), return_stddev=True)[
+                1
+            ][0][0],
             102170.85106127625,
             6,
         )
