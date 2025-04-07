@@ -149,3 +149,4 @@ cython_debug/
 /testdata/
 *.hdf5
 *.root
+uv.lock

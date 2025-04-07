@@ -95,7 +95,7 @@ def test_genie_reader_weighter(event_weight, nfiles, include_volscale, flux):
 @pytest.mark.parametrize("event_weight", (1e-6, 1e-3, 1))
 @pytest.mark.parametrize("volscale", (1, 2, 3))
 @pytest.mark.parametrize("flux", (0.1, 1, 10))
-@pytest.mark.skipif("dataio" not in globals(), reason="Not in an IceTray environment")
+@pytest.mark.skipif("dataclasses" not in globals(), reason="Not in an IceTray environment")
 def test_genie_reader_weighter_i3file(event_weight, volscale, flux):
     nevents = 10000
     coszen = 0.7

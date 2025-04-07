@@ -1,0 +1,16 @@
+SPDX-PackageDownloadLocation = "https://github.com/icecube/simweights"
+SPDX-PackageName = "SimWeights"
+SPDX-PackageSupplier = "The SimWeights Contributors"
+version = 1
+
+[[annotations]]
+SPDX-FileCopyrightText = "2022 The SimWeights Contributors"
+SPDX-License-Identifier = "BSD-2-Clause"
+path = ["docs/**.svg", "tests/flux_values.json"]
+precedence = "aggregate"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2024 The SimWeights Contributors"
+SPDX-License-Identifier = "BSD-2-Clause"
+path = "tests/test_fluxes/**.npz"
+precedence = "aggregate"
