@@ -142,20 +142,25 @@ class Weighter:
         cos_zenith_bins: ArrayLike,
         mask: ArrayLike | None = None,
         flux: Any = 1,  # default is 1 GeV^-1 cm^-2 sr^-1 flux
-    ) -> NDArray[np.float64]:
-        r"""Calculate The effective area for the given energy and zenith bins.
+        *,
+        return_stddev: bool = False,
+    ) -> NDArray[np.float64] | tuple[NDArray[np.float64], NDArray[np.float64]]:
+        r"""Calculate the effective area for the given energy and zenith bins.
 
-        This is accomplished by histogramming the generation surface the simulation sample
+        This is accomplished by histogramming the generation surface of the simulation sample
         in energy and zenith bins and dividing by the size of the energy and solid angle of each bin.
-        If mask is passed as a parameter, only events which are included in the mask are used.
-        Effective areas are given units of :math:`\mathrm{m}^2`
+        If a mask is passed as a parameter, only events which are included in the mask are used.
+        Effective areas are given in units of :math:`\mathrm{m}^2`
 
         .. Note ::
 
             If the sample contains more than one type of primary particle, then the result will be
             averaged over the number of particles. This is usually what you want. However, it can
             cause strange behavior if there is a small number of one type. In this case, the mask
-            should be used to select the particle types individually.
+            should be used to select the particle types individually. Alternatively, a flux model
+            can be specified to apply a weighting to the individual primary particle types. If
+            return_stddev is set to True, a tuple of effective area histograms and their standard
+            deviation are returned.
 
 
         Args:
@@ -169,11 +174,16 @@ class Weighter:
             flux: Any
                 A model describing the flux of the primaries to weight against. For
                 possible types, see get_weights()
+            return_stddev: bool
+                boolean to specify if only effective area (default) or a tuple of
+                effective area and its standard deviation is returned
 
         Returns:
-            array_like
+            array_like | tuple(array_like, array_like)
                 An NxM array of effective areas. Where N is the number of energy bins and M
                 is the number of cos(zenith) bins.
+                If return_stddev, a tuple of two NxM arrays (effective area and its
+                standard deviation)
 
         """
         cm2_to_m2 = 1e-4
@@ -200,6 +210,13 @@ class Weighter:
             bins=[cos_zenith_bins, energy_bins],
         )
 
+        hist_val_variance, _, _ = np.histogram2d(
+            cos_zen[maska],
+            energy[maska],
+            weights=(weights[maska]) ** 2,
+            bins=[cos_zenith_bins, energy_bins],
+        )
+
         assert np.array_equal(enbin, energy_bins)
         assert np.array_equal(czbin, cos_zenith_bins)
         pdgids = np.unique(self.get_weight_column("pdgid")[maska])
@@ -217,7 +234,15 @@ class Weighter:
             mesg = f"flux of type {type(flux)} is supplied but only scalar flux or cosmic ray flux models are supported so far"
             raise TypeError(mesg)
         e_int, z_int = np.meshgrid(flux_integrals, np.ediff1d(czbin))
-        return np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64)
+        output: NDArray[np.float64] | tuple[NDArray[np.float64], NDArray[np.float64]]
+        if return_stddev:
+            output = (
+                np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64),
+                np.asarray(cm2_to_m2 * np.sqrt(hist_val_variance) / (e_int * 2 * np.pi * z_int), dtype=np.float64),
+            )
+        else:
+            output = np.asarray(cm2_to_m2 * hist_val / (e_int * 2 * np.pi * z_int), dtype=np.float64)
+        return output
 
     def __add__(self: Weighter, other: Weighter | int) -> Weighter:
         if other == 0:
