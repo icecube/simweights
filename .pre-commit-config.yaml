@@ -35,14 +35,14 @@ repos:
         additional_dependencies: [numpy]
         exclude: ^contrib/
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.4
+    rev: v3.3.6
     hooks:
       - id: pylint
         files: simweights
         exclude: ^contrib/
         additional_dependencies: [numpy, pandas]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.7
+    rev: v0.11.4
     hooks:
       - id: ruff
         args: [--fix, --show-fixes]
@@ -90,7 +90,7 @@ repos:
       - id: trailing-whitespace
         exclude: \.svg$
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: "3.2.0"
+    rev: "3.2.1"
     hooks:
       - id: editorconfig-checker
         alias: ec

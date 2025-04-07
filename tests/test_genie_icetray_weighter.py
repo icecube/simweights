@@ -97,7 +97,7 @@ def test_empty():
 @pytest.mark.parametrize("nfiles", (1, 10, 100))
 @pytest.mark.parametrize("flux", (1e-6, 1, 1e6))
 @pytest.mark.parametrize("nevents", (10000, 100000, 1000000))
-@pytest.mark.skipif("dataio" not in globals(), reason="Not in an IceTray environment")
+@pytest.mark.skipif("dataclasses" not in globals(), reason="Not in an IceTray environment")
 def test_genie_icetray_i3files(nfiles, flux, nevents):
     coszen = 0.7
     pdgid = 12

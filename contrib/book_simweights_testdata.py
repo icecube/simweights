@@ -6,7 +6,6 @@
 
 """Script to generate the test data used by simweights testing."""
 
-import os.path
 import sys
 import tarfile
 import tempfile
@@ -134,7 +133,7 @@ tarfilename = "/data/ana/Software/simweights/test-data/simweights_testdata.tar.g
 print(f"Writing tarfile {tarfilename}")
 
 with tarfile.open(tarfilename, "w:gz") as tar:
-    for f in os.listdir(outdir):
+    for f in outdir.iterdir():
         print(f"Adding {f} to tarball")
         tar.add(outdir / f, arcname=f)
 

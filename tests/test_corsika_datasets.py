@@ -140,7 +140,7 @@ def test_dataset_i3file(triggered, fname, rate):
     else:
         nfiles = 1
         refweight = untriggered_weights
-        s_frame_counts = {c: 1 for c in set(reffile["CorsikaWeightMap"]["PrimaryType"])}
+        s_frame_counts = dict.fromkeys(set(reffile["CorsikaWeightMap"]["PrimaryType"]), 1)
 
     w0 = refweight(reffile)
     f = dataio.I3File(str(fname) + ".i3.zst")
