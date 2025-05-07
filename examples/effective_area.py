@@ -14,7 +14,7 @@ import simweights
 # load hdf5 file
 f = tables.open_file("Level2_IC86.2016_NuMu.021217.N100.hdf5", "r")
 # create weighter object
-w = simweights.NuGenWeighter(f, nfiles=10)
+w = simweights.NuGenWeighter(f, nfiles=100)
 # create the energy and zenith bins
 energy_bins = np.geomspace(1e2, 1e8, 25)
 cos_zenith_bins = [-1, -0.5, 0, 0.5, 1]

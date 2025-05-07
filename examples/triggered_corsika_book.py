@@ -6,13 +6,12 @@
 
 from pathlib import Path
 
-from I3Tray import I3Tray
-from icecube import hdfwriter, simclasses
+from icecube import icetray, hdfwriter, simclasses
 
 FILE_DIR = Path("/data/sim/IceCube/2016/filtered/level2/CORSIKA-in-ice/21889/0000000-0000999")
 files = sorted(str(f) for f in FILE_DIR.glob("Level2_IC86.2016_corsika.021889.00000*.i3.zst"))
 
-tray = I3Tray()
+tray = icetray.I3Tray()
 tray.Add("I3Reader", FileNameList=files)
 tray.Add(
     hdfwriter.I3HDFWriter,
