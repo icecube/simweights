@@ -325,7 +325,7 @@ class GlobalFitGST(CosmicRayFlux):
 class GlobalFitGST_IT(CosmicRayFlux):
     r"""GlobalFitGST for four components [p, He, O, Fe].
 
-    The Oxygen group is the sum of Nitrogen and Aluminum groups of GlobalFitGST.
+    The Oxygen group is the sum of Carbon and Oxygen groups.
     """
 
     pdgids = PDGID_4COMP
