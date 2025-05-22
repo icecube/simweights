@@ -322,10 +322,11 @@ class GlobalFitGST(CosmicRayFlux):
     )
 
 
-class GlobalFitGST_IT(CosmicRayFlux):
-    r"""GlobalFitGST for four components [p, He, O, Fe].
+class GlobalFitGST_IT(CosmicRayFlux):  # pylint: disable=invalid-name
+    r"""GlobalFitGST (4 populations) for four components [p, He, O, Fe].
 
     The Oxygen group is the sum of Carbon and Oxygen groups.
+    The Iron group is the sum of Iron, Tellurium and Mercury groups.
     """
 
     pdgids = PDGID_4COMP
