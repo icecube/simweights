@@ -319,14 +319,21 @@ class GlobalFitGST_IT(CosmicRayFlux):  # pylint: disable=invalid-name
 
     pdgids = PDGID_4COMP
     _funcs = (
-            lambda E: 0.7000 * E**-2.66 * exp(-E / 1.2e5)      + 0.0150   * E**-2.4 * exp(-E / 4e6)      + 0.0012    * E**-2.4 * exp(-E / 1.5e9)      + 0.00012 * E**-2.4 * exp(-E / 40e9),
-            lambda E: 0.3200 * E**-2.58 * exp(-E / 1.2e5 / 2)  + 0.0065   * E**-2.3 * exp(-E / 4e6 / 2),
-            lambda E: 0.0100 * E**-2.40 * exp(-E / 1.2e5 / 6)  + 0.0006   * E**-2.3 * exp(-E / 4e6 / 6)
-                    + 0.0130 * E**-2.40 * exp(-E / 1.2e5 / 8)  + 0.0007   * E**-2.3 * exp(-E / 4e6 / 8),
-            lambda E: 0.0060 * E**-2.30 * exp(-E / 1.2e5 / 26) + 0.00021  * E**-2.2 * exp(-E / 4e6 / 26) + 0.0000011 * E**-2.2 * exp(-E / 1.5e9 / 26)
-                                                               + 0.00001  * E**-2.2 * exp(-E / 4e6 / 52)
-                                                               + 0.000053 * E**-2.2 * exp(-E / 4e6 / 80),
-        )
+        lambda E: 0.7000 * E**-2.66 * exp(-E / 1.2e5)
+        + 0.0150 * E**-2.4 * exp(-E / 4e6)
+        + 0.0012 * E**-2.4 * exp(-E / 1.5e9)
+        + 0.00012 * E**-2.4 * exp(-E / 40e9),
+        lambda E: 0.3200 * E**-2.58 * exp(-E / 1.2e5 / 2) + 0.0065 * E**-2.3 * exp(-E / 4e6 / 2),
+        lambda E: 0.0100 * E**-2.40 * exp(-E / 1.2e5 / 6)
+        + 0.0006 * E**-2.3 * exp(-E / 4e6 / 6)
+        + 0.0130 * E**-2.40 * exp(-E / 1.2e5 / 8)
+        + 0.0007 * E**-2.3 * exp(-E / 4e6 / 8),
+        lambda E: 0.0060 * E**-2.30 * exp(-E / 1.2e5 / 26)
+        + 0.00021 * E**-2.2 * exp(-E / 4e6 / 26)
+        + 0.0000011 * E**-2.2 * exp(-E / 1.5e9 / 26)
+        + 0.00001 * E**-2.2 * exp(-E / 4e6 / 52)
+        + 0.000053 * E**-2.2 * exp(-E / 4e6 / 80),
+    )
 
 
 class GlobalSplineFitBase(CosmicRayFlux):
