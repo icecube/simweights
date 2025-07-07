@@ -6,11 +6,11 @@ ci:
   autoupdate_schedule: quarterly
 repos:
   - repo: https://github.com/google/yamlfmt
-    rev: v0.16.0
+    rev: v0.17.2
     hooks:
       - id: yamlfmt
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.14.0
+    rev: v2.15.0
     hooks:
       - id: pretty-format-toml
         args: [--autofix]
@@ -28,27 +28,27 @@ repos:
       - id: blacken-docs
         args: [-l 100]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v1.16.1
     hooks:
       - id: mypy
         files: simweights
         additional_dependencies: [numpy]
         exclude: ^contrib/
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.6
+    rev: v3.3.7
     hooks:
       - id: pylint
         files: simweights
         exclude: ^contrib/
         additional_dependencies: [numpy, pandas]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.4
+    rev: v0.12.2
     hooks:
       - id: ruff
         args: [--fix, --show-fixes]
       - id: ruff-format
   - repo: https://github.com/PyCQA/doc8
-    rev: "v1.1.2"
+    rev: "v2.0.0"
     hooks:
       - id: doc8
   - repo: https://github.com/pre-commit/pygrep-hooks
