@@ -4,12 +4,16 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+import contextlib
 import unittest
 from copy import deepcopy
 
 import numpy as np
 
 from simweights import TIG1996, IceTopSurface, NaturalRateCylinder, NuGenSurface, PowerLaw, Weighter
+
+with contextlib.suppress(ImportError):
+    import nuflux
 
 
 def fluxfun1(energy):

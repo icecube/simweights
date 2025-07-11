@@ -159,7 +159,10 @@ class CompositeSurface:
         assert np.isfinite(czmax)
         return czmin, czmax
 
-    def __eq__(self, other: object) -> bool:
+    def __hash__(self) -> int:
+        return hash(self.spectra)
+
+    def __eq__(self: GenerationSurface, other: object) -> bool:
         # must handle the same set of particle types
         if isinstance(other, GenerationSurface):
             return self == CompositeSurface(other)
