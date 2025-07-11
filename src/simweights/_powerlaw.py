@@ -121,6 +121,9 @@ class PowerLaw:
     def __repr__(self: PowerLaw) -> str:
         return f"{self.__class__.__name__}({self.g} ,{self.a}, {self.b})"
 
+    def __hash__(self) -> int:
+        return hash((self.g, self.a, self.b))
+
     def __eq__(self: PowerLaw, other: object) -> bool:
         if not isinstance(other, PowerLaw):
             mesg = f"{self} cannot be compared to {other}"

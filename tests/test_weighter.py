@@ -4,12 +4,16 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+import contextlib
 import unittest
 from copy import copy
 
 import numpy as np
 
 from simweights import TIG1996, NaturalRateCylinder, PowerLaw, Weighter, generation_surface
+
+with contextlib.suppress(ImportError):
+    import nuflux
 
 
 def fluxfun1(energy):
@@ -299,12 +303,8 @@ class TestWeighter(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.weighter1 + object()
 
+    @unittest.skipIf("nuflux" not in globals(), "Nuflux not available")
     def test_nuflux(self):
-        try:
-            import nuflux
-        except ImportError:
-            self.skipTest("nuflux not found")
-
         N1 = 15
         data1 = {
             "I3Weight": {

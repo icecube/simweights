@@ -31,6 +31,9 @@ class Column:
         r"""Probability density function."""
         return 1.0 / np.asarray(value, dtype=np.float64)
 
+    def __hash__(self) -> int:
+        return hash(self.columns)
+
     def __eq__(self: Column, other: object) -> bool:
         return isinstance(other, Column) and self.columns == other.columns
 
@@ -48,6 +51,9 @@ class Const:
     def pdf(self: Const) -> NDArray[np.float64]:
         r"""Probability density function."""
         return np.asarray(self.v, dtype=np.float64)
+
+    def __hash__(self) -> int:
+        return hash(self.v)
 
     def __eq__(self: Const, other: object) -> bool:
         return isinstance(other, Const) and self.v == other.v
