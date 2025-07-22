@@ -64,9 +64,6 @@ class CylinderBase:
             f"{self.cos_zen_min:1.4g}, {self.cos_zen_max:1.4g})"
         )
 
-    def __hash__(self) -> int:
-        return hash((self.length, self.radius, self.cos_zen_min, self.cos_zen_max))
-
     def __eq__(self: CylinderBase, other: object) -> bool:
         return (
             isinstance(other, type(self))
@@ -166,9 +163,6 @@ class CircleInjector:
 
     def __repr__(self: CircleInjector) -> str:
         return f"CircleInjector({self.radius:1.4g}, {self.cos_zen_min:1.4g}, {self.cos_zen_max:1.4g})"
-
-    def __hash__(self) -> int:
-        return hash((self.radius, self.cos_zen_min, self.cos_zen_max))
 
     def __eq__(self: CircleInjector, other: object) -> bool:
         return (
