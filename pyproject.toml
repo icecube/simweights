@@ -100,7 +100,8 @@ ignore = [
   "COM812",  # conflicts with ruff formatter
   "ISC001",  # conflicts with ruff formatter
   "PLR0913",  # Too many arguments in function definition
-  "PLR0911"  # Too many return statement
+  "PLR0911",  # Too many return statement
+  "PLW1641"  # object does not implement `__hash__` method
 ]
 select = ["ALL"]
 
