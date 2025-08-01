@@ -13,7 +13,8 @@ import pytest
 from numpy.testing import assert_allclose
 from pytest import approx
 
-from simweights import CircleInjector, NuGenWeighter, PowerLaw, UniformSolidAngleCylinder
+from simweights import CircleInjector, NaturalRateCylinder, NuGenSurface, NuGenWeighter, PowerLaw, UniformSolidAngleCylinder
+from tests.test_generation_surface import CompositeSurface
 
 with contextlib.suppress(ImportError):
     from icecube import dataclasses, icetray
@@ -46,6 +47,36 @@ def make_new_table(pdgid, nevents, spatial, spectrum):
     )
     weight["PrimaryNeutrinoEnergy"] = spectrum.ppf(np.linspace(0, 1, nevents))
     return weight
+
+
+def test_two_nugen_surfaces():
+    p1 = PowerLaw(-1, 10, 100)
+    p2 = PowerLaw(-2, 50, 500)
+    c1 = NaturalRateCylinder(3, 8, -1, 1)
+
+    N1 = 10000
+    N2 = 20000
+    s0 = NuGenSurface(2212, N1, p1, c1)
+    s2 = NuGenSurface(2212, N2, p2, c1)
+
+    cz1 = np.linspace(c1.cos_zen_min, c1.cos_zen_max, N1)
+    cz2 = np.linspace(c1.cos_zen_min, c1.cos_zen_max, N2)
+    q1 = np.linspace(1 / 2 / N1, 1 - 1 / 2 / N1, N1)
+    E1 = 10 * np.exp(q1 * np.log(100 / 10))
+    q2 = np.linspace(1 / 2 / N2, 1 - 1 / 2 / N2, N2)
+    E2 = (q2 * (500**-1 - 50**-1) + 50**-1) ** -1
+
+    w1 = 1 / s0.get_epdf({"pdgid": 2212, "energy": E1, "cos_zen": cz1, "TotalWeight": 1})
+    assert w1.sum() / (p1.b - p1.a) / c1.etendue == approx(1)
+    w2 = 1 / s2.get_epdf({"pdgid": 2212, "energy": E2, "cos_zen": cz2, "TotalWeight": 1})
+    assert w2.sum() / (p2.b - p2.a) / c1.etendue == approx(1)
+
+    surf = CompositeSurface(s0, s2)
+    E = np.r_[E1, E2]
+    czc = np.r_[cz1, cz2]
+    wc = 1 / surf.get_epdf({"pdgid": 2212, "energy": E, "cos_zen": czc, "TotalWeight": 1})
+
+    assert wc.sum() / (p2.b - p1.a) / c1.etendue == approx(1, 1e-5)
 
 
 @pytest.mark.parametrize("weight", (0.1, 1, 10))

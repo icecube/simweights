@@ -39,7 +39,8 @@ def test_dataset(fname):
 
     solid_angle = 2 * np.pi * (np.cos(wd["MinZenith"]) - np.cos(wd["MaxZenith"]))
     injection_area_cm = 1e4 * np.pi * wd["InjectionSurfaceR"] ** 2
-    total_weight = wd["TotalInteractionProbabilityWeight"]
+    genie_weight = wd["GENIEWeight"]
+    global_probability_scale = wd["GlobalProbabilityScale"]
 
     type_weight = np.empty_like(wd["OneWeight"])
     type_weight[pdgid > 0] = 0.7
@@ -55,23 +56,23 @@ def test_dataset(fname):
         w = GenieWeighter(fobj, nfiles=1)
 
         event_weight = w.get_weight_column("wght")
-        assert event_weight == approx(total_weight)
+        assert event_weight == approx(genie_weight)
 
         for particle in np.unique(pdgid):
-            for spectrum in w.surface.spectra[particle]:
-                power_min, power_max = spectrum.dists[1].a, spectrum.dists[1].b
+            for spectrum in w.surface.components[particle]:
+                power_min, power_max = spectrum.power_law.a, spectrum.power_law.b
                 event_mask = (pdgid == particle) & (emin == power_min) & (emax == power_max)
-
-                power_law = spectrum.dists[1]
-                energy_factor = 1 / power_law.pdf(w.get_weight_column("energy"))
+                energy_factor = 1 / spectrum.power_law.pdf(w.get_weight_column("energy"))
 
                 one_weight = (
                     w.get_weight_column("wght")[event_mask]
+                    * global_probability_scale[event_mask]
                     * energy_factor[event_mask]
                     * solid_angle[event_mask]
                     * injection_area_cm[event_mask]
                 )
 
+                assert global_probability_scale[event_mask] == approx(spectrum.global_probability_scale)
                 assert one_weight == approx(wd["OneWeight"][event_mask])
 
         assert w0 == approx(w.get_weights(1), rel=1e-5)

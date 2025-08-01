@@ -6,11 +6,11 @@
 
 import contextlib
 import unittest
-from copy import copy
+from copy import deepcopy
 
 import numpy as np
 
-from simweights import TIG1996, NaturalRateCylinder, PowerLaw, Weighter, generation_surface
+from simweights import TIG1996, IceTopSurface, NaturalRateCylinder, NuGenSurface, PowerLaw, Weighter
 
 with contextlib.suppress(ImportError):
     import nuflux
@@ -44,9 +44,9 @@ class TestWeighter(unittest.TestCase):
                 "zenith": np.full(cls.N1, np.pi / 4),
             },
         }
-        cls.c1 = NaturalRateCylinder(100, 200, 0, 1, "cos_zen")
-        cls.p1 = PowerLaw(0, 5e5, 5e6, "energy")
-        cls.s1 = cls.N1 * generation_surface(2212, cls.p1, cls.c1)
+        cls.c1 = NaturalRateCylinder(100, 200, 0, 1)
+        cls.p1 = PowerLaw(0, 5e5, 5e6)
+        cls.s1 = IceTopSurface(2212, cls.N1, cls.p1, cls.c1)
         cls.m1 = {
             "pdgid": ("I3Weight", "type"),
             "energy": ("I3Weight", "energy"),
@@ -248,28 +248,24 @@ class TestWeighter(unittest.TestCase):
         self.assertEqual(2 * len(w1), len(ws))
         self.assertIsNot(self.weighter1, weighter_sum)
         self.assertEqual(2 * len(self.weighter1.data), len(weighter_sum.data))
-        self.assertEqual(2 * self.weighter1.surface, weighter_sum.surface)
         self.assertEqual(self.weighter1.colnames, weighter_sum.colnames)
         self.check_weight(weighter_sum, 2 * self.N1, self.p1.integral * self.c1.etendue)
 
-        weightera = copy(self.weighter1)
+        weightera = deepcopy(self.weighter1)
         weightera += self.weighter1
         self.assertIsNot(self.weighter1, weightera)
         self.assertEqual(2 * len(self.weighter1.data), len(weightera.data))
-        self.assertEqual(2 * self.weighter1.surface, weightera.surface)
         self.assertEqual(self.weighter1.colnames, weightera.colnames)
         self.check_weight(weightera, 2 * self.N1, self.p1.integral * self.c1.etendue)
 
-        weighterb = copy(self.weighter1)
+        weighterb = deepcopy(self.weighter1)
         weighterb += self.weighter2
         self.assertEqual(2 * len(self.weighter1.data), len(weighterb.data))
-        self.assertEqual(2 * self.weighter1.surface, weighterb.surface)
         self.assertEqual(self.weighter1.colnames, weighterb.colnames)
         self.check_weight(weighterb, 2 * self.N1, self.p1.integral * self.c1.etendue)
 
         weighterc = self.weighter1 + self.weighter2
         self.assertEqual(2 * len(self.weighter1.data), len(weighterc.data))
-        self.assertEqual(2 * self.weighter1.surface, weighterc.surface)
         self.assertEqual(self.weighter1.colnames, weighterc.colnames)
         self.check_weight(weighterc, 2 * self.N1, self.p1.integral * self.c1.etendue)
 
@@ -287,7 +283,6 @@ class TestWeighter(unittest.TestCase):
 
         weighterf = sum([self.weighter1, self.weighter2])
         self.assertEqual(2 * len(self.weighter1.data), len(weighterf.data))
-        self.assertEqual(2 * self.weighter1.surface, weighterf.surface)
         self.assertEqual(self.weighter1.colnames, weighterf.colnames)
         self.check_weight(weighterf, 2 * self.N1, self.p1.integral * self.c1.etendue)
 
@@ -313,7 +308,7 @@ class TestWeighter(unittest.TestCase):
                 "zenith": np.full(N1, np.pi / 4),
             },
         }
-        s1 = N1 * generation_surface(14, self.p1, self.c1)
+        s1 = NuGenSurface(14, N1, self.p1, self.c1)
         weighter1 = Weighter([data1], s1)
         weighter1.add_weight_column("pdgid", data1["I3Weight"]["type"])
         weighter1.add_weight_column("energy", data1["I3Weight"]["energy"])

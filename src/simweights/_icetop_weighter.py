@@ -3,20 +3,31 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 
-from typing import Any
+from typing import Any, Mapping
 
 import numpy as np
 
-from ._generation_surface import GenerationSurface, generation_surface
+# if TYPE_CHECKING:
+from numpy.typing import ArrayLike, NDArray
+
+from ._generation_surface import CompositeSurface, GenerationSurface
 from ._powerlaw import PowerLaw
 from ._spatial import NaturalRateCylinder
 from ._utils import get_column, get_table
 from ._weighter import Weighter
 
 
-def sframe_icetop_surface(table: Any) -> GenerationSurface:
+class IceTopSurface(GenerationSurface):
+    """Represents a surface on which IceTop simulation was generated on."""
+
+    def get_epdf(self: "IceTopSurface", weight_cols: Mapping[str, ArrayLike]) -> "NDArray[np.float64]":
+        """Get the extended pdf of a sample of GENIE."""
+        return self.nevents * self.power_law.pdf(weight_cols["energy"]) * self.spatial.pdf(weight_cols["cos_zen"])
+
+
+def sframe_icetop_surface(table: Any) -> CompositeSurface:
     """Inspect the rows of a I3TopInjectorInfo S-Frame table object to generate a surface object."""
-    surfaces = []
+    surfaces = CompositeSurface()
 
     n_events = get_column(table, "n_events")
     power_law_index = get_column(table, "power_law_index")
@@ -33,20 +44,17 @@ def sframe_icetop_surface(table: Any) -> GenerationSurface:
             power_law_index[i],
             min_energy[i],
             max_energy[i],
-            "energy",
         )
         spatial = NaturalRateCylinder(
             0,  # set cylinder height to 0 to get simple surface plane
             sampling_radius[i],
             max_zenith[i],
             min_zenith[i],
-            "cos_zen",
         )
         pdgid = int(primary_type[i])
-        surfaces.append(nevents * generation_surface(pdgid, spectrum, spatial))
-    retval = sum(surfaces)
-    assert isinstance(retval, GenerationSurface)
-    return retval
+        surfaces.insert(IceTopSurface(pdgid, nevents, spectrum, spatial))
+    assert isinstance(surfaces, CompositeSurface)
+    return surfaces
 
 
 def IceTopWeighter(file_obj: Any) -> Weighter:  # noqa: N802

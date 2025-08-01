@@ -31,6 +31,23 @@ info_dtype = [
 result_dtype = [("neu", np.int32), ("pzv", np.float64), ("Ev", np.float64), ("wght", np.float64)]
 
 
+def test_genie_repr():
+    c1 = simweights.CircleInjector(300, 0, 1)
+    p1 = simweights.PowerLaw(0, 1e3, 1e4)
+    g = simweights.GenieSurface(-14, 1000, 0.3333, c1, p1)
+    assert (
+        eval(
+            repr(g),
+            locals={
+                "GenieSurface": simweights.GenieSurface,
+                "CircleInjector": simweights.CircleInjector,
+                "PowerLaw": simweights.PowerLaw,
+            },
+        )
+        == g
+    )
+
+
 @pytest.mark.parametrize("event_weight", (1e-6, 1e-3, 1))
 @pytest.mark.parametrize("nfiles", (1, 5, 50))
 @pytest.mark.parametrize("include_volscale", (True, False))

@@ -15,15 +15,15 @@ import pandas as pd
 import pytest
 import tables
 import uproot
+from pytest import approx
 
 from simweights import GenieWeighter
 
 with contextlib.suppress(ImportError):
     from icecube import dataio, simclasses  # noqa: F401
 
-approx = pytest.approx
 datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
-datasets = [
+genie_reader_datasets = [
     "upgrade_genie_step3_141828_000000",
     "GENIE_NuMu_IceCubeUpgrade_v58.22590.000000",
     "genie_numu_volume_scaling",
@@ -67,6 +67,7 @@ def load_reference_values(fname):
     if "MuonVolumeScaling" in wd.dtype.names:
         assert wd["MuonVolumeScaling"] == approx(muon_volume_scaling)
 
+    ref["pdgid"] = primary_type
     ref["solid_angle"] = 2 * np.pi * (np.cos(min_zenith) - np.cos(max_zenith))
     ref["injection_area"] = np.pi * (cylinder_radius * 1e2) ** 2
 
@@ -84,20 +85,18 @@ def load_reference_values(fname):
     return ref
 
 
-@pytest.mark.parametrize("fname", datasets)
+@pytest.mark.parametrize("fname", genie_reader_datasets)
 @pytest.mark.parametrize("loader", loaders)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
-def test_dataset(fname, loader):
+def test_genie_reader_dataset(fname, loader):
     filename = Path(datadir) / fname
     ref = load_reference_values(filename)
 
     fobj = loader(filename)
     w = GenieWeighter(fobj)
+    energy_term = 1 / w.surface.components[ref["pdgid"]][0].power_law.pdf(w.get_weight_column("energy"))
 
-    gprob, _, _, edist = next(iter(w.surface.spectra.values()))[0].dists
-    energy_term = 1 / edist.pdf(w.get_weight_column("energy"))
-
-    assert gprob.v == approx(1 / ref["solid_angle"] / ref["injection_area"] / ref["global_probability_scale"])
+    assert w.surface.components[ref["pdgid"]][0].global_probability_scale == approx(ref["global_probability_scale"])
     assert w.get_weight_column("wght") == approx(ref["GENIEWeight"])
     assert energy_term == approx(ref["energy_factor"])
 
@@ -111,13 +110,12 @@ def test_dataset(fname, loader):
         * vol_scale
     )
     assert one_weight == approx(ref["one_weight"], rel=1e-5)
-
     assert w.get_weights(1) == approx(ref["final_weight"], rel=1e-5)
 
     fobj.close()
 
 
-@pytest.mark.parametrize("fname", datasets)
+@pytest.mark.parametrize("fname", genie_reader_datasets)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
 @pytest.mark.skipif("dataio" not in globals(), reason="Not in an IceTray environment")
 def test_dataset_i3file(fname):

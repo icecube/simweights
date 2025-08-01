@@ -65,9 +65,9 @@ def load_reference_values(fname):
         d["injection_area"] = wd["InjectionAreaNormCGS"]
 
     if "TotalWeight" in wd.dtype.names:
-        d["total_weight"] = wd["TotalWeight"]
+        d["TotalWeight"] = wd["TotalWeight"]
     elif "TotalInteractionProbabilityWeight" in wd.dtype.names:
-        d["total_weight"] = wd["TotalInteractionProbabilityWeight"]
+        d["TotalWeight"] = wd["TotalInteractionProbabilityWeight"]
 
     type_weight = wd["TypeWeight"] if "TypeWeight" in wd.dtype.names else 0.5
     d["OneWeight"] = wd["OneWeight"]
@@ -86,20 +86,20 @@ def test_dataset(fname, loader):
     with loader(filename) as fobj:
         w = NuGenWeighter(fobj, nfiles=1)
 
-        event_weight = w.get_weight_column("event_weight")
-        assert event_weight == approx(ref_values["total_weight"])
+        event_weight = w.get_weight_column("TotalWeight")
+        assert event_weight == approx(ref_values["TotalWeight"])
 
-        cylinder = w.surface.spectra[ref_values["pdgid"]][0].dists[2]
+        cylinder = w.surface.components[ref_values["pdgid"]][0].spatial
         proj_area = cylinder.projected_area(w.get_weight_column("cos_zen"))
         assert proj_area == approx(ref_values["injection_area"])
 
         sw_etendue = 1 / cylinder.pdf(w.get_weight_column("cos_zen"))
         assert sw_etendue == approx(ref_values["solid_angle"] * ref_values["injection_area"], rel=1e-5)
 
-        power_law = w.surface.spectra[ref_values["pdgid"]][0].dists[1]
+        power_law = w.surface.components[ref_values["pdgid"]][0].power_law
         energy_factor = 1 / power_law.pdf(w.get_weight_column("energy"))
         one_weight = (
-            w.get_weight_column("event_weight") * energy_factor * ref_values["solid_angle"] * ref_values["injection_area"]
+            w.get_weight_column("TotalWeight") * energy_factor * ref_values["solid_angle"] * ref_values["injection_area"]
         )
         assert one_weight == approx(ref_values["OneWeight"])
         assert w.get_weights(1) == approx(ref_values["OneWeightByN"], rel=1e-5)

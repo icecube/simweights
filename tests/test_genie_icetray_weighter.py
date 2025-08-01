@@ -27,6 +27,7 @@ mcwd_keys = [
     "InjectionSurfaceR",
     "PrimaryNeutrinoEnergy",
     "GeneratorVolume",
+    "GlobalProbabilityScale",
 ]
 
 grd_keys = ["neu", "pxv", "pyv", "pzv", "Ev", "wght", "_glbprbscale"]
@@ -44,6 +45,7 @@ def make_new_table(pdgid, nevents, spatial, spectrum, coszen):
     weight["InjectionSurfaceR"] = spatial.radius
     weight["GeneratorVolume"] = 1.0
     weight["PrimaryNeutrinoEnergy"] = spectrum.ppf(np.linspace(0, 1, nevents, endpoint=False))
+    weight["GlobalProbabilityScale"] = 1.0
 
     dtype = [(k, float) for k in grd_keys]
     resultdict = np.zeros(nevents, dtype=dtype)

@@ -24,6 +24,7 @@ __all__ = [
     "GaisserH4a_IT",
     "GaisserHillas",
     "GenerationSurface",
+    "GenieSurface",
     "GenieWeighter",
     "GlobalFitGST",
     "GlobalFitGST_IT",
@@ -34,15 +35,16 @@ __all__ = [
     "Hoerandel5",
     "Hoerandel_IT",
     "Honda2004",
+    "IceTopSurface",
     "IceTopWeighter",
     "NaturalRateCylinder",
+    "NuGenSurface",
     "NuGenWeighter",
     "PDGCode",
     "PowerLaw",
     "UniformSolidAngleCylinder",
     "Weighter",
     "corsika_to_pdg",
-    "generation_surface",
 ]
 
 from ._corsika_weighter import CorsikaWeighter
@@ -63,10 +65,10 @@ from ._fluxes import (
     Hoerandel_IT,
     Honda2004,
 )
-from ._generation_surface import GenerationSurface, generation_surface
-from ._genie_weighter import GenieWeighter
-from ._icetop_weighter import IceTopWeighter
-from ._nugen_weighter import NuGenWeighter
+from ._generation_surface import GenerationSurface
+from ._genie_weighter import GenieSurface, GenieWeighter
+from ._icetop_weighter import IceTopSurface, IceTopWeighter
+from ._nugen_weighter import NuGenSurface, NuGenWeighter
 from ._pdgcode import PDGCode
 from ._powerlaw import PowerLaw
 from ._spatial import CircleInjector, NaturalRateCylinder, UniformSolidAngleCylinder

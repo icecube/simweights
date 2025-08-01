@@ -6,24 +6,40 @@ from __future__ import annotations
 
 import numbers
 import warnings
-from typing import Any
+from typing import TYPE_CHECKING, Any, Mapping
 
 import numpy as np
 
-from ._generation_surface import GenerationSurface, generation_surface
+from ._generation_surface import CompositeSurface, GenerationSurface
 from ._powerlaw import PowerLaw
 from ._spatial import NaturalRateCylinder
-from ._utils import Column, constcol, get_column, get_table, has_column, has_table
+from ._utils import constcol, get_column, get_table, has_column, has_table
 from ._weighter import Weighter
 
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
-def sframe_corsika_surface(table: Any) -> GenerationSurface:
+
+class CorsikaSurface(GenerationSurface):
+    """Represents a surface on which CORSIKA simulation was generated on."""
+
+    def get_epdf(self: CorsikaSurface, weight_cols: Mapping[str, NDArray[np.float64]]) -> NDArray[np.float64]:
+        """Get the extended pdf of a sample of CORSIKA."""
+        return (
+            self.nevents
+            / weight_cols["event_weight"]
+            * self.power_law.pdf(weight_cols["energy"])
+            * self.spatial.pdf(weight_cols["cos_zen"])
+        )
+
+
+def sframe_corsika_surface(table: Any) -> CompositeSurface:
     """Inspect the rows of a CORSIKA S-Frame table object to generate a surface object.
 
     This function works on files generated with either triggered CORSIKA or corsika-reader because
     `I3PrimaryInjectorInfo` and `I3CorsikaInfo` use exactly the same names for quantities.
     """
-    surfaces = []
+    surfaces = CompositeSurface()
     cylinder_height = get_column(table, "cylinder_height")
     cylinder_radius = get_column(table, "cylinder_radius")
     max_zenith = get_column(table, "max_zenith")
@@ -39,32 +55,26 @@ def sframe_corsika_surface(table: Any) -> GenerationSurface:
             cylinder_radius[i],
             np.cos(max_zenith[i]),
             np.cos(min_zenith[i]),
-            "cos_zen",
         )
         spectrum = PowerLaw(
             power_law_index[i],
             min_energy[i],
             max_energy[i],
-            "energy",
         )
         oversampling_val = get_column(table, "oversampling")[i] if has_column(table, "oversampling") else 1
         pdgid = int(get_column(table, "primary_type")[i])
-        surfaces.append(
-            n_events[i] * oversampling_val * generation_surface(pdgid, Column("event_weight"), spectrum, spatial),
-        )
-    retval = sum(surfaces)
-    assert isinstance(retval, GenerationSurface)
-    return retval
+        surfaces.insert(CorsikaSurface(pdgid, n_events[i] * oversampling_val, spectrum, spatial))
+    return surfaces
 
 
-def weight_map_corsika_surface(table: Any) -> GenerationSurface:
+def weight_map_corsika_surface(table: Any) -> CompositeSurface:
     """Inspect the `CorsikaWeightMap` table object of a corsika file to generate a surface object."""
     pdgids = sorted(np.unique(get_column(table, "ParticleType").astype(int)))
 
     if len(pdgids) == 0:
         msg = "`CorsikaWeightMap` is empty. SimWeights cannot process this file"
         raise RuntimeError(msg)
-    surface: int | GenerationSurface = 0
+    surface = CompositeSurface()
     for pdgid in pdgids:
         mask = pdgid == get_column(table, "ParticleType")
 
@@ -73,7 +83,6 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
             constcol(table, "CylinderRadius", mask),
             np.cos(constcol(table, "ThetaMax", mask)),
             np.cos(constcol(table, "ThetaMin", mask)),
-            "cos_zen",
         )
 
         primary_spectral_index = round(constcol(table, "PrimarySpectralIndex", mask), 6)
@@ -83,11 +92,9 @@ def weight_map_corsika_surface(table: Any) -> GenerationSurface:
             primary_spectral_index,
             constcol(table, "EnergyPrimaryMin", mask),
             constcol(table, "EnergyPrimaryMax", mask),
-            "energy",
         )
         nevents = constcol(table, "OverSampling", mask) * constcol(table, "NEvents", mask)
-        surface += nevents * generation_surface(pdgid, spectrum, spatial)
-    assert isinstance(surface, GenerationSurface)
+        surface.insert(CorsikaSurface(pdgid, nevents, spectrum, spatial))
     return surface
 
 
@@ -145,7 +152,8 @@ def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # 
             )
 
         table = get_table(file_obj, "CorsikaWeightMap")
-        surface = nfiles * weight_map_corsika_surface(table)
+        surface = weight_map_corsika_surface(table)
+        surface.scale(nfiles)
         triggered = False
 
     weighter = Weighter([file_obj], surface)

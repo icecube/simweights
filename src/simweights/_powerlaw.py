@@ -38,7 +38,7 @@ class PowerLaw:
 
     # pylint: disable=invalid-name
 
-    def __init__(self: PowerLaw, g: float, a: float, b: float, colname: str | None = None) -> None:
+    def __init__(self: PowerLaw, g: float, a: float, b: float) -> None:
         assert b > a
         self.g = float(g)
         self.a = float(a)
@@ -49,7 +49,6 @@ class PowerLaw:
         else:
             self.integral = (self.b**self.G - self.a**self.G) / self.G
         self.span = b - a
-        self.columns = (colname,)
 
     def _pdf(self: PowerLaw, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.asarray(x**self.g / self.integral, dtype=np.float64)

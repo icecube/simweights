@@ -2,31 +2,18 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import annotations
-
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, NamedTuple, Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
-from ._pdgcode import PDGCode
-from ._powerlaw import PowerLaw
-from ._spatial import CircleInjector, CylinderBase, SpatialDist
+from simweights._pdgcode import PDGCode
+from simweights._powerlaw import PowerLaw
+from simweights._spatial import SpatialDist
 
-if TYPE_CHECKING:  # pragma: no cover
-    from numpy.typing import ArrayLike, NDArray
-
-    from ._utils import Column, Const
-
-    Dist = SpatialDist | PowerLaw | Column | Const
-
-
-class SurfaceTuple(NamedTuple):
-    """Container for the components Generation Surfaces."""
-
-    pdgid: int | PDGCode
-    nevents: float
-    dists: Sequence[Any]
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class GenerationSurface:
@@ -36,136 +23,152 @@ class GenerationSurface:
     class. Each particle type is stored separately.
     """
 
-    def __init__(self: GenerationSurface, *spectra: SurfaceTuple) -> None:
-        """:param spectra: a collection of GenerationProbabilities."""
-        self.spectra: dict[int, list[SurfaceTuple]] = {}
-        for spec in spectra:
-            self._insert(spec)
+    def __init__(self, pdgid: "PDGCode | int", nevents: float, power_law: PowerLaw, spatial: SpatialDist) -> None:
+        self.pdgid: PDGCode = PDGCode(pdgid)
+        self.nevents = nevents
+        self.power_law = power_law
+        self.spatial = spatial
 
-    def _insert(self: GenerationSurface, surface: SurfaceTuple) -> None:
-        key = int(surface.pdgid)
-        if key not in self.spectra:
-            self.spectra[key] = []
+    def equivalent(self, surface: Any) -> bool:
+        """Test for weather two surfaces cand be combined into a single surface with the sum of the nevents."""
+        if not isinstance(surface, self.__class__):
+            return False
+        return self.pdgid == surface.pdgid and self.power_law == surface.power_law and self.spatial == surface.spatial
 
-        for i, spec in enumerate(self.spectra[key]):
-            if surface.dists == spec.dists:
-                self.spectra[key][i] = spec._replace(nevents=surface.nevents + spec.nevents)
-                break
+    def scale(self, factor: float) -> None:
+        """Scale the number of events by this factor."""
+        self.nevents *= factor
+
+    def __eq__(self, surface: object) -> bool:
+        if not isinstance(surface, self.__class__):
+            return False
+        return self.equivalent(surface) and self.nevents == surface.nevents
+
+    def get_energy_range(self, pdgid: "PDGCode | None" = None) -> "tuple[float, float]":
+        """Return the energy range for given particle type over all surfaces."""
+        if pdgid is None:
+            pdgid = self.pdgid
+        assert pdgid == self.pdgid
+        return self.power_law.a, self.power_law.b
+
+    def get_cos_zenith_range(self, pdgid: "PDGCode | None" = None) -> "tuple[float, float]":
+        """Return the cos zenith range for given particle type over all surfaces."""
+        if pdgid is None:
+            pdgid = self.pdgid
+        assert pdgid == self.pdgid
+        return self.spatial.cos_zen_min, self.spatial.cos_zen_max
+
+    def get_epdf(self, weight_cols: "Mapping[str, NDArray[np.float64]]") -> NDArray[np.float64]:
+        """Get the extended pdf of sample.
+
+        The pdf is the probability that an event with these parameters is generated. The pdf is multiplied
+        by the number of events.
+        """
+        raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.pdgid.name}, {self.nevents}, {self.power_law}, {self.spatial})"
+
+
+class CompositeSurface:
+    """Represents two or more surface on which Monte Carlo simulation was generated on.
+
+    This combines multiple surfaces either because the surfaces had different parameters
+    or because they are different particle types
+    """
+
+    def __init__(self, *args: GenerationSurface) -> None:
+        self.components: dict[PDGCode, list[GenerationSurface]] = {}
+        for a in args:
+            self.insert(a)
+
+    def insert(self, new_surface: Any) -> None:
+        """Insert a new surface into this composite service."""
+        if isinstance(new_surface, CompositeSurface):
+            for val in new_surface.components.values():
+                for v in val:
+                    self.insert(v)
+        elif isinstance(new_surface, GenerationSurface):
+            key = new_surface.pdgid
+            if key not in self.components:
+                self.components[key] = []
+            for comp in self.components[key]:
+                if new_surface.equivalent(comp):
+                    comp.nevents += new_surface.nevents
+                    break
+            else:
+                self.components[key].append(deepcopy(new_surface))
         else:
-            self.spectra[key].append(deepcopy(surface))
-
-    def __add__(self: GenerationSurface, other: int | GenerationSurface) -> GenerationSurface:
-        output = deepcopy(self)
-        if other == 0:
-            return output
-        if not isinstance(other, GenerationSurface):
-            mesg = f"Cannot add {type(self)} to {type(other)}"
+            mesg = f"Cannot combine {type(self)} to {type(new_surface)}"
             raise TypeError(mesg)
-        for ospectra in other.spectra.values():
-            for ospec in ospectra:
-                output._insert(ospec)
-        return output
 
-    def __radd__(self: GenerationSurface, other: int | GenerationSurface) -> GenerationSurface:
-        return self + other
+    def scale(self, factor: float) -> None:
+        """Scale the number of events by this factor."""
+        for val in self.components.values():
+            for comp in val:
+                comp.scale(factor)
 
-    def __mul__(self: GenerationSurface, factor: float) -> GenerationSurface:
-        new_surface = deepcopy(self)
-        for subsurf in new_surface.spectra.values():
-            for i, _ in enumerate(subsurf):
-                subsurf[i] = subsurf[i]._replace(nevents=factor * subsurf[i].nevents)
-        return new_surface
-
-    def __rmul__(self: GenerationSurface, factor: float) -> GenerationSurface:
-        return self.__mul__(factor)
-
-    def get_keys(self: GenerationSurface) -> list[str]:
-        """Get a list of the available keys needed for weighting this surface."""
-        keys = []
-        for x in self.spectra.values():
-            for y in x:
-                for a in y.dists:
-                    keys += list(a.columns)
-        return list(set(keys))
-
-    def get_epdf(
-        self: GenerationSurface,
-        pdgid: ArrayLike,
-        **kwargs: ArrayLike,
-    ) -> NDArray[np.float64]:
+    def get_epdf(self, weight_cols: "Mapping[str, ArrayLike]") -> NDArray[np.float64]:
         """Get the extended pdf of an event.
 
         The pdf is the probability that an event with these parameters is generated. The pdf is multiplied
         by the number of events.
         """
         cols = {}
-        shape = None
-        for key, value in kwargs.items():
-            cols[key] = np.asarray(value, dtype=np.float64)
-            if shape is None:
-                shape = cols[key].shape
-            else:
-                assert shape == cols[key].shape
-        assert shape is not None
-        count = np.zeros(shape, dtype=np.float64)
+        b = np.broadcast(*(v for v in weight_cols.values()))
+        cols = {k: np.asarray(v, dtype=np.float64) for k, v in weight_cols.items()}
+        count = np.zeros(b.shape, dtype=np.float64)
         # loop over particle type
-        for ptype in np.unique(pdgid):
-            mask = ptype == pdgid
+        for ptype in np.unique(weight_cols["pdgid"]):
+            mask = ptype == weight_cols["pdgid"]
+            cc = {k: v[mask] for k, v in cols.items()}
             # loop over different datasets of the same particle type
-            for surface in self.spectra[ptype]:
-                result = surface.nevents
-                # loop over the different distributions in the generation surface
-                for dist in surface.dists:
-                    result *= dist.pdf(*(cols[k][mask] for k in dist.columns))
-                count[mask] += result
+            for surface in self.components[ptype]:
+                count[mask] += surface.get_epdf(cc)
         return count
 
-    def get_pdgids(self: GenerationSurface) -> list[int | PDGCode]:
-        """Return a list of pdgids that this surface represents."""
-        return sorted(self.spectra.keys())
-
-    def get_energy_range(self: GenerationSurface, pdgid: PDGCode | None) -> tuple[float, float]:
+    def get_energy_range(self: "CompositeSurface", pdgid: "PDGCode | None" = None) -> "tuple[float, float]":
         """Return the energy range for given particle type over all surfaces."""
-        pdgids = sorted(self.spectra.keys()) if pdgid is None else [pdgid]
+        pdgids = sorted(self.components.keys()) if pdgid is None else [pdgid]
 
-        assert set(pdgids).issubset(self.spectra.keys())
+        assert set(pdgids).issubset(self.components.keys())
         emin = np.inf
         emax = -np.inf
         for pid in pdgids:
-            for surf in self.spectra[pid]:
-                for dist in surf.dists:
-                    if isinstance(dist, PowerLaw):
-                        emin = min(emin, dist.a)
-                        emax = max(emax, dist.b)
+            for surf in self.components[pid]:
+                a, b = surf.get_energy_range()
+                emin = min(emin, a)
+                emax = max(emax, b)
         assert np.isfinite(emin)
         assert np.isfinite(emax)
         return emin, emax
 
-    def get_cos_zenith_range(self: GenerationSurface, pdgid: PDGCode | None) -> tuple[float, float]:
+    def get_cos_zenith_range(self: "CompositeSurface", pdgid: "PDGCode | None" = None) -> "tuple[float, float]":
         """Return the cos zenith range for given particle type over all surfaces."""
-        pdgids = sorted(self.spectra.keys()) if pdgid is None else [pdgid]
+        pdgids = sorted(self.components.keys()) if pdgid is None else [pdgid]
 
-        assert set(pdgids).issubset(self.spectra.keys())
+        assert set(pdgids).issubset(self.components.keys())
         czmin = np.inf
         czmax = -np.inf
         for pid in pdgids:
-            for surf in self.spectra[pid]:
-                for dist in surf.dists:
-                    if isinstance(dist, (CircleInjector, CylinderBase)):
-                        czmin = min(czmin, dist.cos_zen_min)
-                        czmax = max(czmax, dist.cos_zen_max)
+            for surf in self.components[pid]:
+                a, b = surf.get_cos_zenith_range()
+                czmin = min(czmin, a)
+                czmax = max(czmax, b)
         assert np.isfinite(czmin)
         assert np.isfinite(czmax)
         return czmin, czmax
 
-    def __eq__(self: GenerationSurface, other: object) -> bool:
+    def __eq__(self, other: object) -> bool:
         # must handle the same set of particle types
-        if not isinstance(other, GenerationSurface):
+        if isinstance(other, GenerationSurface):
+            return self == CompositeSurface(other)
+        if not isinstance(other, CompositeSurface):
             return False
-        if set(self.spectra.keys()) != set(other.spectra.keys()):
+        if set(self.components.keys()) != set(other.components.keys()):
             return False
-        for pdgid, spec1 in self.spectra.items():
-            spec2 = other.spectra[pdgid]
+        for pdgid, spec1 in self.components.items():
+            spec2 = other.components[pdgid]
             # must have the same number of unique spectra
             if len(spec1) != len(spec2):
                 return False
@@ -175,23 +178,11 @@ class GenerationSurface:
                     return False
         return True
 
-    def __repr__(self: GenerationSurface) -> str:
-        return self.__class__.__name__ + "(" + ",".join(repr(y) for x in self.spectra.values() for y in x) + ")"
-
-    def __str__(self: GenerationSurface) -> str:
+    def __str__(self) -> str:
         outstrs = []
-        for pdgid, specs in self.spectra.items():
-            try:
-                ptype = PDGCode(pdgid).name
-            except ValueError:
-                ptype = str(pdgid)
-            collections = (f"N={subspec.nevents} " + " ".join(repr(d) for d in subspec.dists) for subspec in specs)
-            outstrs.append(f"     {ptype:>11} : " + "\n                   ".join(collections))
+        for pdgid, specs in self.components.items():
+            outstrs.append(f"     {pdgid.name:>11} : " + "\n                   ".join([str(s) for s in specs]))
         return "< " + self.__class__.__name__ + "\n" + "\n".join(outstrs) + "\n>"
 
-
-def generation_surface(pdgid: int | PDGCode, *dists: Dist) -> GenerationSurface:
-    """Convenience function to generate a GenerationSurface for a single particle type."""
-    return GenerationSurface(
-        SurfaceTuple(pdgid=pdgid, nevents=1.0, dists=dists),
-    )
+    def __repr__(self) -> str:
+        return self.__class__.__name__ + "(\n  " + ",\n  ".join(repr(y) for x in self.components.values() for y in x) + ",\n)"

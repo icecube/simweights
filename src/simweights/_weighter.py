@@ -11,12 +11,11 @@ from typing import TYPE_CHECKING, Any, Callable, Iterable
 import numpy as np
 from scipy.integrate import quad  # pylint: disable=import-error
 
+from ._generation_surface import CompositeSurface
 from ._utils import get_column, get_table
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
-
-    from ._generation_surface import GenerationSurface  # pragma: nocover
 
 
 class Weighter:
@@ -28,7 +27,7 @@ class Weighter:
     added together to form samples with different simulation parameters
     """
 
-    def __init__(self: Weighter, data: Iterable[Any], surface: GenerationSurface) -> None:
+    def __init__(self: Weighter, data: Iterable[Any], surface: CompositeSurface) -> None:
         self.data = list(data)
         self.surface = surface
         self.weight_cols: dict[str, NDArray[np.float64]] = {}
@@ -80,14 +79,11 @@ class Weighter:
             areas. For neutrinos, If the value is 1 then the return value will be the
             well known quantity OneWeight.
         """
-        # get a dictionary of the columns we need for weighting
-        event_col = {k: self.get_weight_column(k) for k in ["pdgid", *self.surface.get_keys()]}
-
         # do nothing if everything is empty
-        if event_col["pdgid"].shape == (0,):
+        if self.get_weight_column("pdgid").shape == (0,):
             return np.array([])
 
-        epdf = self.surface.get_epdf(**event_col)
+        epdf = self.surface.get_epdf(self.weight_cols)
 
         # calculate the flux based on which type of flux it is
         if hasattr(flux, "getFlux"):
@@ -251,7 +247,11 @@ class Weighter:
             mesg = f"cannot add {other!r} to weighter object {self!r}"
             raise TypeError(mesg)
 
-        weighter = Weighter(self.data + other.data, self.surface + other.surface)
+        s = CompositeSurface()
+        s.insert(self.surface)
+        s.insert(other.surface)
+
+        weighter = Weighter(self.data + other.data, s)
 
         for colname, column in self.weight_cols.items():
             if colname in other.weight_cols:

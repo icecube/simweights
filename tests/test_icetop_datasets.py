@@ -53,7 +53,7 @@ def test_dataset(fname, loader):
     ref = load_reference_values(filename)
     fobj = loader(filename)
     w = IceTopWeighter(fobj)
-    spatial = w.surface.spectra[2212][0].dists[1]
+    spatial = w.surface.components[2212][0].spatial
     proj_area = spatial.projected_area(1)
     assert proj_area == approx(ref["injection_area"])
     sw_etendue = 1 / spatial.pdf(1)
