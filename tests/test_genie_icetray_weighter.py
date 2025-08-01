@@ -117,6 +117,7 @@ def test_genie_icetray_i3files(nfiles, flux, nevents):
     weight["InjectionSurfaceR"] = c1.radius
     weight["GeneratorVolume"] = 1.0
     weight["PrimaryNeutrinoEnergy"] = energy
+    weight["GlobalProbabilityScale"] = 1
 
     resultdict = simclasses.I3GENIEResultDict()
     resultdict.neu = pdgid

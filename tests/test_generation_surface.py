@@ -160,12 +160,13 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(self.s0.nevents, 10000)
 
     def test_repr(self):
-        ll = {"Gamma": PDGCode.Gamma, "PPlus": PDGCode.PPlus}
-        self.assertEqual(eval(repr(self.s0), locals=ll), self.s0)
-        self.assertEqual(eval(repr(self.s1), locals=ll), self.s1)
-        self.assertEqual(eval(repr(self.s2), locals=ll), self.s2)
-        self.assertEqual(eval(repr(self.s3), locals=ll), self.s3)
-        self.assertEqual(eval(repr(self.s4), locals=ll), self.s4)
+        Gamma = PDGCode.Gamma  # noqa: F841
+        PPlus = PDGCode.PPlus  # noqa: F841
+        self.assertEqual(eval(repr(self.s0)), self.s0)
+        self.assertEqual(eval(repr(self.s1)), self.s1)
+        self.assertEqual(eval(repr(self.s2)), self.s2)
+        self.assertEqual(eval(repr(self.s3)), self.s3)
+        self.assertEqual(eval(repr(self.s4)), self.s4)
 
     def test_addition_gsc(self):
         s0 = CompositeSurface(self.gsc1, self.s0)
@@ -244,11 +245,12 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(self.gsc4, CompositeSurface(self.s4, self.s0))
 
     def test_repr_gsc(self):
-        ll = {"PPlus": PDGCode.PPlus, "Gamma": PDGCode.Gamma}
-        self.assertEqual(self.gsc1, eval(repr(self.gsc1), locals=ll))
-        self.assertEqual(self.gsc2, eval(repr(self.gsc2), locals=ll))
-        self.assertEqual(self.gsc3, eval(repr(self.gsc3), locals=ll))
-        self.assertEqual(self.gsc4, eval(repr(self.gsc4), locals=ll))
+        PPlus = PDGCode.PPlus  # noqa: F841
+        Gamma = PDGCode.Gamma  # noqa: F841
+        self.assertEqual(self.gsc1, eval(repr(self.gsc1)))
+        self.assertEqual(self.gsc2, eval(repr(self.gsc2)))
+        self.assertEqual(self.gsc3, eval(repr(self.gsc3)))
+        self.assertEqual(self.gsc4, eval(repr(self.gsc4)))
 
         s = str(CompositeSurface(self.gsc2, self.gsc3, self.gsc4)).split("\n")
         self.assertEqual(s[0], "< CompositeSurface")

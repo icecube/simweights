@@ -35,17 +35,10 @@ def test_genie_repr():
     c1 = simweights.CircleInjector(300, 0, 1)
     p1 = simweights.PowerLaw(0, 1e3, 1e4)
     g = simweights.GenieSurface(-14, 1000, 0.3333, c1, p1)
-    assert (
-        eval(
-            repr(g),
-            locals={
-                "GenieSurface": simweights.GenieSurface,
-                "CircleInjector": simweights.CircleInjector,
-                "PowerLaw": simweights.PowerLaw,
-            },
-        )
-        == g
-    )
+    GenieSurface = simweights.GenieSurface  # noqa: F841
+    CircleInjector = simweights.CircleInjector  # noqa: F841
+    PowerLaw = simweights.PowerLaw  # noqa: F841
+    assert eval(repr(g)) == g
 
 
 @pytest.mark.parametrize("event_weight", (1e-6, 1e-3, 1))
