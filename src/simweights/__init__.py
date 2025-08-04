@@ -17,6 +17,7 @@ __version__ = "0.1.3"
 __all__ = [
     "TIG1996",
     "CircleInjector",
+    "CompositeSurface",
     "CorsikaWeighter",
     "FixedFractionFlux",
     "GaisserH3a",
@@ -65,7 +66,7 @@ from ._fluxes import (
     Hoerandel_IT,
     Honda2004,
 )
-from ._generation_surface import GenerationSurface
+from ._generation_surface import CompositeSurface, GenerationSurface
 from ._genie_weighter import GenieSurface, GenieWeighter
 from ._icetop_weighter import IceTopSurface, IceTopWeighter
 from ._nugen_weighter import NuGenSurface, NuGenWeighter

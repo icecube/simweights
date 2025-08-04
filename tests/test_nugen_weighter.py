@@ -13,8 +13,15 @@ import pytest
 from numpy.testing import assert_allclose
 from pytest import approx
 
-from simweights import CircleInjector, NaturalRateCylinder, NuGenSurface, NuGenWeighter, PowerLaw, UniformSolidAngleCylinder
-from tests.test_generation_surface import CompositeSurface
+from simweights import (
+    CircleInjector,
+    CompositeSurface,
+    NaturalRateCylinder,
+    NuGenSurface,
+    NuGenWeighter,
+    PowerLaw,
+    UniformSolidAngleCylinder,
+)
 
 with contextlib.suppress(ImportError):
     from icecube import dataclasses, icetray
