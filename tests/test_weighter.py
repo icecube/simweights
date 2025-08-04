@@ -310,6 +310,7 @@ class TestWeighter(unittest.TestCase):
         }
         s1 = NuGenSurface(14, N1, self.p1, self.c1)
         weighter1 = Weighter([data1], s1)
+        weighter1.add_weight_column("TotalWeight", np.ones(N1))
         weighter1.add_weight_column("pdgid", data1["I3Weight"]["type"])
         weighter1.add_weight_column("energy", data1["I3Weight"]["energy"])
         weighter1.add_weight_column("cos_zen", np.cos(data1["I3Weight"]["zenith"]))
