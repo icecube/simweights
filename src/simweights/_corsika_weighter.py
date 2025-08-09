@@ -29,7 +29,7 @@ class CorsikaSurface(GenerationSurface):
             self.nevents
             / weight_cols["event_weight"]
             * self.power_law.pdf(weight_cols["energy"])
-            * self.spatial.pdf(weight_cols["cos_zen"])
+            / self.spatial.etendue
         )
 
 
@@ -164,10 +164,8 @@ def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # 
         weighter.add_weight_column("cos_zen", np.cos(weighter.get_column("I3CorsikaWeight", "zenith")))
         weighter.add_weight_column("event_weight", weighter.get_column("I3CorsikaWeight", "weight"))
     else:
-        energy = weighter.get_column("PolyplopiaPrimary", "energy")
-        weighter.add_weight_column("energy", energy)
-        weighter.add_weight_column("pdgid", weighter.get_column("PolyplopiaPrimary", "type"))
-        weighter.add_weight_column("cos_zen", np.cos(weighter.get_column("PolyplopiaPrimary", "zenith")))
-        weighter.add_weight_column("event_weight", np.full(len(energy), 1))
+        weighter.add_weight_column("energy", weighter.get_column("CorsikaWeightMap", "PrimaryEnergy"))
+        weighter.add_weight_column("pdgid", weighter.get_column("CorsikaWeightMap", "PrimaryType").astype(np.int64))
+        weighter.add_weight_column("event_weight", weighter.get_column("CorsikaWeightMap", "Weight"))
 
     return weighter

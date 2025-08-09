@@ -45,6 +45,8 @@ weight_dtype = [
     ("EnergyPrimaryMin", np.float64),
     ("EnergyPrimaryMax", np.float64),
     ("PrimarySpectralIndex", np.float64),
+    ("PrimaryEnergy", np.float64),
+    ("PrimaryType", np.float64),
 ]
 
 
@@ -71,13 +73,9 @@ def make_corsika_data(pdgid, nevents, c, p):
     weight["EnergyPrimaryMin"] = p.a
     weight["EnergyPrimaryMax"] = p.b
     weight["PrimarySpectralIndex"] = p.g
-
-    primary = np.zeros(nevents, dtype=primary_dtype)
-    primary["type"] = pdgid
-    primary["zenith"] = np.arccos(get_cos_zenith_dist(c, nevents))
-    np.random.default_rng().shuffle(primary["zenith"])
-    primary["energy"] = p.ppf(np.linspace(0, 1, nevents))
-    return {"CorsikaWeightMap": weight, "PolyplopiaPrimary": primary}
+    weight["PrimaryEnergy"] = p.ppf(np.linspace(0, 1, nevents))
+    weight["PrimaryType"] = pdgid
+    return weight
 
 
 @pytest.mark.parametrize("oversampling", (1, 5, 50))
@@ -88,24 +86,24 @@ def test_old_corsika(oversampling, nfiles, flux):
     p1 = simweights.PowerLaw(0, 1e3, 1e4)
     d = make_corsika_data(2212, 10000, c1, p1)
 
-    d["CorsikaWeightMap"]["OverSampling"] = oversampling
-    wobj = CorsikaWeighter(d, nfiles=nfiles)
+    d["OverSampling"] = oversampling
+    wobj = CorsikaWeighter({"CorsikaWeightMap":d}, nfiles=nfiles)
 
     w = wobj.get_weights(flux)
     np.testing.assert_allclose(
         w.sum(),
         flux * c1.etendue * p1.integral / nfiles / oversampling,
     )
-    E = d["PolyplopiaPrimary"]["energy"]
+    E = d["PrimaryEnergy"]
     y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
     Ewidth = np.ediff1d(x)
     np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / nfiles / oversampling, 5e-3)
 
     with pytest.raises(RuntimeError):
-        CorsikaWeighter(d)
+        CorsikaWeighter({"CorsikaWeigthMap":d})
 
     with pytest.raises(TypeError):
-        CorsikaWeighter(d, nfiles=object())
+        CorsikaWeighter({"CorsikaWeigthMap":d}, nfiles=object())
 
     with pytest.raises(RuntimeError):
         x = {"CorsikaWeightMap": {"ParticleType": []}, "PolyplopiaPrimary": {}}
@@ -118,7 +116,7 @@ def test_old_corsika(oversampling, nfiles, flux):
 def test_sframe_corsika(oversampling, nfiles, flux):
     c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
     p1 = simweights.PowerLaw(0, 1e3, 1e4)
-    d = make_corsika_data(2212, 10000, c1, p1)
+    d = {"CorsikaWeightMap": make_corsika_data(2212, 10000, c1, p1)}
     rows = nfiles * [
         (
             10000,
@@ -141,7 +139,7 @@ def test_sframe_corsika(oversampling, nfiles, flux):
         w.sum(),
         flux * c1.etendue * p1.integral / nfiles / oversampling,
     )
-    E = d["PolyplopiaPrimary"]["energy"]
+    E = d["CorsikaWeightMap"]["PrimaryEnergy"]
     y, x = np.histogram(E, weights=w, bins=51, range=[p1.a, p1.b])
     Ewidth = np.ediff1d(x)
     np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / nfiles / oversampling, 5e-3)
@@ -223,21 +221,18 @@ def test_triggered_corsika(event_weight, nfiles, flux):
 def test_old_corsika_i3file(oversampling, flux):
     c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
     p1 = simweights.PowerLaw(0, 1e3, 1e4)
-    d = make_corsika_data(2212, 1, c1, p1)
-    d["CorsikaWeightMap"]["OverSampling"] = oversampling
-
-    cwm = d["CorsikaWeightMap"]
+    cwm = make_corsika_data(2212, 1, c1, p1)
+    cwm["OverSampling"] = oversampling
     wm = dataclasses.I3MapStringDouble({k: float(cwm[k][0]) for k in cwm.dtype.names})
     pp = dataclasses.I3Particle()
-    pp.type = pp.ParticleType(d["PolyplopiaPrimary"]["type"][0])
-    pp.energy = d["PolyplopiaPrimary"]["energy"][0]
-    pp.dir = dataclasses.I3Direction(d["PolyplopiaPrimary"]["zenith"][0], 0)
+    pp.type = pp.ParticleType(cwm["PrimaryType"][0])
+    pp.energy = cwm["PrimaryEnergy"][0]
     frame = icetray.I3Frame()
     frame["CorsikaWeightMap"] = wm
     frame["PolyplopiaPrimary"] = pp
     wobj = CorsikaWeighter(frame, nfiles=1)
     w = wobj.get_weights(flux)
-    assert w == approx(flux / c1.pdf(np.cos(pp.dir.zenith)) / p1.pdf(pp.energy) / oversampling)
+    assert w == approx(flux * c1.etendue / p1.pdf(pp.energy) / oversampling)
 
 
 @pytest.mark.parametrize("oversampling", (1, 10, 100, 1000))
@@ -261,16 +256,16 @@ def test_sframe_corsika_i3files(oversampling, n_events, flux):
     info.min_energy = p1.a
     info.max_energy = p1.b
 
-    pp = dataclasses.I3Particle()
-    pp.type = pp.ParticleType(d["PolyplopiaPrimary"]["type"][0])
-    pp.energy = d["PolyplopiaPrimary"]["energy"][0]
-    pp.dir = dataclasses.I3Direction(d["PolyplopiaPrimary"]["zenith"][0], 0)
+    wm = dataclasses.I3MapStringDouble()
+    wm["PrimaryEnergy"] = d["PrimaryEnergy"][0]
+    wm["PrimaryType"] = d["PrimaryType"][0]
+    wm["Weight"]  = 1.
 
     frame = icetray.I3Frame()
     frame["I3CorsikaInfo"] = info
-    frame["PolyplopiaPrimary"] = pp
+    frame["CorsikaWeightMap"]  = wm
     w = CorsikaWeighter(frame).get_weights(flux)
-    assert w == approx(flux / c1.pdf(np.cos(pp.dir.zenith)) / p1.pdf(pp.energy) / n_events / oversampling)
+    assert w == approx(flux * c1.etendue / p1.pdf(wm["PrimaryEnergy"]) / n_events / oversampling)
 
 
 @pytest.mark.parametrize("event_weight", (1e-6, 1e-3, 1))
@@ -280,12 +275,11 @@ def test_sframe_corsika_i3files(oversampling, n_events, flux):
 def test_triggered_corsika_i3file(event_weight, nevents, flux):
     c1 = simweights.NaturalRateCylinder(1200, 600, 0, 1)
     p1 = simweights.PowerLaw(0, 1e3, 1e4)
-    d = make_corsika_data(2212, 1, c1, p1)
+    cwm = make_corsika_data(2212, 1, c1, p1)
 
     primary = dataclasses.I3Particle()
     primary.type = primary.ParticleType(2212)
-    primary.dir = dataclasses.I3Direction(d["PolyplopiaPrimary"]["zenith"][0], 0)
-    primary.energy = d["PolyplopiaPrimary"]["energy"][0]
+    primary.energy = cwm["PrimaryEnergy"][0]
     weight = simclasses.I3CorsikaWeight()
     weight.primary = primary
     weight.weight = event_weight
