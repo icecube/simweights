@@ -121,6 +121,6 @@ print(f"Writing tarfile {tarfilename}")
 with tarfile.open(tarfilename, "w:gz") as tar:
     for f in outdir.iterdir():
         print(f"Adding {f} to tarball")
-        tar.add(outdir / f, arcname=f)
+        tar.add(outdir / f, arcname=f.name)
 
 print(f"Finished writing tarfile {tarfilename}")
