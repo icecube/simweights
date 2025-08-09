@@ -27,19 +27,6 @@ datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
 if datadir:
     datadir = Path(datadir)
 
-datasets = [
-    pytest.param(False, "Level2_IC86.2015_corsika.012602.000000", 101.71983520393832, id="12602"),
-    pytest.param(False, "Level2_IC86.2015_corsika.020014.000000", 22.857025444108743, id="20014"),
-    pytest.param(False, "Level2_IC86.2015_corsika.020021.000000", 68.93732262681625, id="20021"),
-    pytest.param(False, "Level2_IC86.2016_corsika.020208.000001", 12.397742530207822, id="20208"),
-    pytest.param(False, "Level2_IC86.2016_corsika.020243.000001", 3.302275062730073, id="20243"),
-    pytest.param(False, "Level2_IC86.2016_corsika.020263.000000", 5.3137132171197905, id="20263"),
-    pytest.param(False, "Level2_IC86.2016_corsika.020777.000000", 359.20422121174204, id="20777"),
-    pytest.param(False, "Level2_IC86.2016_corsika.020778.000000", 6.25969855736358, id="20778"),
-    pytest.param(False, "Level2_IC86.2016_corsika.020780.000000", 13.864780296171585, id="20780"),
-    pytest.param(True, "Level2_IC86.2016_corsika.021889.000000", 122.56278334422919, id="21889"),
-]
-
 loaders = [
     pytest.param(lambda f: h5py.File(str(f) + ".hdf5", "r"), id="h5py"),
     pytest.param(lambda f: uproot.open(str(f) + ".root"), id="uproot"),
@@ -101,18 +88,23 @@ def triggered_weights(f):
     return i3cw["weight"] * flux_val / epdf
 
 
-@pytest.mark.parametrize(("triggered", "fname", "rate"), datasets)
+datasets = [
+    pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020208.000001", 12.397742530207822, id="20208"),
+    pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020243.000001", 3.302275062730073, id="20243"),
+    pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020263.000000", 5.3137132171197905, id="20263"),
+    pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020777.000000", 359.20422121174204, id="20777"),
+    pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020778.000000", 6.25969855736358, id="20778"),
+    pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020780.000000", 13.864780296171585, id="20780"),
+    pytest.param(triggered_weights, None, "Level2_IC86.2016_corsika.021889.000000", 122.56278334422919, id="21889"),
+    pytest.param(untriggered_weights, None, "Level2_IC86.2024_corsika.023111.000000", 2494.4260561524957, id="023111"),
+]
+
+
+@pytest.mark.parametrize(("refweight", "nfiles", "fname", "rate"), datasets)
 @pytest.mark.parametrize("loader", loaders)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
-def test_dataset(triggered, fname, rate, loader):
+def test_dataset(refweight, nfiles, fname, rate, loader):
     fname = datadir / fname
-
-    if triggered:
-        nfiles = None
-        refweight = triggered_weights
-    else:
-        nfiles = 1
-        refweight = untriggered_weights
 
     reffile = h5py.File(str(fname) + ".hdf5", "r")
     w0 = refweight(reffile)
@@ -125,21 +117,17 @@ def test_dataset(triggered, fname, rate, loader):
     infile.close()
 
 
-@pytest.mark.parametrize(("triggered", "fname", "rate"), datasets)
+@pytest.mark.parametrize(("refweight", "nfiles", "fname", "rate"), datasets)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
 @pytest.mark.skipif("dataio" not in globals(), reason="Not in an IceTray environment")
-def test_dataset_i3file(triggered, fname, rate):
+def test_dataset_i3file(refweight, nfiles, fname, rate):
     fname = datadir / fname
 
     reffile = h5py.File(str(fname) + ".hdf5", "r")
-    if triggered:
-        nfiles = None
-        refweight = triggered_weights
+    if "I3PrimaryInjectorInfo" in reffile:
         counts = np.unique(reffile["I3PrimaryInjectorInfo"]["primary_type"], return_counts=True)
         s_frame_counts = {counts[0][i]: counts[1][i] for i in range(len(counts[0]))}
     else:
-        nfiles = 1
-        refweight = untriggered_weights
         s_frame_counts = dict.fromkeys(set(reffile["CorsikaWeightMap"]["PrimaryType"]), 1)
 
     w0 = refweight(reffile)

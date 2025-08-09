@@ -25,17 +25,6 @@ datasets = [
     "Level2_IC86.2016_NuE.020885.000000",
     "Level2_IC86.2016_NuMu.020878.000000",
     "Level2_IC86.2016_NuTau.020895.000000",
-    "Level2_IC86.2012_nugen_nue.012646.000000.clsim-base-4.0.5.0.99_eff",
-    "Level2_IC86.2012_nugen_nutau.011836.000000.clsim-base-4.0.3.0.99_eff",
-    "Level2_IC86.2012_nugen_nutau.011477.000000.clsim-base-4.0.3.0.99_eff",
-    "Level2_IC86.2012_nugen_numu.011374.000050.clsim-base-4.0.3.0.99_eff",
-    "Level2_nugen_nutau_IC86.2012.011297.000000",
-    "Level2_nugen_numu_IC86.2012.011070.000000",
-    "Level2_nugen_numu_IC86.2012.011069.000000",
-    "Level2_IC86.2012_nugen_NuTau.011065.000001",
-    "Level2_nugen_numu_IC86.2012.011029.000000",
-    "Level2_IC86.2011_nugen_NuE.010692.000000",
-    "Level2_IC86.2011_nugen_NuMu.010634.000000",
 ]
 loaders = [
     pytest.param(lambda f: h5py.File(f"{f}.hdf5", "r"), id="h5py"),

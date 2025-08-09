@@ -85,6 +85,13 @@ def test_two_nugen_surfaces():
 
     assert wc.sum() / (p2.b - p1.a) / c1.etendue == approx(1, 1e-5)
 
+    assert s0.equivalent(s0) is True
+    assert s2.equivalent(s2) is True
+    assert s0.equivalent(s2) is False
+    assert s2.equivalent(s0) is False
+    assert s0.equivalent(object()) is False
+    assert s0.equivalent(33) is False
+
 
 @pytest.mark.parametrize("weight", (0.1, 1, 10))
 @pytest.mark.parametrize("nfiles", (1, 10, 100))
