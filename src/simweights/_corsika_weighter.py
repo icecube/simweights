@@ -25,12 +25,7 @@ class CorsikaSurface(GenerationSurface):
 
     def get_epdf(self: CorsikaSurface, weight_cols: Mapping[str, NDArray[np.float64]]) -> NDArray[np.float64]:
         """Get the extended pdf of a sample of CORSIKA."""
-        return (
-            self.nevents
-            / weight_cols["event_weight"]
-            * self.power_law.pdf(weight_cols["energy"])
-            / self.spatial.etendue
-        )
+        return self.nevents / weight_cols["event_weight"] * self.power_law.pdf(weight_cols["energy"]) / self.spatial.etendue
 
 
 def sframe_corsika_surface(table: Any) -> CompositeSurface:

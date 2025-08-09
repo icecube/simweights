@@ -87,7 +87,7 @@ def test_old_corsika(oversampling, nfiles, flux):
     d = make_corsika_data(2212, 10000, c1, p1)
 
     d["OverSampling"] = oversampling
-    wobj = CorsikaWeighter({"CorsikaWeightMap":d}, nfiles=nfiles)
+    wobj = CorsikaWeighter({"CorsikaWeightMap": d}, nfiles=nfiles)
 
     w = wobj.get_weights(flux)
     np.testing.assert_allclose(
@@ -100,10 +100,10 @@ def test_old_corsika(oversampling, nfiles, flux):
     np.testing.assert_allclose(y, flux * Ewidth * c1.etendue / nfiles / oversampling, 5e-3)
 
     with pytest.raises(RuntimeError):
-        CorsikaWeighter({"CorsikaWeigthMap":d})
+        CorsikaWeighter({"CorsikaWeigthMap": d})
 
     with pytest.raises(TypeError):
-        CorsikaWeighter({"CorsikaWeigthMap":d}, nfiles=object())
+        CorsikaWeighter({"CorsikaWeigthMap": d}, nfiles=object())
 
     with pytest.raises(RuntimeError):
         x = {"CorsikaWeightMap": {"ParticleType": []}, "PolyplopiaPrimary": {}}
@@ -259,11 +259,11 @@ def test_sframe_corsika_i3files(oversampling, n_events, flux):
     wm = dataclasses.I3MapStringDouble()
     wm["PrimaryEnergy"] = d["PrimaryEnergy"][0]
     wm["PrimaryType"] = d["PrimaryType"][0]
-    wm["Weight"]  = 1.
+    wm["Weight"] = 1.0
 
     frame = icetray.I3Frame()
     frame["I3CorsikaInfo"] = info
-    frame["CorsikaWeightMap"]  = wm
+    frame["CorsikaWeightMap"] = wm
     w = CorsikaWeighter(frame).get_weights(flux)
     assert w == approx(flux * c1.etendue / p1.pdf(wm["PrimaryEnergy"]) / n_events / oversampling)
 

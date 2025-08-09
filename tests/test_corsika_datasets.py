@@ -87,6 +87,7 @@ def triggered_weights(f):
 
     return i3cw["weight"] * flux_val / epdf
 
+
 datasets = [
     pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020208.000001", 12.397742530207822, id="20208"),
     pytest.param(untriggered_weights, 1, "Level2_IC86.2016_corsika.020243.000001", 3.302275062730073, id="20243"),
@@ -98,7 +99,8 @@ datasets = [
     pytest.param(untriggered_weights, None, "Level2_IC86.2024_corsika.023111.000000", 2494.4260561524957, id="023111"),
 ]
 
-@pytest.mark.parametrize(("refweight","nfiles", "fname", "rate"), datasets)
+
+@pytest.mark.parametrize(("refweight", "nfiles", "fname", "rate"), datasets)
 @pytest.mark.parametrize("loader", loaders)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
 def test_dataset(refweight, nfiles, fname, rate, loader):
@@ -115,10 +117,10 @@ def test_dataset(refweight, nfiles, fname, rate, loader):
     infile.close()
 
 
-@pytest.mark.parametrize(("refweight","nfiles", "fname", "rate"), datasets)
+@pytest.mark.parametrize(("refweight", "nfiles", "fname", "rate"), datasets)
 @pytest.mark.skipif(not datadir, reason="environment variable SIMWEIGHTS_TESTDATA not set")
 @pytest.mark.skipif("dataio" not in globals(), reason="Not in an IceTray environment")
-def test_dataset_i3file(refweight,nfiles, fname, rate):
+def test_dataset_i3file(refweight, nfiles, fname, rate):
     fname = datadir / fname
 
     reffile = h5py.File(str(fname) + ".hdf5", "r")
