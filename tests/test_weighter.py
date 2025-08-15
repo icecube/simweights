@@ -4,16 +4,12 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-import contextlib
 import unittest
 from copy import deepcopy
 
 import numpy as np
 
 from simweights import TIG1996, IceTopSurface, NaturalRateCylinder, NuGenSurface, PowerLaw, Weighter
-
-with contextlib.suppress(ImportError):
-    import nuflux
 
 
 def fluxfun1(energy):
@@ -315,7 +311,7 @@ class TestWeighter(unittest.TestCase):
         weighter1.add_weight_column("energy", data1["I3Weight"]["energy"])
         weighter1.add_weight_column("cos_zen", np.cos(data1["I3Weight"]["zenith"]))
 
-        honda = nuflux.makeFlux("honda2006")
+        honda = nuflux.makeFlux("honda2006")  # noqa : F821
         w = weighter1.get_weights(honda)
         fluxval = honda.getFlux(14, data1["I3Weight"]["energy"], np.cos(data1["I3Weight"]["zenith"]))
         oneweight = weighter1.get_weights(1)
