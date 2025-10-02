@@ -43,7 +43,7 @@ for flux_model in models:
     NAME = getattr(flux_model, "name", "Northern Track 9.5 year")
 
     # print the total rate of each model
-    print(f"{NAME:26} {1e6 * weights.sum():8.2f} mHz")
+    print(f"{NAME:26} {1e6 * weights.sum():8.2f} uHz")
 
     # histogram the primary energy with the weights
     plt.hist(primary_energy, weights=weights, bins=bins, histtype="step", label=NAME)
@@ -58,3 +58,5 @@ plt.ylabel("Event Rate [Hz]")
 plt.xlim(bins[0], bins[-1])
 plt.savefig("nugen_nuflux.svg")
 plt.show()
+
+hdffile.close()
