@@ -22,11 +22,13 @@ jobs:
         os: [ubuntu-24.04]
         include:
           - python-version: "3.13"
-            os: macos-13
+            os: macos-15-intel
           - python-version: "3.13"
             os: macos-14
           - python-version: "3.13"
             os: macos-15
+          - python-version: "3.13"
+            os: macos-26
     steps:
       - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
@@ -48,7 +50,7 @@ jobs:
           SIMWEIGHTS_TESTDATA: .
         run: python3 -m pytest  --cov-report=xml --junit-xml=test-results-${{matrix.os}}-${{matrix.python-version}}.junit.xml
       - name: Upload Test Results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           if-no-files-found: error
@@ -86,7 +88,7 @@ jobs:
           SIMWEIGHTS_TESTDATA: .
         run: /opt/icetray/bin/icetray-shell python -m pytest --junit-xml=test-results-icetray.junit.xml
       - name: Upload Test Results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           if-no-files-found: error
@@ -103,7 +105,7 @@ jobs:
     if: always()
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: .
           pattern: test-results-*
