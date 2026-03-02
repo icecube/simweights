@@ -18,16 +18,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         os: [ubuntu-24.04]
         include:
-          - python-version: "3.13"
+          - python-version: "3.14"
             os: macos-15-intel
-          - python-version: "3.13"
+          - python-version: "3.14"
             os: macos-14
-          - python-version: "3.13"
+          - python-version: "3.14"
             os: macos-15
-          - python-version: "3.13"
+          - python-version: "3.14"
             os: macos-26
     steps:
       - uses: actions/checkout@v6
@@ -50,7 +50,7 @@ jobs:
           SIMWEIGHTS_TESTDATA: .
         run: python3 -m pytest  --cov-report=xml --junit-xml=test-results-${{matrix.os}}-${{matrix.python-version}}.junit.xml
       - name: Upload Test Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           if-no-files-found: error
@@ -88,7 +88,7 @@ jobs:
           SIMWEIGHTS_TESTDATA: .
         run: /opt/icetray/bin/icetray-shell python -m pytest --junit-xml=test-results-icetray.junit.xml
       - name: Upload Test Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           if-no-files-found: error
@@ -105,7 +105,7 @@ jobs:
     if: always()
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: .
           pattern: test-results-*

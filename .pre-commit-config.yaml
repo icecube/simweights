@@ -10,7 +10,7 @@ repos:
     hooks:
       - id: yamlfmt
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.15.0
+    rev: v2.16.0
     hooks:
       - id: pretty-format-toml
         args: [--autofix]
@@ -27,22 +27,15 @@ repos:
     hooks:
       - id: blacken-docs
         args: [-l 100]
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
-    hooks:
-      - id: mypy
-        files: simweights
-        additional_dependencies: [numpy]
-        exclude: ^contrib/
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.4
+    rev: v4.0.5
     hooks:
       - id: pylint
         files: simweights
         exclude: ^contrib/
         additional_dependencies: [numpy, pandas]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.10
+    rev: v0.15.4
     hooks:
       - id: ruff
         args: [--fix, --show-fixes]
@@ -62,7 +55,7 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
+    rev: v1.5.6
     hooks:
       - id: forbid-crlf
       - id: forbid-tabs

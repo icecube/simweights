@@ -21,10 +21,11 @@ classifiers = [
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
   'Programming Language :: Python :: 3.13',
+  'Programming Language :: Python :: 3.14',
   'Topic :: Scientific/Engineering :: Astronomy',
   'Topic :: Scientific/Engineering :: Physics'
 ]
-dependencies = ["numpy>=1.21.2", "scipy"]
+dependencies = ["numpy>=2", "scipy"]
 dynamic = ["version", "description"]
 keywords = ["python", "science", "astronomy", "astrophysics", "IceCube", "neutrino", "simulation"]
 license = {file = "LICENSES/BSD-2-Clause.txt"}
@@ -33,7 +34,7 @@ readme = "README.rst"
 requires-python = "~=3.8"
 
 [project.optional-dependencies]
-dev = ["pytest", "pre-commit", "reuse", "black", "ruff", "pylint", "mypy"]
+dev = ["pytest", "pre-commit", "reuse", "ruff", "pylint"]
 docs = ["sphinx", "sphinx-rtd-theme", "pandas"]
 examples = ['matplotlib']
 test = [
@@ -67,11 +68,6 @@ source = ["simweights"]
 
 [tool.doc8]
 max-line-length = 128
-
-[tool.mypy]
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-strict = true
-warn_unreachable = true
 
 [tool.pylint.format]
 max-line-length = "128"

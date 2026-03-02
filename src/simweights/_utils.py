@@ -81,6 +81,8 @@ def has_column(table: Any, name: str) -> bool:
 
 def get_column(table: Any, name: str) -> Any:
     """Helper function getting a column from a table, works with h5py, pytables, and pandas."""
+    if hasattr(table, "arrays"):
+        return table.arrays(library="np")[name]
     if hasattr(table, "cols"):
         return np.asarray(getattr(table.cols, name)[:], dtype=np.float64)
     if hasattr(table, name):
@@ -92,8 +94,6 @@ def get_column(table: Any, name: str) -> Any:
     if hasattr(table, "primary") and hasattr(table.primary.dir, name):
         return np.asarray(np.atleast_1d(getattr(table.primary.dir, name)), dtype=np.float64)
     column = table[name]
-    if hasattr(column, "array") and callable(column.array):
-        return np.asarray(column.array(library="np"), dtype=np.float64)
     return np.asarray(np.atleast_1d(column), dtype=np.float64)
 
 
