@@ -140,4 +140,4 @@ jobs:
         working-directory: ./docs
         run: |
           tar -czvf simweights_docs.tar.gz -C_build/html .
-          curl -XPUT -i --data-binary @simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${{ secrets.ICECUBE_PASSWORD }}
+          curl -XPUT -i --data-binary @simweights_docs.tar.gz https://docs.icecube.aq/api/upload?path=simweights/${{ github.ref_name }} -u icecube:${{ secrets.DOCS_ICECUBE_AQ_PASSWORD }}
