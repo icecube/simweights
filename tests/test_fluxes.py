@@ -4,17 +4,13 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-import json
 import sys
-from pathlib import Path
 
 import numpy as np
 import pytest
 
 import simweights
 
-with (Path(__file__).parent / "flux_values.json").open() as f:
-    flux_values = json.load(f)
 E = np.logspace(2, 10, 9)
 
 flux_models = [
@@ -29,6 +25,7 @@ flux_models = [
     simweights.TIG1996(),
     simweights.GlobalFitGST(),
     simweights.GlobalFitGST_IT(),
+    simweights.GlobalFitGST4Comp(),
     simweights.GlobalSplineFit(),
     simweights.GlobalSplineFit5Comp(),
     simweights.GlobalSplineFit_IT(),
@@ -39,12 +36,6 @@ flux_models = [
 
 @pytest.mark.parametrize("flux", flux_models, ids=[x.__class__.__name__ for x in flux_models])
 def test_flux_model(flux, ndarrays_regression):
-    # this is the old regression test it can stick around for a bit but will be deleted at a certain point
-    for pdgid in flux.pdgids:
-        v1 = flux(E, pdgid)
-        v2 = np.array(flux_values[flux.__class__.__name__][str(int(pdgid))]) / 1e4
-    assert v1 == pytest.approx(v2, rel=1e-13)
-
     ndarrays_regression.check({pdgid.name: flux(E, pdgid) for pdgid in flux.pdgids}, default_tolerance={"rtol": 1e-13})
     # make sure you get zero for non CR primaries
     assert flux(E, 22) == pytest.approx(0)
