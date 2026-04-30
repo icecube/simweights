@@ -36,8 +36,8 @@ for filename in filelist:
             # get the info from the frame
             info = frame["I3PrimaryInjectorInfo"]
 
-            for k in I3PrimaryInjectorInfo:
-                I3PrimaryInjectorInfo[k].append(getattr(info, k))
+            for k, v in I3PrimaryInjectorInfo.items():
+                v.append(getattr(info, k))
 
         # if this is a physics event in the right sub-event stream
         elif frame.Stop == frame.Physics and frame["I3EventHeader"].sub_event_stream == "InIceSplit":

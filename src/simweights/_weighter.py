@@ -6,15 +6,17 @@ from __future__ import annotations
 
 import inspect
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Iterable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from scipy.integrate import quad  # pylint: disable=import-error
+from scipy.integrate import quad
 
 from ._generation_surface import CompositeSurface
 from ._utils import get_column, get_table
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
     from numpy.typing import ArrayLike, NDArray
 
 

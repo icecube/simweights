@@ -36,8 +36,6 @@ class PowerLaw:
         b (float): Upper bound of the support of the distribution.
     """
 
-    # pylint: disable=invalid-name
-
     def __init__(self: PowerLaw, g: float, a: float, b: float) -> None:
         assert b > a
         self.g = float(g)

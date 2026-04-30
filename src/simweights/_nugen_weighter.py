@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -90,7 +91,6 @@ def nugen_surface(table: Any) -> CompositeSurface:
 
 
 def NuGenWeighter(file_obj: Any, nfiles: float) -> Weighter:  # noqa: N802
-    # pylint: disable=invalid-name
     """Weighter for neutrino-generator (NuGen) simulation.
 
     Does not use S-Frames and stores the surface information in an I3MapStringDouble so that the user

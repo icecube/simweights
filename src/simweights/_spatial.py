@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -150,7 +150,6 @@ class CircleInjector:
 
     def projected_area(self: CircleInjector, cos_zen: float) -> float:  # noqa: ARG002
         """Returns the cross sectional area of the injection area in cm^2."""
-        # pylint: disable=unused-argument
         return self._cap
 
     def pdf(self: CircleInjector, cos_zen: ArrayLike) -> NDArray[np.float64]:
@@ -174,4 +173,4 @@ class CircleInjector:
         )
 
 
-SpatialDist = Union[CylinderBase, CircleInjector]
+SpatialDist = CylinderBase | CircleInjector

@@ -70,7 +70,7 @@ To run pre-commit on all files without making a commit you can just run::
 
 in the base of the simweights directory.
 
-The checks include isort, flake8, pylint, and mypy.
+The checks include isort, and mypy.
 Be sure that all checks pass before submitting a pull request.
 
 Tests

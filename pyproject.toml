@@ -15,8 +15,6 @@ classifiers = [
   'Operating System :: MacOS :: MacOS X',
   'Operating System :: POSIX :: Linux',
   'Programming Language :: Python',
-  'Programming Language :: Python :: 3.8',
-  'Programming Language :: Python :: 3.9',
   'Programming Language :: Python :: 3.10',
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
@@ -31,10 +29,10 @@ keywords = ["python", "science", "astronomy", "astrophysics", "IceCube", "neutri
 license = {file = "LICENSES/BSD-2-Clause.txt"}
 name = "simweights"
 readme = "README.rst"
-requires-python = "~=3.8"
+requires-python = "~=3.10"
 
 [project.optional-dependencies]
-dev = ["pytest", "pre-commit", "reuse", "ruff", "pylint"]
+dev = ["pytest", "pre-commit", "reuse", "ruff"]
 docs = ["sphinx", "sphinx-rtd-theme", "pandas"]
 examples = ['matplotlib']
 test = [
@@ -69,12 +67,6 @@ source = ["simweights"]
 [tool.doc8]
 max-line-length = 128
 
-[tool.pylint.format]
-max-line-length = "128"
-
-[tool.pylint.messages_control]
-disable = "C0114,R0902,R0913,R0917,R0914,R0911"
-
 [tool.pytest.ini_options]
 addopts = ["-ra", "--strict-config", "--strict-markers", "--cov=simweights", "-W ignore"]
 filterwarnings = ["error"]
@@ -94,19 +86,17 @@ ignore = [
   "S101",  # assert-used
   "COM812",  # conflicts with ruff formatter
   "ISC001",  # conflicts with ruff formatter
-  "PLR0913",  # Too many arguments in function definition
   "PLR0911",  # Too many return statement
   "PLW1641"  # object does not implement `__hash__` method
 ]
 select = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"contrib/*" = ["T201"]
+"contrib/*" = ["T201"]  # flake8-print
 "examples/*" = [
   "D",  # pydocstyle
   "F401",  # unused-import
   "T201",  # flake8-print
-  "PLC0206",  # Extracting value from dictionary without calling `.items()`
   "N802"  # Function name should be lowercase
 ]
 "tests/*" = [
@@ -114,7 +104,6 @@ select = ["ALL"]
   "N",  # pep8-naming
   "ANN",  # flake8-annotations
   "PT",  # flake8-pytest-style
-  "PGH001",  # eval
   "SLF001",  # private-member-access
   "PLR2004",  # magic-value-comparison
   "PLR0915",  # too-many-statements
@@ -128,7 +117,7 @@ convention = "google"
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py3{10,11,12,13}
+envlist = py3{10,11,12,13,14}
 isolated_build = True
 
 [testenv]

@@ -13,8 +13,6 @@ class PDGCode(IntEnum):
     only used for cosmic-ray flux models and is limited to particle types in these models.
     """
 
-    # pylint: disable=invalid-name
-
     MuMinus = 13
     MuPlus = -13
     NuE = 12

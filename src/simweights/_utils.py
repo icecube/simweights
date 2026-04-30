@@ -4,18 +4,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.random import Generator, RandomState  # pylint: disable=no-name-in-module
+from numpy.random import Generator, RandomState
 
 from ._pdgcode import PDGCode
 
 if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import ArrayLike, NDArray
 
-GeneratorType = Union[Generator, RandomState]
-SeedType = Union[GeneratorType, int, None]
+GeneratorType = Generator | RandomState
+SeedType = GeneratorType | int | None
 
 
 class Column:
