@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import numbers
 import warnings
-from typing import TYPE_CHECKING, Any, Mapping
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -17,6 +17,8 @@ from ._utils import constcol, get_column, get_table, has_column, has_table
 from ._weighter import Weighter
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from numpy.typing import NDArray
 
 
@@ -94,7 +96,6 @@ def weight_map_corsika_surface(table: Any) -> CompositeSurface:
 
 
 def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # noqa: N802
-    # pylint: disable=invalid-name
     """Weighter for CORSIKA-in-ice simulation made with I3CORSIKAReader.
 
     I3CORSIKAReader not use S-Frames and stores the surface information in an I3MapStringDouble so that

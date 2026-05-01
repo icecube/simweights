@@ -1,8 +1,7 @@
 # SPDX-FileCopyrightText: © 2022 the SimWeights contributors
 #
 # SPDX-License-Identifier: BSD-2-Clause
-# pylint: disable=too-few-public-methods
-# flake8: noqa: N801 N803
+# ruff: noqa: N801 N803
 
 """A collection of cosmic ray flux parametrizations.
 
@@ -19,15 +18,17 @@ However they have been refactored to:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Mapping, Sequence
+from typing import TYPE_CHECKING
 
 from numpy import asarray, bool_, broadcast_arrays, exp, float64, genfromtxt, int32, piecewise, sqrt
 from numpy import sum as nsum
-from scipy.interpolate import PchipInterpolator  # pylint: disable=import-error
+from scipy.interpolate import PchipInterpolator
 
 from ._pdgcode import PDGCode
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping, Sequence
+
     from numpy.typing import ArrayLike, NDArray
 
 PDGID_4COMP = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus)
@@ -81,7 +82,6 @@ class CosmicRayFlux:
         energy: NDArray[float64],  # noqa: ARG002
         pdgid: NDArray[int32],
     ) -> list[NDArray[bool_]]:
-        # pylint: disable=unused-argument
         return [pdgid == p for p in self.pdgids]
 
     def __call__(self: CosmicRayFlux, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
@@ -144,7 +144,6 @@ class Hoerandel5(CosmicRayFlux):
 class Hoerandel_IT(CosmicRayFlux):
     """Modified 5-component Hoerandel spectrum with N and Al replaced by O."""
 
-    # pylint: disable=invalid-name
     pdgids = PDGID_4COMP
     _funcs = (
         lambda E: 1.1776445965025136 * E**-2.71 * (1 + (E / (4.49e6 * 1)) ** 1.9) ** (-2.1 / 1.9),
@@ -240,7 +239,6 @@ class GaisserH4a_IT(CosmicRayFlux):
     flux\ [#Aartsen]_.
     """
 
-    # pylint: disable=invalid-name
     pdgids = PDGID_4COMP
     _funcs = (
         lambda E: (
@@ -324,7 +322,7 @@ class GlobalFitGST(CosmicRayFlux):
     )
 
 
-class GlobalFitGST_IT(CosmicRayFlux):  # pylint: disable=invalid-name
+class GlobalFitGST_IT(CosmicRayFlux):
     r"""GlobalFitGST for four components [p, He, O, Fe].
 
     The Oxygen group is the sum of Nitrogen and Aluminum groups of GlobalFitGST.
@@ -390,7 +388,7 @@ class GlobalSplineFit5Comp(GlobalSplineFitBase):
         super().__init__()
 
 
-class GlobalSplineFit_IT(GlobalSplineFitBase):  # pylint: disable=invalid-name
+class GlobalSplineFit_IT(GlobalSplineFitBase):
     r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
 
     [(H),  (He),  (Li, Be, B, C, N, O, F, Ne),  (Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]

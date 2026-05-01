@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import numpy as np
 
@@ -40,7 +41,7 @@ def sframe_icetop_surface(table: Any) -> CompositeSurface:
 
     for i, nevents in enumerate(n_events):
         assert power_law_index[i] <= 0
-        spectrum = PowerLaw(  # pylint: disable=duplicate-code
+        spectrum = PowerLaw(
             power_law_index[i],
             min_energy[i],
             max_energy[i],
@@ -58,7 +59,6 @@ def sframe_icetop_surface(table: Any) -> CompositeSurface:
 
 
 def IceTopWeighter(file_obj: Any) -> Weighter:  # noqa: N802
-    # pylint: disable=invalid-name
     """Weighter for IceTop CORSIKA simulation made with I3TopSimulator.cxx."""
     surface = sframe_icetop_surface(get_table(file_obj, "I3TopInjectorInfo"))
     weighter = Weighter([file_obj], surface)

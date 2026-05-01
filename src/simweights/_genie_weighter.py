@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterable, Mapping
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -17,6 +17,8 @@ from ._utils import constcol, get_column, get_table, has_column, has_table
 from ._weighter import Weighter
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterable, Mapping
+
     from np.typing import ArrayLike, NDArray
 
     from simweights._pdgcode import PDGCode
@@ -129,7 +131,6 @@ def genie_reader_surface(table: Iterable[Mapping[str, float]]) -> CompositeSurfa
 
 
 def GenieWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # noqa: N802
-    # pylint: disable=invalid-name
     """Weighter for GENIE simulation.
 
     Reads ``I3GenieInfo`` from S-Frames and ``I3GenieResult`` from Q-Frames for genie-reader files
