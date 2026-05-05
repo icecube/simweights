@@ -87,7 +87,7 @@ class CosmicRayFlux:
     def __call__(self: CosmicRayFlux, energy: ArrayLike, pdgid: ArrayLike) -> NDArray[float64]:
         energy_arr, pdgid_arr = broadcast_arrays(energy, pdgid)
         pcond = self._condition(energy_arr, pdgid_arr)
-        return piecewise(energy, pcond, self._funcs)  # type: ignore[no-any-return,call-overload]
+        return piecewise(energy, pcond, self._funcs)
 
 
 class Hoerandel(CosmicRayFlux):
