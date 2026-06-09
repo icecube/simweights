@@ -20,6 +20,7 @@ flux_models = [
     simweights.GaisserHillas(),
     simweights.GaisserH3a(),
     simweights.GaisserH4a(),
+    simweights.GaisserH4a2Comp(),
     simweights.GaisserH4a_IT(),
     simweights.Honda2004(),
     simweights.TIG1996(),

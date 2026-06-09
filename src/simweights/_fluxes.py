@@ -232,6 +232,32 @@ class GaisserH4a(CosmicRayFlux):
     )
 
 
+class GaisserH4a2Comp(CosmicRayFlux):
+    r"""Variation of Gaisser's H4a flux using only two components.
+
+    *This is not a very physical flux*: The light group is the sum of H4a's proton and helium groups. Heavy group is the rest.
+    """
+
+    pdgids = PDGID_2COMP
+    _funcs = (
+        lambda E: (
+            0.7860 * E**-2.66 * exp(-E / (4e6 * 1))
+            + 0.0020 * E**-2.4 * exp(-E / (3e7 * 1))
+            + 0.0200 * E**-2.6 * exp(-E / 6e10)
+            + 0.3550 * E**-2.58 * exp(-E / (4e6 * 2))
+            + 0.0020 * E**-2.4 * exp(-E / (3e7 * 2))
+        ),
+        lambda E: (
+            0.2200 * E**-2.63 * exp(-E / (4e6 * 7))
+            + 0.00134 * E**-2.4 * exp(-E / (3e7 * 7))
+            + 0.1430 * E**-2.67 * exp(-E / (4e6 * 13))
+            + 0.00134 * E**-2.4 * exp(-E / (3e7 * 13))
+            + 0.2120 * E**-2.63 * exp(-E / (4e6 * 26))
+            + 0.00134 * E**-2.4 * exp(-E / (3e7 * 26))
+        ),
+    )
+
+
 class GaisserH4a_IT(CosmicRayFlux):
     r"""Variation of Gaisser's H4a flux using only four components.
 
