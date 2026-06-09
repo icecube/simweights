@@ -463,7 +463,7 @@ class GlobalSplineFit_IT(GlobalSplineFitBase):
 
 
 class GlobalSplineFit2Comp(GlobalSplineFitBase):
-    r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
+    r"""Sum of the flux of the GSF model for a 2-component dataset injected by IceCube.
 
     [(H, He),  (Li, Be, B, C, N, O, F, Ne, Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]
     GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]_.
