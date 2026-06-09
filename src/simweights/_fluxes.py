@@ -436,7 +436,7 @@ class GlobalSplineFit_IT(GlobalSplineFitBase):
         super().__init__()
 
 
-class GlobalSplineFit2Comp_IT(GlobalSplineFitBase):
+class GlobalSplineFit2Comp(GlobalSplineFitBase):
     r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
 
     [(H, He),  (Li, Be, B, C, N, O, F, Ne, Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]
@@ -446,7 +446,7 @@ class GlobalSplineFit2Comp_IT(GlobalSplineFitBase):
     pdgids = PDGID_2COMP
     groups = ((1, 2), (3, 28))
 
-    def __init__(self: GlobalSplineFit2Comp_IT) -> None:
+    def __init__(self: GlobalSplineFit2Comp) -> None:
         super().__init__()
 
 
