@@ -434,7 +434,8 @@ class GlobalSplineFit_IT(GlobalSplineFitBase):
 
     def __init__(self: GlobalSplineFit_IT) -> None:
         super().__init__()
-        
+
+
 class GlobalSplineFit2Comp_IT(GlobalSplineFitBase):
     r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
 
