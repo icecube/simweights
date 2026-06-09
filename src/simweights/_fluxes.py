@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike, NDArray
 
+PDGID_2COMP = (PDGCode.PPlus, PDGCode.Fe56Nucleus)
 PDGID_4COMP = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus)
 PDGID_5COMP = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.N14Nucleus, PDGCode.Al27Nucleus, PDGCode.Fe56Nucleus)
 PDGID_ALL = (
@@ -432,6 +433,19 @@ class GlobalSplineFit_IT(GlobalSplineFitBase):
     groups = ((1, 1), (2, 2), (3, 10), (11, 28))
 
     def __init__(self: GlobalSplineFit_IT) -> None:
+        super().__init__()
+        
+class GlobalSplineFit_IT_2comp(GlobalSplineFitBase):
+    r"""Sum of the flux of the GSF model for the standard 4 components injected by IceCube.
+
+    [(H, He),  (Li, Be, B, C, N, O, F, Ne, Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]
+    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]_.
+    """
+
+    pdgids = PDGID_4COMP
+    groups = ((1, 2), (3, 28))
+
+    def __init__(self: GlobalSplineFit_IT_2comp) -> None:
         super().__init__()
 
 
