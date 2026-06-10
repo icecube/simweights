@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike, NDArray
 
+PDGID_2COMP = (PDGCode.PPlus, PDGCode.Fe56Nucleus)
 PDGID_4COMP = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.O16Nucleus, PDGCode.Fe56Nucleus)
 PDGID_5COMP = (PDGCode.PPlus, PDGCode.He4Nucleus, PDGCode.N14Nucleus, PDGCode.Al27Nucleus, PDGCode.Fe56Nucleus)
 PDGID_ALL = (
@@ -228,6 +229,32 @@ class GaisserH4a(CosmicRayFlux):
         lambda E: 0.2200 * E**-2.63 * exp(-E / (4e6 * 7)) + 0.00134 * E**-2.4 * exp(-E / (3e7 * 7)),
         lambda E: 0.1430 * E**-2.67 * exp(-E / (4e6 * 13)) + 0.00134 * E**-2.4 * exp(-E / (3e7 * 13)),
         lambda E: 0.2120 * E**-2.63 * exp(-E / (4e6 * 26)) + 0.00134 * E**-2.4 * exp(-E / (3e7 * 26)),
+    )
+
+
+class GaisserH4a2Comp(CosmicRayFlux):
+    r"""Variation of Gaisser's H4a flux using only two components.
+
+    *This is not a very physical flux*: The light group is the sum of H4a's proton and helium groups. Heavy group is the rest.
+    """
+
+    pdgids = PDGID_2COMP
+    _funcs = (
+        lambda E: (
+            0.7860 * E**-2.66 * exp(-E / (4e6 * 1))
+            + 0.0020 * E**-2.4 * exp(-E / (3e7 * 1))
+            + 0.0200 * E**-2.6 * exp(-E / 6e10)
+            + 0.3550 * E**-2.58 * exp(-E / (4e6 * 2))
+            + 0.0020 * E**-2.4 * exp(-E / (3e7 * 2))
+        ),
+        lambda E: (
+            0.2200 * E**-2.63 * exp(-E / (4e6 * 7))
+            + 0.00134 * E**-2.4 * exp(-E / (3e7 * 7))
+            + 0.1430 * E**-2.67 * exp(-E / (4e6 * 13))
+            + 0.00134 * E**-2.4 * exp(-E / (3e7 * 13))
+            + 0.2120 * E**-2.63 * exp(-E / (4e6 * 26))
+            + 0.00134 * E**-2.4 * exp(-E / (3e7 * 26))
+        ),
     )
 
 
@@ -432,6 +459,20 @@ class GlobalSplineFit_IT(GlobalSplineFitBase):
     groups = ((1, 1), (2, 2), (3, 10), (11, 28))
 
     def __init__(self: GlobalSplineFit_IT) -> None:
+        super().__init__()
+
+
+class GlobalSplineFit2Comp(GlobalSplineFitBase):
+    r"""Sum of the flux of the GSF model for a 2-component dataset injected by IceCube.
+
+    [(H, He),  (Li, Be, B, C, N, O, F, Ne, Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni)]
+    GSF is a Data-driven spline fit of the cosmic ray spectrum by Dembinski et. al. \ [#GSFDembinski]_.
+    """
+
+    pdgids = PDGID_2COMP
+    groups = ((1, 2), (3, 28))
+
+    def __init__(self: GlobalSplineFit2Comp) -> None:
         super().__init__()
 
 

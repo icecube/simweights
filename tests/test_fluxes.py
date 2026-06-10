@@ -20,6 +20,7 @@ flux_models = [
     simweights.GaisserHillas(),
     simweights.GaisserH3a(),
     simweights.GaisserH4a(),
+    simweights.GaisserH4a2Comp(),
     simweights.GaisserH4a_IT(),
     simweights.Honda2004(),
     simweights.TIG1996(),
@@ -27,6 +28,7 @@ flux_models = [
     simweights.GlobalFitGST_IT(),
     simweights.GlobalFitGST4Comp(),
     simweights.GlobalSplineFit(),
+    simweights.GlobalSplineFit2Comp(),
     simweights.GlobalSplineFit5Comp(),
     simweights.GlobalSplineFit_IT(),
     simweights.FixedFractionFlux({2212: 0.1, 1000020040: 0.2, 1000080160: 0.3, 1000260560: 0.4}),
@@ -43,6 +45,7 @@ def test_flux_model(flux, ndarrays_regression):
 
 gsfmodels = [
     simweights.GlobalSplineFit(),
+    simweights.GlobalSplineFit2Comp(),
     simweights.GlobalSplineFit5Comp(),
     simweights.GlobalSplineFit_IT(),
 ]
