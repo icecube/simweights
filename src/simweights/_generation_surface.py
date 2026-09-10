@@ -3,14 +3,14 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from simweights._pdgcode import PDGCode
-from simweights._powerlaw import PowerLaw
-from simweights._spatial import SpatialDist
+from simweights._powerlaw import PowerLaw, resolve_powerlaw
+from simweights._spatial import SpatialDist, resolve_spatial
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -68,6 +68,67 @@ class GenerationSurface:
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.pdgid.name}, {self.nevents}, {self.power_law}, {self.spatial})"
+
+    def to_dict(self) -> dict[str, Any]:
+        # json safe state
+        return {
+            "pdgid": int(self.pdgid.value),
+            "nevents": float(self.nevents),
+            "power_law": {
+                "cls": type(self.power_law).__name__,
+                "params": self.power_law.to_dict()
+            },
+            "spatial": {
+                "cls": type(self.spatial).__name__,
+                "params": self.spatial.to_dict()
+            }
+        }
+
+    @classmethod
+    def from_dict(cls, state: "Mapping[str, Any]") -> Self:
+        # ensure required params are included
+        # need to check explicitly as we have to rebuild powerlaw and spatial objects before initializing
+        required = ("power_law", "spatial", "pdgid", "nevents")
+        missing = [param for param in required if param not in state]
+        if missing:
+            raise TypeError(f"{cls.__name__}.from_dict: missing required keys {missing}, got {sorted(state)}")
+
+        # ensure nevents is a float or int
+        nevents = state["nevents"]
+        if isinstance(nevents, bool) or not isinstance(nevents, (int, float)):
+            raise TypeError(f"{cls.__name__}.from_dict: 'nevents' must be a number, got {type(nevents).__name__}")
+
+        # ensure pdgid is an int (enumification validates the int is valid later)
+        pdgid = state["pdgid"]
+        if isinstance(pdgid, bool) or not isinstance(pdgid, int):
+            raise TypeError(f"{cls.__name__}.from_dict: 'pdgid' must be an int, got {type(pdgid).__name__}")
+
+        # reconstruct powerlaw and spatial objects
+        rebuilt_state = dict(state)
+        for p, resolve in (("power_law", resolve_powerlaw), ("spatial", resolve_spatial)):
+            # ensure value is a dict
+            sub = state[p]
+            if not isinstance(sub, dict):
+                raise TypeError(f"{cls.__name__}.from_dict: '{p}' must be a dict, got {type(sub).__name__}")
+            if set(sub) != {"cls", "params"}:
+                raise TypeError(f"{cls.__name__}.from_dict: '{p}' must have keys 'cls' and 'params', got {sorted(sub)}")
+
+            # make sure class name is a str
+            name = sub["cls"]
+            if not isinstance(name, str):
+                raise TypeError(f"{cls.__name__}.from_dict: '{p}.cls' must be a str, got {type(name).__name__}")
+
+            # make sure params is a dict
+            params = sub["params"]
+            if not isinstance(params, dict):
+                raise TypeError(f"{cls.__name__}.from_dict: '{p}.params' must be a dict, got {type(params).__name__}")
+
+            # resolver rejects unknown names
+            # class itself validates params
+            rebuilt_state[p] = resolve(name).from_dict(params)
+
+        # rely on init to validate rest
+        return cls(**rebuilt_state)
 
 
 class CompositeSurface:
@@ -186,3 +247,36 @@ class CompositeSurface:
 
     def __repr__(self) -> str:
         return self.__class__.__name__ + "(\n  " + ",\n  ".join(repr(y) for x in self.components.values() for y in x) + ",\n)"
+
+    def to_dict(self) -> dict[str, Any]:
+        # store flattened list of serialized surfaces
+        # init will rebuild
+        return {"components": [s.to_dict() for lst in self.components.values() for s in lst]}
+
+    @classmethod
+    def from_dict(cls, state: dict[str, Any]) -> Self:
+        # ensure all required keys exist
+        required = ("components",)
+        missing = [param for param in required if param not in state]
+        if missing:
+            raise TypeError(f"{cls.__name__}.from_dict: missing required keys {missing}, got {sorted(state)}")
+
+        # ensure components is a list
+        components = state["components"]
+        if not isinstance(components, list):
+            raise TypeError(f"{cls.__name__}.from_dict: 'components' must be a list, got {type(components).__name__}")
+
+        # rebuild each surface
+        surfaces = []
+        for i, surface_dict in enumerate(state["components"]):
+            # ensure surface_dict is a dict
+            if not isinstance(surface_dict, dict):
+                raise TypeError(
+                    f"{cls.__name__}.from_dict: 'components' must be a list of dicts, got {type(surface_dict).__name__} at index {i}"
+                )
+
+            # class itself validates surface_dict
+            surfaces.append(GenerationSurface.from_dict(surface_dict))
+
+        return cls(*surfaces)
+

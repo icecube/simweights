@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 import numpy as np
 
@@ -123,3 +123,31 @@ class PowerLaw:
             mesg = f"{self} cannot be compared to {other}"
             raise TypeError(mesg)
         return self.g == other.g and self.a == other.a and self.b == other.b
+
+    def to_dict(self: PowerLaw) -> dict[str, float]:
+        # json safe state
+        return {param: float(getattr(self, param)) for param in ("g", "a", "b")}
+
+    @classmethod
+    def from_dict(cls: type[PowerLaw], state: dict[str, float]) -> Self:
+        # ensure correct types
+        for k, v in state.items():
+            if isinstance(v, bool) or not isinstance(v, (float, int)):
+                raise TypeError(f"{cls.__name__}.from_dict: '{k}' must be a number, got {type(v).__name__}")
+
+        # rely on init to validate the rest
+        return cls(**state)
+
+
+# although only one power law class, just adding so if more get added later
+# backwards compatibility wont be a problem
+_POWERLAW_CLASSES = {cls.__name__: cls for cls in (PowerLaw,)}
+
+def resolve_powerlaw(name: str) -> type[PowerLaw]:
+    """Resolve a powerlaw class object from its name."""
+    if name not in _POWERLAW_CLASSES:
+        raise ValueError(
+            f"resolve_powerlaw: unknown power law class {name!r}, expected one of {sorted(_POWERLAW_CLASSES)}"
+        )
+
+    return _POWERLAW_CLASSES[name]

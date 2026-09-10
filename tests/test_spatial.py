@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+import json
 import unittest
 
 import numpy as np
@@ -13,10 +14,46 @@ from simweights import (
     NaturalRateCylinder,
     UniformSolidAngleCylinder,
 )
-from simweights._spatial import CylinderBase
+from simweights._spatial import CylinderBase, resolve_spatial
 
 
 class TestSpatial(unittest.TestCase):
+
+    def check_round_trip(self, c):
+        state = c.to_dict()
+
+        # json safe
+        self.assertEqual(json.loads(json.dumps(state)), state)
+
+        # round trip
+        self.assertEqual(type(c).from_dict(state), c)
+
+        # class name round trips through resolve
+        self.assertIs(resolve_spatial(type(c).__name__), type(c))
+        self.assertEqual(resolve_spatial(type(c).__name__).from_dict(state), c)
+
+        # extra params raise
+        with self.assertRaises(TypeError):
+            type(c).from_dict({**state, "bogus": 1})
+
+        # missing params raise
+        random_key = next(iter(state))
+        with self.assertRaises(TypeError):
+            type(c).from_dict({k: v for k, v in state.items() if k != random_key})
+
+        # non numeric values rejected
+        for bad in ("1.0", None, True, [1.0]):
+            with self.assertRaises(TypeError):
+                type(c).from_dict({**state, random_key: bad})
+
+    def test_resolve_spatial(self):
+        for cls in (CylinderBase, UniformSolidAngleCylinder, NaturalRateCylinder, CircleInjector):
+            self.assertIs(resolve_spatial(cls.__name__), cls)
+
+        for bad in ("", "bogus", "np", "resolve_spatial"):
+            with self.assertRaises(ValueError):
+                resolve_spatial(bad)
+
     def check_diff_etendue(self, c, le, r):
         le *= 1e2
         r *= 1e2
@@ -91,6 +128,8 @@ class TestSpatial(unittest.TestCase):
             c.pdf(0.5)
         self.assertEqual(c, c)
 
+        self.check_round_trip(c)
+
     def test_natural_rate_cylinder(self):
         last_c1 = None
         for le in range(100, 1000, 300):
@@ -98,6 +137,8 @@ class TestSpatial(unittest.TestCase):
                 c1 = NaturalRateCylinder(le, r, -1, 1)
                 self.check_diff_etendue(c1, le, r)
                 self.check_pdf_etendue(c1, 2 * np.pi**2 * r * (r + le))
+
+                self.check_round_trip(c1)
 
                 c2 = NaturalRateCylinder(le, r, -1, 0)
                 self.check_pdf_etendue(c2, np.pi**2 * r * (r + le))
@@ -145,6 +186,8 @@ class TestSpatial(unittest.TestCase):
                 self.check_diff_etendue(c1, le, r)
                 self.check_uniform_pdf(c1, 4 * np.pi, np.pi / 2 * r * (r + le))
 
+                self.check_round_trip(c1)
+
                 c2 = UniformSolidAngleCylinder(le, r, -1, 0)
                 self.check_uniform_pdf(c2, 2 * np.pi, np.pi / 2 * r * (r + le))
 
@@ -188,6 +231,8 @@ class TestSpatial(unittest.TestCase):
         for r in range(100, 1000, 300):
             c1 = CircleInjector(r, -1, 1)
             self.check_circle(c1, 4e4 * np.pi**2 * r**2)
+
+            self.check_round_trip(c1)
 
             c2 = CircleInjector(r, -1, 0)
             self.check_circle(c2, 2e4 * np.pi**2 * r**2)

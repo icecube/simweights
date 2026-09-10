@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+import json
 import unittest
 from copy import deepcopy
 
@@ -263,6 +264,87 @@ class Testgeneration_surface(unittest.TestCase):
         self.assertEqual(eval("".join(s[4].split()[-4:])[:-1]), self.c1)
         self.assertEqual(eval("".join(s[4].split()[-7:-4])[:-1]), self.p1)
         self.assertEqual(s[5], ">")
+
+    def check_surface_round_trip(self, s):
+        state = s.to_dict()
+
+        # json safe
+        self.assertEqual(json.loads(json.dumps(state)), state)
+
+        # round trip
+        rebuilt = GenerationSurface.from_dict(state)
+        self.assertEqual(rebuilt, s)
+
+        # from_dict shouldnt mutate the state it was handed
+        self.assertEqual(state, s.to_dict())
+
+    def test_surface_to_from_dict(self):
+        for s in (self.s0, self.s1, self.s2, self.s3, self.s4):
+            self.check_surface_round_trip(s)
+
+    def test_composite_to_from_dict(self):
+        for c in (self.gsc1, self.gsc2, self.gsc3, self.gsc4, CompositeSurface()):
+            state = c.to_dict()
+
+            # json safe
+            self.assertEqual(json.loads(json.dumps(state)), state)
+
+            # round trip
+            self.assertEqual(CompositeSurface.from_dict(state), c)
+
+        # merged nevents survive the flatten and rebuild
+        rebuilt = CompositeSurface.from_dict(self.gsc1.to_dict())
+        self.assertEqual(len(rebuilt.components[2212]), 1)
+        self.assertEqual(rebuilt.components[2212][0].nevents, 30000)
+
+    def test_surface_from_dict_errors(self):
+        state = self.s0.to_dict()
+
+        for key in ("pdgid", "nevents", "power_law", "spatial"):
+            with self.assertRaises(TypeError):
+                GenerationSurface.from_dict({k: v for k, v in state.items() if k != key})
+
+        for bad in ("2212", None, True, 2212.0, [2212]):
+            with self.assertRaises(TypeError):
+                GenerationSurface.from_dict({**state, "pdgid": bad})
+
+        for bad in ("10000", None, True, [10000]):
+            with self.assertRaises(TypeError):
+                GenerationSurface.from_dict({**state, "nevents": bad})
+
+        # correct type but invalid particle
+        with self.assertRaises(ValueError):
+            GenerationSurface.from_dict({**state, "pdgid": 999999})
+
+        for p in ("power_law", "spatial"):
+            for bad in (None, [], "PowerLaw", {}, {"cls": "PowerLaw"}, {"cls": 1, "params": {}},
+                        {"cls": "PowerLaw", "params": None}, {**state[p], "extra": 1}):
+                with self.assertRaises(TypeError):
+                    GenerationSurface.from_dict({**state, p: bad})
+
+            # resolve reject unknown names
+            with self.assertRaises(ValueError):
+                GenerationSurface.from_dict({**state, p: {**state[p], "cls": "Bogus"}})
+
+        # init still validates own params
+        with self.assertRaises(ValueError):
+            GenerationSurface.from_dict(
+                {**state, "spatial": {**state["spatial"], "params": {**state["spatial"]["params"], "cos_zen_min": 2.0}}},
+            )
+
+    def test_composite_from_dict_errors(self):
+        state = self.gsc1.to_dict()
+
+        with self.assertRaises(TypeError):
+            CompositeSurface.from_dict({})
+
+        for bad in (None, 47, {}, "components"):
+            with self.assertRaises(TypeError):
+                CompositeSurface.from_dict({"components": bad})
+
+        for bad in (None, 47, "surface", []):
+            with self.assertRaises(TypeError):
+                CompositeSurface.from_dict({"components": [*state["components"], bad]})
 
 
 if __name__ == "__main__":

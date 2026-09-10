@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 
+import json
 import unittest
 
 import numpy as np
@@ -11,6 +12,7 @@ from scipy import stats
 from scipy.integrate import quad
 
 from simweights import PowerLaw
+from simweights._powerlaw import resolve_powerlaw
 
 
 class TestPowerLaw(unittest.TestCase):
@@ -145,6 +147,45 @@ class TestPowerLaw(unittest.TestCase):
             p == object()  # noqa: B015
         with self.assertRaises(TypeError):
             p == np.array([])  # noqa: B015
+
+    def check_round_trip(self, p):
+        state = p.to_dict()
+
+        # json safe
+        self.assertEqual(json.loads(json.dumps(state)), state)
+
+        # round trip
+        self.assertEqual(type(p).from_dict(state), p)
+
+        # class name round trips through resolve
+        self.assertIs(resolve_powerlaw(type(p).__name__), type(p))
+        self.assertEqual(resolve_powerlaw(type(p).__name__).from_dict(state), p)
+
+        # extra params raise
+        with self.assertRaises(TypeError):
+            type(p).from_dict({**state, "bogus": 1})
+
+        # missing params raise
+        random_key = next(iter(state))
+        with self.assertRaises(TypeError):
+            type(p).from_dict({k: v for k, v in state.items() if k != random_key})
+
+        # non numeric values rejected
+        for bad in ("1.0", None, True, [1.0]):
+            with self.assertRaises(TypeError):
+                type(p).from_dict({**state, random_key: bad})
+
+    def test_resolve_powerlaw(self):
+        for cls in (PowerLaw,):
+            self.assertIs(resolve_powerlaw(cls.__name__), cls)
+
+        for bad in ("", "bogus", "np", "resolve_powerlaw"):
+            with self.assertRaises(ValueError):
+                resolve_powerlaw(bad)
+
+    def test_round_trip(self):
+        self.check_round_trip(PowerLaw(1, 1, 1000))
+
 
 
 if __name__ == "__main__":

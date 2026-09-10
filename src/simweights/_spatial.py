@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import numpy as np
 
@@ -72,6 +72,20 @@ class CylinderBase:
             and self.cos_zen_min == other.cos_zen_min
             and self.cos_zen_max == other.cos_zen_max
         )
+
+    def to_dict(self: CylinderBase) -> dict[str, float]:
+        # json safe state
+        return {param: float(getattr(self, param)) for param in ("length", "radius", "cos_zen_min", "cos_zen_max")}
+
+    @classmethod
+    def from_dict(cls: type[CylinderBase], state: dict[str, int | float]) -> Self:
+        # ensure correct types
+        for k, v in state.items():
+            if isinstance(v, bool) or not isinstance(v, (float, int)):
+                raise TypeError(f"{cls.__name__}.from_dict: '{k}' must be a number, got {type(v).__name__}")
+
+        # rely on init to validate the rest
+        return cls(**state)
 
 
 class UniformSolidAngleCylinder(CylinderBase):
@@ -172,5 +186,33 @@ class CircleInjector:
             and self.cos_zen_max == other.cos_zen_max
         )
 
+    def to_dict(self: CircleInjector) -> dict[str, float]:
+        # json safe state
+        return {param: float(getattr(self, param)) for param in ("radius", "cos_zen_min", "cos_zen_max")}
+
+    @classmethod
+    def from_dict(cls: type[CircleInjector], state: dict[str, float]) -> Self:
+        # ensure correct types
+        for k, v in state.items():
+            if isinstance(v, bool) or not isinstance(v, (float, int)):
+                raise TypeError(f"{cls.__name__}.from_dict: '{k}' must be a number, got {type(v).__name__}")
+
+        # rely on init to validate the rest
+        return cls(**state)
+
 
 SpatialDist = CylinderBase | CircleInjector
+
+
+_SPATIAL_CLASSES = {
+    cls.__name__: cls for cls in (CylinderBase, UniformSolidAngleCylinder, NaturalRateCylinder, CircleInjector)
+}
+
+def resolve_spatial(name: str) -> type[SpatialDist]:
+    """Resolve a spatial distribution class object from its name."""
+    if name not in _SPATIAL_CLASSES:
+        raise ValueError(
+            f"resolve_spatial: unknown spatial distribution class {name!r}, expected one of {sorted(_SPATIAL_CLASSES)}"
+        )
+
+    return _SPATIAL_CLASSES[name]
