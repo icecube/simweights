@@ -18,7 +18,6 @@ from simweights._spatial import CylinderBase, resolve_spatial
 
 
 class TestSpatial(unittest.TestCase):
-
     def check_round_trip(self, c):
         state = c.to_dict()
 

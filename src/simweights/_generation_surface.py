@@ -74,14 +74,8 @@ class GenerationSurface:
         return {
             "pdgid": int(self.pdgid.value),
             "nevents": float(self.nevents),
-            "power_law": {
-                "cls": type(self.power_law).__name__,
-                "params": self.power_law.to_dict()
-            },
-            "spatial": {
-                "cls": type(self.spatial).__name__,
-                "params": self.spatial.to_dict()
-            }
+            "power_law": {"cls": type(self.power_law).__name__, "params": self.power_law.to_dict()},
+            "spatial": {"cls": type(self.spatial).__name__, "params": self.spatial.to_dict()},
         }
 
     @classmethod
@@ -279,4 +273,3 @@ class CompositeSurface:
             surfaces.append(GenerationSurface.from_dict(surface_dict))
 
         return cls(*surfaces)
-

@@ -143,11 +143,10 @@ class PowerLaw:
 # backwards compatibility wont be a problem
 _POWERLAW_CLASSES = {cls.__name__: cls for cls in (PowerLaw,)}
 
+
 def resolve_powerlaw(name: str) -> type[PowerLaw]:
     """Resolve a powerlaw class object from its name."""
     if name not in _POWERLAW_CLASSES:
-        raise ValueError(
-            f"resolve_powerlaw: unknown power law class {name!r}, expected one of {sorted(_POWERLAW_CLASSES)}"
-        )
+        raise ValueError(f"resolve_powerlaw: unknown power law class {name!r}, expected one of {sorted(_POWERLAW_CLASSES)}")
 
     return _POWERLAW_CLASSES[name]

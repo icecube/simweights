@@ -317,8 +317,16 @@ class Testgeneration_surface(unittest.TestCase):
             GenerationSurface.from_dict({**state, "pdgid": 999999})
 
         for p in ("power_law", "spatial"):
-            for bad in (None, [], "PowerLaw", {}, {"cls": "PowerLaw"}, {"cls": 1, "params": {}},
-                        {"cls": "PowerLaw", "params": None}, {**state[p], "extra": 1}):
+            for bad in (
+                None,
+                [],
+                "PowerLaw",
+                {},
+                {"cls": "PowerLaw"},
+                {"cls": 1, "params": {}},
+                {"cls": "PowerLaw", "params": None},
+                {**state[p], "extra": 1},
+            ):
                 with self.assertRaises(TypeError):
                     GenerationSurface.from_dict({**state, p: bad})
 

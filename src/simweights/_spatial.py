@@ -204,9 +204,8 @@ class CircleInjector:
 SpatialDist = CylinderBase | CircleInjector
 
 
-_SPATIAL_CLASSES = {
-    cls.__name__: cls for cls in (CylinderBase, UniformSolidAngleCylinder, NaturalRateCylinder, CircleInjector)
-}
+_SPATIAL_CLASSES = {cls.__name__: cls for cls in (CylinderBase, UniformSolidAngleCylinder, NaturalRateCylinder, CircleInjector)}
+
 
 def resolve_spatial(name: str) -> type[SpatialDist]:
     """Resolve a spatial distribution class object from its name."""

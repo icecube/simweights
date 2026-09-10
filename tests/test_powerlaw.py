@@ -187,6 +187,5 @@ class TestPowerLaw(unittest.TestCase):
         self.check_round_trip(PowerLaw(1, 1, 1000))
 
 
-
 if __name__ == "__main__":
     unittest.main()
