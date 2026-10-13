@@ -6,6 +6,7 @@
 
 import contextlib
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -22,7 +23,7 @@ from simweights._utils import constcol
 with contextlib.suppress(ImportError):
     from icecube import dataio, simclasses  # noqa: F401
 
-flux = GaisserH4a()
+gaisser_h4a = GaisserH4a()
 datadir = os.environ.get("SIMWEIGHTS_TESTDATA", None)
 if datadir:
     datadir = Path(datadir)
@@ -40,7 +41,7 @@ loaders = [
 
 def untriggered_weights(f):
     cwm = f["CorsikaWeightMap"]
-    pflux = flux(cwm["PrimaryEnergy"], cwm["PrimaryType"])
+    pflux = gaisser_h4a(cwm["PrimaryEnergy"], cwm["PrimaryType"])
     if (cwm["PrimarySpectralIndex"] == -1).any():
         assert (cwm["PrimarySpectralIndex"] == -1).all()
         energy_integral = np.log(cwm["EnergyPrimaryMax"] / cwm["EnergyPrimaryMin"])
@@ -56,7 +57,7 @@ def untriggered_weights(f):
 
 def triggered_weights(f):
     i3cw = f["I3CorsikaWeight"]
-    flux_val = flux(i3cw["energy"], i3cw["type"])
+    flux_val = gaisser_h4a(i3cw["energy"], i3cw["type"])
     info = f["I3PrimaryInjectorInfo"]
     energy = i3cw["energy"]
     epdf = np.zeros_like(energy, dtype=float)
@@ -111,9 +112,12 @@ def test_dataset(refweight, nfiles, fname, rate, loader):
 
     infile = loader(fname)
     wobj = CorsikaWeighter(infile, nfiles)
-    w = wobj.get_weights(flux)
+    w = wobj.get_weights(gaisser_h4a)
     assert w.sum() == pytest.approx(rate)
     assert w0 == pytest.approx(w, 1e-6)
+    text = wobj.tostring(gaisser_h4a)
+    match = re.search(r"Event Rate\s+:(.*)Hz", text)
+    assert float(match.group(1)) == pytest.approx(rate, abs=2)
     infile.close()
 
 
@@ -140,7 +144,7 @@ def test_dataset_i3file(refweight, nfiles, fname, rate):
             continue
         ww = CorsikaWeighter(frame, nfiles)
         pdgid = ww.get_weight_column("pdgid")[0]
-        w = ww.get_weights(flux) / s_frame_counts[pdgid]
+        w = ww.get_weights(gaisser_h4a) / s_frame_counts[pdgid]
         assert w == pytest.approx(w0[i], 1e-6)
         i += 1
         W += w

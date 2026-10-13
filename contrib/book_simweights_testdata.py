@@ -62,6 +62,7 @@ keys = {
         "I3CorsikaInfo",
         "CorsikaWeightMap",
         "I3CorsikaWeight",
+        "PolyplopiaPrimary",
     ],
     "nugen": ["I3MCWeightDict"],
     "genie": [

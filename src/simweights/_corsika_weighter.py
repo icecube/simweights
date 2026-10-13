@@ -163,5 +163,7 @@ def CorsikaWeighter(file_obj: Any, nfiles: float | None = None) -> Weighter:  # 
         weighter.add_weight_column("energy", weighter.get_column("CorsikaWeightMap", "PrimaryEnergy"))
         weighter.add_weight_column("pdgid", weighter.get_column("CorsikaWeightMap", "PrimaryType").astype(np.int64))
         weighter.add_weight_column("event_weight", weighter.get_column("CorsikaWeightMap", "Weight"))
+        if has_table(file_obj, "PolyplopiaPrimary"):
+            weighter.add_weight_column("cos_zen", np.cos(weighter.get_column("PolyplopiaPrimary", "zenith")))
 
     return weighter

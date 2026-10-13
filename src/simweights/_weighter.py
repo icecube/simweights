@@ -273,10 +273,13 @@ class Weighter:
         output = str(self.surface) + "\n"
         output += f"Weight Columns   : {', '.join(self.colnames)}\n"
         output += f"Number of Events : {len(self.get_weights(1)):8d}\n"
-        eff_area = self.effective_area(
-            self.surface.get_energy_range(None),
-            self.surface.get_cos_zenith_range(None),
-        )
+        try:
+            eff_area = self.effective_area(
+                self.surface.get_energy_range(None),
+                self.surface.get_cos_zenith_range(None),
+            )
+        except KeyError:
+            eff_area = [[float("nan")]]
         output += f"Effective Area   : {eff_area[0][0]:8.6g} m²\n"
         if flux:
             weights = self.get_weights(flux)
