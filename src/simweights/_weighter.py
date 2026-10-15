@@ -263,7 +263,7 @@ class Weighter:
     def __radd__(self: Weighter, other: Weighter | int) -> Weighter:
         return self + other
 
-    def tostring(self: Weighter, flux: None | object | Callable[[Any], ArrayLike] | ArrayLike = None) -> str:
+    def tostring(self: Weighter, flux: object | Callable[[Any], ArrayLike] | ArrayLike | None = None) -> str:
         """Creates a string with important information about this weighting object.
 
         Generation surface, event map, number of events, and effective area.
