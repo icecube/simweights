@@ -19,7 +19,7 @@ repos:
     hooks:
       - id: reuse
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: v2.4.3
     hooks:
       - id: codespell
   - repo: https://github.com/adamchainz/blacken-docs
@@ -28,7 +28,7 @@ repos:
       - id: blacken-docs
         args: [-l 100]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.21
+    rev: v0.17.1
     hooks:
       - id: ruff
         args: [--fix, --show-fixes]
@@ -76,7 +76,7 @@ repos:
       - id: trailing-whitespace
         exclude: \.svg$
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: "3.6.1"
+    rev: "3.11.1"
     hooks:
       - id: editorconfig-checker
         alias: ec

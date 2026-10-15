@@ -83,6 +83,7 @@ namespace-packages = ["examples", "contrib", "docs"]
 fixable = ["I", "Q"]
 ignore = [
   "ANN401",  # any-type
+  "CPY001",  # Missing copyright notice at top of file
   "S101",  # assert-used
   "COM812",  # conflicts with ruff formatter
   "PLR0911",  # Too many return statement
