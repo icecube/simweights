@@ -415,7 +415,7 @@ class GlobalSplineFitBase(CosmicRayFlux):
     groups: Sequence[tuple[int, int]]
 
     def __init__(self: GlobalSplineFitBase) -> None:
-        data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt")
+        data = genfromtxt(Path(__file__).parent / "gsf_data_table.txt", encoding="utf-8")
         energy = data.T[0]
         elements = data.T[1:]
         self._funcs = []
